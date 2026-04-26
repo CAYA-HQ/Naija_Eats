@@ -11,7 +11,7 @@ const SetBudget = () => {
 
   return (
     <div className=" h-full flex flex-col justify-center items-center gap-4 px-4 pb-5">
-      <h1 className="text-[32px] text-left font-bold mb-8 px-5">
+      <h1 className="text-[32px] text-left font-bold mb-8">
         What's your weekly food budget?
       </h1>
       <ul className="flex-col w-full justify-start items-center gap-5">
@@ -31,7 +31,7 @@ const SetBudget = () => {
       />
       <p className="italic text-left w-full">This can be changed ANYTIME</p>
       <Link
-        className="py-3 px-6 rounded-xl border-2 border-text-primary text-text-primary w-full mx-auto max-w-[200px] my-4 uppercase "
+        className="py-3 px-6 rounded-xl border-2 border-text-primary text-text-primary text-center w-full mx-auto max-w-[200px] my-4 uppercase "
         to="/onboarding/cooking-frequency"
       >
         Next

@@ -6,7 +6,7 @@ const Buffer = () => {
 
   return (
     <div className=" h-full flex flex-col justify-center items-center gap-4 px-4 pb-5">
-      <h1 className="text-[32px] text-left font-bold mb-8 px-5">
+      <h1 className="text-[32px] text-left font-bold mb-8">
         Select your buffer range?
       </h1>
       <p className="italic text-left">
@@ -30,7 +30,7 @@ const Buffer = () => {
       <p className="italic text-left w-full">We’ll plan accordingly</p>
       <Link
         to="/onboarding/food-preferences"
-        className="py-3 px-6 rounded-xl border-2 border-text-primary text-text-primary w-full mx-auto max-w-[200px] my-4 uppercase"
+        className="py-3 px-6 rounded-xl border-2 border-text-primary text-text-primary text-center w-full mx-auto max-w-[200px] my-4 uppercase"
       >
         Next
       </Link>
