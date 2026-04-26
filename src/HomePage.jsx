@@ -1,11 +1,12 @@
 const HomePage = () => {
-  const budgets = ["4000-5000", "5500-7000", ""];
+  const currentStep = 0;
+  const budgets = ["4000-5000", "5500-7000", "7000-10000", "10500+"];
   return (
-    <div className="pt-51">
+    <div className=" h-full flex flex-col justify-center items-center gap-4 pb-5">
       <h1 className="text-[32px] text-left font-bold mb-8 px-5">
         What's your weekly food budget?
       </h1>
-      <ul className="flex-col justify-start items-center gap-5">
+      <ul className="flex-col w-full justify-start items-center gap-5">
         {budgets.map((budget) => (
           <li className="flex items-center gap-1 p-4" key={budget}>
             <input type="checkbox" />
@@ -13,6 +14,23 @@ const HomePage = () => {
           </li>
         ))}
       </ul>
+      <input type="text" name="custom-range" id="range" />
+      <p className="italic text-left">This can be changed ANYTIME</p>
+      <button className="py-3 px-6 rounded-xl border-2 border-text-primary text-text-primary w-full mx-auto max-w-[200px] my-4 uppercase ">
+        Next
+      </button>
+      <div className="flex gap-5 items-center justify-start">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div
+            key={index}
+            className={`rounded-full transition-all duration-300 ${
+              index === currentStep
+                ? "w-3 h-3 bg-text-primary border border-text-primary"
+                : "w-3 h-3 bg-transparent border border-text-primary"
+            }`}
+          ></div>
+        ))}
+      </div>
     </div>
   );
 };
