@@ -1,5 +1,5 @@
-const HomePage = () => {
-  const currentStep = 0
+const SetBudget = () => {
+  const currentStep = 0;
   const budgets = ["4000-5000", "5500-7000", "7000-10000", "10500+"];
   return (
     <div className=" h-full flex flex-col justify-center items-center gap-4 px-4 pb-5">
@@ -41,4 +41,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default SetBudget;
