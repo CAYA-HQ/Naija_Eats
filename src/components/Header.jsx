@@ -1,7 +1,14 @@
+import { useNavigate } from "react-router-dom";
+
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative top-0 left-0 mt-8 flex justify-center items-center gap-10">
-      <span className="absolute left-6 top-1/2 -translate-y-1/2">
+      <span
+        className="absolute left-6 top-1/2 -translate-y-1/2 cursor-pointer active:scale-95 transition-transform"
+        onClick={() => navigate(-1)}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24px"
