@@ -1,24 +1,22 @@
 import { Link } from "react-router-dom";
 
-const CookingFrequency = () => {
-  const currentStep = 2;
-  const frequency = [
-    "Daily (7 days)",
-    "Most Days (5 - 6 days)",
-    "Once in a while (3 - 4)",
-    "Rarely (1 - 2)",
-  ];
+const Buffer = () => {
+  const currentStep = 3;
+  const buffers = ["10%", "15%", "20%", "No Buffer"];
 
   return (
     <div className=" h-full flex flex-col justify-center items-center gap-4 px-4 pb-5">
       <h1 className="text-[32px] text-left font-bold mb-8 px-5">
-        How often do you cook?
+        Select your buffer range?
       </h1>
+      <p className="italic text-left">
+        This is allow for price fluctuations while shopping
+      </p>
       <ul className="flex-col w-full justify-start items-center gap-5">
-        {frequency.map((f) => (
-          <li className="flex items-center gap-1 py-4" key={f}>
+        {buffers.map((buffer) => (
+          <li className="flex items-center gap-1 py-4" key={buffer}>
             <input type="checkbox" />
-            {f}
+            {buffer}
           </li>
         ))}
       </ul>
@@ -31,7 +29,7 @@ const CookingFrequency = () => {
       />
       <p className="italic text-left w-full">We’ll plan accordingly</p>
       <Link
-        to="/onboarding/buffer"
+        to="/onboarding/food-preferences"
         className="py-3 px-6 rounded-xl border-2 border-text-primary text-text-primary w-full mx-auto max-w-[200px] my-4 uppercase"
       >
         Next
@@ -52,4 +50,4 @@ const CookingFrequency = () => {
   );
 };
 
-export default CookingFrequency;
+export default Buffer;
