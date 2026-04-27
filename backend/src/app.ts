@@ -2,7 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import supabaseRoutes from './routes/supabaseTest';
+import mealsRoutes from './routes/meals';
 
 const app: Application = express();
 
@@ -11,6 +11,8 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+app.use('/', mealsRoutes)
 
 // Routes
 pp.get('/health', (req: Request, res: Response) => {
