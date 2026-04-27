@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import supabaseRoutes from './routes/supabaseTest';
 
 const app: Application = express();
 
@@ -12,7 +13,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.get('/health', (req: Request, res: Response) => {
+pp.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', message: 'Server is healthy' });
 });
 
