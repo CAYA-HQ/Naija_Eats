@@ -3,11 +3,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-background: #ffffff;
+  --color-bg-background: #f5f5dc;
   --color-text-primary: #182d09;
   --color-accent-orange: #f97316;
   --color-text-link: #2d5016;
-  --text-subheading: 20px;
+  --color-body: #43493d;
+  --color-text-muted: #64748b;
+  --text-subheading: 2rem;
   --font-display: "Playfair Display", serif;
   --font-inter: "Inter", sans-serif;
 }
