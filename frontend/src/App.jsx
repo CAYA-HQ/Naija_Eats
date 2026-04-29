@@ -7,15 +7,23 @@ import SetBudget from "./onboarding/SetBudget";
 import WelcomePage from "./onboarding/WelcomePage";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { RequireOnboarding } from "./RequireOnboarding";
-import Buffer from "./onboarding/Buffer";
+// import Buffer from "./onboarding/Buffer";
+import FoodPreferences from "./onboarding/FoodPreferences";
+import SignIn from "./pages/auth/SignIn";
+import SignUp from "./pages/auth/SignUp";
+import GeneratingPlan from "./onboarding/GeneratingPlan";
 
 function App() {
   const location = useLocation();
-  const isOnboarding = location.pathname.includes("/onboarding/welcome");
+  const hideGlobalHeader =
+    location.pathname.includes("/onboarding/welcome") ||
+    location.pathname.includes("/onboarding/generating-plan") ||
+    location.pathname.includes("/sign-in") ||
+    location.pathname.includes("/sign-up");
 
   return (
     <>
-      {!isOnboarding && <Header />}
+      {!hideGlobalHeader && <Header />}
       <Routes>
         <Route element={<RequireOnboarding />}>
           <Route path="/" element={<HomePage />} />
@@ -26,7 +34,17 @@ function App() {
           path="/onboarding/cooking-frequency"
           element={<CookingFrequency />}
         />
-        <Route path="/onboarding/buffer" element={<Buffer />} />
+        {/* <Route path="/onboarding/buffer" element={<Buffer />} /> */}
+        <Route
+          path="/onboarding/food-preferences"
+          element={<FoodPreferences />}
+        />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route
+          path="/onboarding/generating-plan"
+          element={<GeneratingPlan />}
+        />
       </Routes>
     </>
   );
