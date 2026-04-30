@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import mealsRoutes from './routes/meals';
+import authRoutes from './routes/auth'
 
 const app: Application = express();
 
@@ -13,9 +14,10 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 app.use('/', mealsRoutes)
+app.use('/auth', authRoutes)
 
 // Routes
-pp.get('/health', (req: Request, res: Response) => {
+app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', message: 'Server is healthy' });
 });
 
