@@ -6,11 +6,10 @@ const GeneratingPlan = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Sequence the animation steps
     const timer1 = setTimeout(() => setCurrentStep(2), 2500);
     const timer2 = setTimeout(() => setCurrentStep(3), 5000);
     const timer3 = setTimeout(() => setCurrentStep(4), 7500);
-    const timer4 = setTimeout(() => navigate("/"), 9000); // Redirect to home when fully done
+    const timer4 = setTimeout(() => navigate("/onboarding/meal-plan"), 9000);
 
     return () => {
       clearTimeout(timer1);
@@ -22,7 +21,6 @@ const GeneratingPlan = () => {
 
   return (
     <main className="flex-1 flex flex-col items-center justify-center p-6 w-full max-w-md mx-auto">
-      {/* Spinner Section */}
       <div className="relative w-56 h-56 mb-10 flex items-center justify-center">
         {/* Animated concentric rings */}
         <div className="absolute inset-0 rounded-full border-[5px] border-[#d8e3d2]/50"></div>
