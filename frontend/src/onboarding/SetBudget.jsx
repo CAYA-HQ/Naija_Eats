@@ -1,6 +1,11 @@
 import { useState } from "react";
 import OnboardingLayout from "../components/OnboardingLayout";
-import { WeeklyIcon, MonthlyIcon, ProInsightIcon } from "../constants/icons";
+import {
+  WeeklyIcon,
+  MonthlyIcon,
+  ProInsightIcon,
+  CircleAlertIcon,
+} from "../constants/icons";
 
 const SetBudget = () => {
   const [budgetTier, setBudgetTier] = useState("Standard");
@@ -8,11 +13,17 @@ const SetBudget = () => {
   const [frequency, setFrequency] = useState("Weekly");
   const [selectedBuffer, setSelectedBuffer] = useState("10%");
 
-  const handleTierChange = (tier) => {
+  const handleTierChange = (tier, currentFreq = frequency) => {
     setBudgetTier(tier);
-    if (tier === "Low cost") setBudgetValue("4500-7000");
-    else if (tier === "Standard") setBudgetValue("7000-10000");
-    else if (tier === "Premium") setBudgetValue("10000-15000");
+    if (currentFreq === "Weekly") {
+      if (tier === "Low cost") setBudgetValue("4500-7000");
+      else if (tier === "Standard") setBudgetValue("7000-10000");
+      else if (tier === "Premium") setBudgetValue("10000-15000");
+    } else {
+      if (tier === "Low cost") setBudgetValue("30000-50000");
+      else if (tier === "Standard") setBudgetValue("50000-70000");
+      else if (tier === "Premium") setBudgetValue("70000-100000");
+    }
   };
 
   const tiers = ["Low cost", "Standard", "Premium"];
@@ -35,11 +46,11 @@ const SetBudget = () => {
       </p>
 
       <div className="bg-text-muted/10 rounded-2xl p-5 mb-5 relative">
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={budgetValue}
           onChange={(e) => setBudgetValue(e.target.value)}
-          className="text-base font-bold w-full border-none font-inter pl-6 py-2 focus:border-b-2 focus:border-b-text-primary focus:outline-0" 
+          className="text-base font-bold w-full border-none font-inter pl-6 py-2 focus:border-b-2 focus:border-b-text-primary focus:outline-0"
         />
         <span className="text-base text-text-primary absolute top-1/2 -translate-y-1/2 left-6 font-bold">
           ₦
@@ -65,14 +76,17 @@ const SetBudget = () => {
         Average meal in Lagos starts from ₦4,500
       </p>
 
-      <h2 className="text-sm font-bold text-inter uppercase tracking-wider mb-3">
+      <span className="text-sm font-bold text-inter uppercase tracking-wider">
         Frequency
-      </h2>
-      <div className="flex gap-3 mb-6">
+      </span>
+      <div className="flex gap-3 my-4">
         {["Weekly", "Monthly"].map((freq) => (
           <button
             key={freq}
-            onClick={() => setFrequency(freq)}
+            onClick={() => {
+              setFrequency(freq);
+              handleTierChange(budgetTier, freq);
+            }}
             className={`flex-1 py-4 px-4 rounded-xl flex flex-col items-center gap-2 transition-all duration-300 cursor-pointer ${
               frequency === freq
                 ? "bg-text-primary/10 text-text-primary border-2 border-text-primary"
@@ -92,10 +106,10 @@ const SetBudget = () => {
       </div>
 
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-bold uppercase tracking-wider">
+        <span className="text-sm font-inter font-bold uppercase tracking-wider">
           Fluctuation Buffer
-        </h2>
-        <span className="text-text-muted text-sm cursor-pointer">ⓘ</span>
+        </span>
+        <CircleAlertIcon className={"text-xs"} />
       </div>
       <div className="flex gap-2 mb-6">
         {bufferOptions.map((opt) => (

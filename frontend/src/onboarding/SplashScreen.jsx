@@ -4,7 +4,7 @@ const SplashScreen = () => {
   return (
     <div className="bg-bg-background grid place-items-center">
       <img
-        src="/images/naijaeats.png"
+        src="/images/naijaeats.webp"
         alt="Naija Eats Logo"
         className="w-full"
       />

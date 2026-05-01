@@ -1,12 +1,12 @@
 // import React from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 import {
   HeartIcon,
   ChevronRightIcon,
   ShoppingCartIcon,
-  FlameIcon,
   StopWatch,
-  MenuLinesIcon,
+  BoltIcon,
 } from "../constants/icons";
 
 const MealPlan = () => {
@@ -33,7 +33,7 @@ const MealPlan = () => {
       <div className="bg-[#2d4a1e] rounded-3xl overflow-hidden text-white relative shadow-[0_10px_25px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:-translate-y-1">
         <div className="w-full h-[220px] relative">
           <img
-            src="/images/jollof.png"
+            src="/images/jollof.webp"
             alt="Smoky Jollof"
             className="w-full h-full object-cover"
           />
@@ -63,7 +63,7 @@ const MealPlan = () => {
               <span>45 mins</span>
             </div>
             <div className="flex items-center gap-1">
-              <FlameIcon className="w-4 h-4" />
+              <BoltIcon className="w-4 h-4" />
               <span>520 kcal</span>
             </div>
           </div>
@@ -73,7 +73,7 @@ const MealPlan = () => {
       <div className="flex flex-col gap-4">
         <div className="bg-[#2d4a1e] rounded-2xl flex items-center p-3 gap-4 text-white no-underline transition-colors duration-200 hover:bg-[#385a26] cursor-pointer">
           <img
-            src="/images/salad.png"
+            src="/images/salad.webp"
             alt="Garden Egg Salad"
             className="w-[60px] h-[60px] rounded-lg object-cover"
           />
@@ -93,7 +93,7 @@ const MealPlan = () => {
 
         <div className="bg-[#2d4a1e] rounded-2xl flex items-center p-3 gap-4 text-white no-underline transition-colors duration-200 hover:bg-[#385a26] cursor-pointer">
           <img
-            src="/images/egusi.png"
+            src="/images/egusi.webp"
             alt="Lean Beef Egusi"
             className="w-[60px] h-[60px] rounded-lg object-cover"
           />
@@ -128,7 +128,10 @@ const MealPlan = () => {
               <span className="flex-1 text-text-primary font-medium text-[0.95rem] ml-4">
                 {item.meal}
               </span>
-              <MenuLinesIcon className="text-accent-orange opacity-60 w-5 h-5" />
+              <div className="flex justify-center flex-col items-center gap-1">
+                <div className="w-5 h-0.5 bg-accent-orange"></div>
+                <div className="w-5 h-0.5 bg-accent-orange"></div>
+              </div>
             </div>
           ))}
         </div>
@@ -145,21 +148,25 @@ const MealPlan = () => {
           All ingredients for this week are automatically calculated for your
           cart.
         </p>
-        <button className="bg-transparent border border-text-primary text-text-primary px-6 py-2.5 rounded-lg font-semibold text-[0.9rem] cursor-pointer transition-all duration-200 w-full hover:bg-text-primary hover:text-white">
+        <Button
+          variant="outline"
+          className="w-full text-[0.9rem] py-2.5"
+          onClick={() => navigate("/market")}
+        >
           View Shopping List
-        </button>
+        </Button>
       </div>
 
       <div className="flex flex-col gap-3 mt-2">
-        <button
-          className="bg-accent-orange text-white border-none py-3.5 rounded-lg font-bold text-base cursor-pointer transition-colors duration-200 hover:bg-[#e66a14]"
-          onClick={() => navigate("/weekly-plan")}
-        >
+        <Button variant="primary" onClick={() => navigate("/weekly-plan")}>
           View Full Plan
-        </button>
-        <button className="bg-white border-[1.5px] border-[#2d4a1e] text-[#2d4a1e] py-3.5 rounded-lg font-bold text-base cursor-pointer transition-all duration-200 hover:bg-[#f8fcf5]">
+        </Button>
+        <Button
+          variant="outline"
+          className="border-[#2d4a1e] text-[#2d4a1e] hover:bg-[#2d4a1e]/5"
+        >
           Regenerate Plan
-        </button>
+        </Button>
       </div>
     </div>
   );

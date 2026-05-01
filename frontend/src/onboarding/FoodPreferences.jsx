@@ -8,6 +8,7 @@ import {
   ForkAndKnife,
   StopWatch,
   LeafIcon,
+  SnackIcon,
 } from "../constants/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -24,22 +25,22 @@ const FoodPreferences = () => {
   const preferences = [
     {
       category: "Traditional Nigerian Meals",
-      image: "/images/traditional-meals.png",
+      image: "/images/traditional-meals.webp",
       icon: <ForkAndKnife />,
     },
     {
       category: "Quick Meals",
-      image: "/images/quick-meals.png",
+      image: "/images/quick-meals.webp",
       icon: <StopWatch />,
     },
     {
       category: "Light Snacks",
-      image: "/images/light-snacks.png",
-      icon: "🍞",
+      image: "/images/light-snacks.webp",
+      icon: <SnackIcon />,
     },
     {
       category: "Vegetarian Options",
-      image: "/images/vegetarian-options.png",
+      image: "/images/vegetarian-options.webp",
       icon: <LeafIcon />,
     },
   ];
@@ -121,9 +122,7 @@ const FoodPreferences = () => {
           <h2 className="text-base font-bold">Dietary Requirements</h2>
         </div>
 
-        <p className="text-sm font-medium mb-3">
-          Do you have any allergies?
-        </p>
+        <p className="text-sm font-medium mb-3">Do you have any allergies?</p>
 
         {/* Allergy Input */}
         <div className="relative mb-4">

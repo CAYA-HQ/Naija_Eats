@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Button from "../components/Button";
 import {
   SearchIcon,
   HomeIcon,
@@ -116,9 +117,9 @@ const Market = () => {
 
       {/* Floating Action Button */}
       <div className="fixed bottom-24 left-5 right-5 z-50">
-        <button className="w-full bg-accent-orange text-white py-4 rounded-2xl font-bold active:scale-95 transition-transform">
+        <Button variant="primary" className="w-full rounded-2xl">
           Mark all as bought
-        </button>
+        </Button>
       </div>
 
       {/* Bottom Navigation */}

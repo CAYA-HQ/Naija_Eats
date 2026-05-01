@@ -2,10 +2,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import CustomCheckbox from "../../components/CustomCheckbox";
+import Button from "../../components/Button";
+import { AppleIcon, GoogleIcon } from "../../constants/icons";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const handleToggleTerms = () => {};
+  const [isTerms, setTerms] = useState(false);
+  const handleToggleTerms = () => {
+    setTerms(!isTerms);
+  };
 
   return (
     <>
@@ -29,6 +34,7 @@ const SignUp = () => {
                 type="text"
                 placeholder="Enter your full name"
                 className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                required
               />
             </div>
 
@@ -40,6 +46,7 @@ const SignUp = () => {
                 type="email"
                 placeholder="name@example.com"
                 className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                required
               />
             </div>
 
@@ -57,7 +64,8 @@ const SignUp = () => {
                 <input
                   type="tel"
                   placeholder="8012345678"
-                  className="flex-1 border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                  className="flex-1 border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm w-full focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                  required
                 />
               </div>
             </div>
@@ -71,6 +79,7 @@ const SignUp = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a strong password"
                   className="w-full border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                  required
                 />
                 <button
                   type="button"
@@ -95,8 +104,13 @@ const SignUp = () => {
             </div>
 
             <div className="flex items-start justify-start gap-3 mt-2">
-              <button onClick={handleToggleTerms}>
-                <CustomCheckbox checked={handleToggleTerms} />
+              <button
+                id="terms"
+                type="button"
+                className="cursor-pointer"
+                onClick={() => handleToggleTerms()}
+              >
+                <CustomCheckbox checked={isTerms} />
               </button>
               <label
                 htmlFor="terms"
@@ -114,10 +128,7 @@ const SignUp = () => {
               </label>
             </div>
 
-            <button
-              type="button"
-              className="bg-accent-orange hover:bg-orange-600 text-white font-semibold font-inter py-3 rounded-lg flex justify-center items-center gap-2 transition-all mt-4 text-base"
-            >
+            <Button variant="primary" className="mt-4">
               Create Account
               <svg
                 width="20"
@@ -132,7 +143,7 @@ const SignUp = () => {
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
               </svg>
-            </button>
+            </Button>
 
             <div className="flex items-center gap-4 my-2">
               <div className="h-px bg-text-muted/30 flex-1"></div>
@@ -143,18 +154,14 @@ const SignUp = () => {
             </div>
 
             <div className="flex gap-4">
-              <button
-                type="button"
-                className="flex-1 border-2 border-text-primary text-text-primary font-bold py-3 rounded-lg hover:bg-gray-50 transition-all flex justify-center items-center text-base font-inter"
-              >
+              <Button variant="outline" className="flex-1">
+                <GoogleIcon />
                 Google
-              </button>
-              <button
-                type="button"
-                className="flex-1 border-2 border-text-primary text-text-primary font-bold py-3 rounded-lg hover:bg-gray-50 transition-all flex justify-center items-center text-base"
-              >
+              </Button>
+              <Button variant="outline" className="flex-1 group">
+                <AppleIcon className={"group-hover:text-white"} />
                 Apple
-              </button>
+              </Button>
             </div>
 
             <div className="text-center mt-3">
@@ -173,7 +180,7 @@ const SignUp = () => {
       </main>
 
       <footer className="py-6 flex flex-col items-center gap-4 text-[13px] text-gray-500 px-4 bg-[#ececd6] mt-auto">
-        <div className="flex gap-6 font-medium">
+        <div className="flex gap-3 font-medium">
           <a href="#" className="hover:text-text-link transition-colors">
             Help Center
           </a>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
+import Button from "../../components/Button";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -11,7 +12,7 @@ const SignIn = () => {
       <main className="flex-1 flex flex-col p-4 gap-6">
         <div className="relative rounded-xl overflow-hidden h-48 w-full shadow-lg shrink-0">
           <img
-            src="/images/sign-in-hero.png"
+            src="/images/sign-in-hero.webp"
             alt="Nigerian Jollof Rice"
             className="w-full h-full object-cover"
           />
@@ -86,9 +87,9 @@ const SignIn = () => {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="bg-accent-orange hover:bg-orange-600 text-white font-semibold py-3 rounded-lg flex justify-center items-center gap-2 transition-all mt-4 font-inter text-base cursor-pointer"
+            <Button
+              variant="primary"
+              className="mt-4"
             >
               Sign In
               <svg
@@ -104,7 +105,7 @@ const SignIn = () => {
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
               </svg>
-            </button>
+            </Button>
 
             <div className="flex items-center gap-4 my-2">
               <div className="h-px bg-gray-200 flex-1"></div>
@@ -112,12 +113,9 @@ const SignIn = () => {
               <div className="h-px bg-gray-200 flex-1"></div>
             </div>
 
-            <button
-              type="button"
-              className="border-2 border-text-primary text-text-primary font-bold py-3 rounded-lg hover:bg-gray-50 transition-all text-base font-inter"
-            >
+            <Button variant="outline" className="w-full">
               Continue as Guest
-            </button>
+            </Button>
 
             <div className="text-center mt-3">
               <span className="text-body text-base font-inter">

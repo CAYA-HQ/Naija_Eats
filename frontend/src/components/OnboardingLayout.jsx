@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Button from "./Button";
 // import Header from "./Header";
 
 const OnboardingLayout = ({
@@ -37,7 +37,7 @@ const OnboardingLayout = ({
           </span>
           <span className="text-sm text-text-primary font-inter">{label}</span>
         </div>
-        <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+        <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden transition-all">
           <div
             className="h-full bg-accent-orange rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -50,29 +50,28 @@ const OnboardingLayout = ({
       <div className="px-5 pb-3 pt-2 relative z-10">
         <div className="flex items-center justify-between gap-4 mb-4">
           {prevTo ? (
-            <Link
+            <Button
+              variant="outline"
               to={prevTo}
-              className="py-3 px-6 rounded-xl border-2 border-text-primary text-text-primary text-center font-semibold text-sm font-inter min-w-[80px]"
+              className="py-3 px-6 text-sm min-w-[80px]"
             >
               Prev
-            </Link>
+            </Button>
           ) : (
             <div></div>
           )}
           {onNext ? (
-            <button
+            <Button
+              variant="primary"
               onClick={onNext}
-              className="py-3 px-6 rounded-xl bg-accent-orange text-bg-background font-semibold text-sm font-inter flex items-center gap-2 cursor-pointer"
+              className="py-3 px-6 text-sm"
             >
               {nextLabel} <span>→</span>
-            </button>
+            </Button>
           ) : nextTo ? (
-            <Link
-              to={nextTo}
-              className="py-3 px-6 rounded-xl bg-accent-orange text-bg-background font-semibold text-sm font-inter flex items-center gap-2"
-            >
+            <Button variant="primary" to={nextTo} className="py-3 px-6 text-sm">
               {nextLabel} <span>→</span>
-            </Link>
+            </Button>
           ) : null}
         </div>
 

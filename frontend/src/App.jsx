@@ -37,7 +37,6 @@ function App() {
           path="/onboarding/cooking-frequency"
           element={<CookingFrequency />}
         />
-        {/* <Route path="/onboarding/buffer" element={<Buffer />} /> */}
         <Route
           path="/onboarding/food-preferences"
           element={<FoodPreferences />}

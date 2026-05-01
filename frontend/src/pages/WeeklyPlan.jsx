@@ -1,5 +1,6 @@
 // import React from "react";
 import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 import {
   FilterIcon,
   CoffeeIcon,
@@ -124,9 +125,12 @@ const WeeklyPlan = () => {
               <span>12% lower than last week</span>
             </div>
           </div>
-          <button className="absolute right-6 bottom-6 bg-accent-orange text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-orange-600 transition-colors">
+          <Button
+            variant="primary"
+            className="absolute right-6 bottom-6 py-2 px-6 rounded-xl text-sm"
+          >
             Adjust
-          </button>
+          </Button>
           {/* Decorative circles */}
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full"></div>
           <div className="absolute -bottom-20 -left-10 w-60 h-60 bg-white/5 rounded-full"></div>
@@ -185,15 +189,19 @@ const WeeklyPlan = () => {
 
       {/* Bottom Buttons */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-bg-background/80 backdrop-blur-md space-y-3 z-50">
-        <button
-          className="w-full bg-accent-orange text-white py-4 rounded-xl font-bold cursor-pointer active:scale-95 transition-transform"
+        <Button
+          variant="primary"
+          className="w-full"
           onClick={() => navigate("/market")}
         >
           Accept Plan
-        </button>
-        <button className="w-full bg-white border border-green-900 text-green-900 py-4 cursor-pointer rounded-xl font-bold active:scale-95 transition-transform">
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full bg-white border-green-900 text-green-900"
+        >
           Regenerate
-        </button>
+        </Button>
       </div>
     </div>
   );
