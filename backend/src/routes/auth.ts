@@ -42,14 +42,33 @@ router.post("/register", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/login", (req: Request, res: Response) => {
-  res.status(200).json({
-    success: true, 
-    message: "preference retrieved successfully", 
-    data: {
-      token: true
+router.post("/login", async (req: Request, res: Response) => {
+  try {
+    const {email, password} = req.body; 
+
+    if (!email || !password) return res.status(400).json({error: 'Email and password are required'})
+    
+    const {data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password, 
+    });
+
+    if (error) {
+      return res.status(401).json({
+        error: error.message
+      })
     }
-  });
+
+    res.status(200).json({
+      success: true, 
+      message: "preference retrieved successfully", 
+      data: {
+        token: data.session.access_token
+      }
+    });
+  } catch (err){
+    res.status(500).json({ error: 'Server error'})
+  }
 });
 
 export default router;
