@@ -4,7 +4,7 @@ const CustomCheckbox = ({ checked }) => {
       className={`relative flex items-center justify-center w-5 h-5 rounded-[5px] border-2 transition-all duration-300 ${
         checked
           ? "bg-accent-orange border-accent-orange"
-          : "border-text-muted bg-transparent"
+          : "border-text-muted/50 bg-transparent"
       }`}
     >
       <div

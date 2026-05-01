@@ -12,6 +12,9 @@ import FoodPreferences from "./onboarding/FoodPreferences";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import GeneratingPlan from "./onboarding/GeneratingPlan";
+import MealPlan from "./onboarding/MealPlan";
+import WeeklyPlan from "./pages/WeeklyPlan";
+import Market from "./pages/Market";
 
 function App() {
   const location = useLocation();
@@ -34,7 +37,6 @@ function App() {
           path="/onboarding/cooking-frequency"
           element={<CookingFrequency />}
         />
-        {/* <Route path="/onboarding/buffer" element={<Buffer />} /> */}
         <Route
           path="/onboarding/food-preferences"
           element={<FoodPreferences />}
@@ -45,6 +47,9 @@ function App() {
           path="/onboarding/generating-plan"
           element={<GeneratingPlan />}
         />
+        <Route path="/onboarding/meal-plan" element={<MealPlan />} />
+        <Route path="/weekly-plan" element={<WeeklyPlan />} />
+        <Route path="/market" element={<Market />} />
       </Routes>
     </>
   );

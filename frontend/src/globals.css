@@ -40,6 +40,10 @@ h6 {
 }
 
 p,
-a {
+a,
+span,
+button,
+input,
+textarea {
   font-family: var(--font-inter);
 }

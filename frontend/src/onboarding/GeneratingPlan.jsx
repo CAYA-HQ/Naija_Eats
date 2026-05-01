@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { MealIcon } from "../constants/icons";
 
 const GeneratingPlan = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Sequence the animation steps
     const timer1 = setTimeout(() => setCurrentStep(2), 2500);
     const timer2 = setTimeout(() => setCurrentStep(3), 5000);
     const timer3 = setTimeout(() => setCurrentStep(4), 7500);
-    const timer4 = setTimeout(() => navigate("/"), 9000); // Redirect to home when fully done
+    const timer4 = setTimeout(() => navigate("/onboarding/meal-plan"), 9000);
 
     return () => {
       clearTimeout(timer1);
@@ -22,7 +22,6 @@ const GeneratingPlan = () => {
 
   return (
     <main className="flex-1 flex flex-col items-center justify-center p-6 w-full max-w-md mx-auto">
-      {/* Spinner Section */}
       <div className="relative w-56 h-56 mb-10 flex items-center justify-center">
         {/* Animated concentric rings */}
         <div className="absolute inset-0 rounded-full border-[5px] border-[#d8e3d2]/50"></div>
@@ -35,21 +34,7 @@ const GeneratingPlan = () => {
 
         {/* Center Content */}
         <div className="flex flex-col items-center gap-2 mt-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="44"
-            height="44"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#2d5016"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="animate-pulse"
-          >
-            <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
-            <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
-          </svg>
+          <MealIcon className={"w-15 text-text-primary"} />
           <div className="flex gap-2 mt-1">
             <div
               className="w-2.5 h-2.5 rounded-full bg-[#a36017] animate-bounce"
@@ -95,11 +80,11 @@ const GeneratingPlan = () => {
       <div className="w-full flex flex-col gap-3">
         {/* Step 1 */}
         <div
-          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 1 ? "border-gray-100 bg-white shadow-sm" : "border-gray-200 bg-white shadow-md"}`}
+          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 1 ? "border-gray-100 bg-white " : "border-gray-200 bg-white "}`}
         >
           <div className="flex items-center gap-3.5">
             {currentStep > 1 ? (
-              <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 ">
                 <svg
                   width="14"
                   height="14"
@@ -144,11 +129,11 @@ const GeneratingPlan = () => {
 
         {/* Step 2 */}
         <div
-          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 2 ? "border-gray-100 bg-white shadow-sm" : currentStep === 2 ? "border-gray-200 bg-white shadow-md" : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
+          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 2 ? "border-gray-100 bg-white " : currentStep === 2 ? "border-gray-200 bg-white " : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
         >
           <div className="flex items-center gap-3.5">
             {currentStep > 2 ? (
-              <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 ">
                 <svg
                   width="14"
                   height="14"
@@ -213,11 +198,11 @@ const GeneratingPlan = () => {
 
         {/* Step 3 */}
         <div
-          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 3 ? "border-gray-100 bg-white shadow-sm" : currentStep === 3 ? "border-gray-200 bg-white shadow-md" : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
+          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 3 ? "border-gray-100 bg-white " : currentStep === 3 ? "border-gray-200 bg-white " : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
         >
           <div className="flex items-center gap-3.5">
             {currentStep > 3 ? (
-              <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 ">
                 <svg
                   width="14"
                   height="14"
