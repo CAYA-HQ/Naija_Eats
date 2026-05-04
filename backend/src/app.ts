@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import mealsRoutes from './routes/meals';
 import authRoutes from './routes/auth'
+import { authMiddleware } from './middleware/auth';
 
 const app: Application = express();
 
@@ -13,8 +14,8 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
-app.use('/', mealsRoutes)
 app.use('/auth', authRoutes)
+app.use('/', authMiddleware, mealsRoutes)
 
 // Routes
 app.get('/health', (req: Request, res: Response) => {
