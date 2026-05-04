@@ -5,18 +5,20 @@ const router = Router();
 
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body; 
+    const { full_name, email, phone_number, password } = req.body; 
 
-    if (!email || !password) {
+    if (!full_name || !email || !phone_number|| !password) {
       return res.status(400).json({
-        error: 'Email and password are required'
+        error: 'Full name, email, phone number and password are required'
       });
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    let { data, error } = await supabase.auth.signUp({
       email,
       password
     })
+    console.log(error)
+    console.log(data)
 
     if (error) {
       return res.status(400).json({
@@ -24,6 +26,27 @@ router.post("/register", async (req: Request, res: Response) => {
       });
     }
 
+    error = (await supabase.auth.updateUser({
+      phone: phone_number
+    })).error;
+
+    if (error) {
+      return res.status(400).json({
+        error: error.message
+      })
+    }
+
+    error = (await supabase.from('profiles').insert({
+      full_name,
+      avatar_url: ""
+    })).error
+
+    
+    if (error) {
+      return res.status(400).json({
+        error: error.message
+      })
+    }
     res.status(201).json({
       success: true, 
       message: 'User registered successfully',
@@ -36,6 +59,7 @@ router.post("/register", async (req: Request, res: Response) => {
       }
     })
   } catch (err) {
+    console.log(err)
     res.status(500).json({
       error: 'Server error during registration'
     });

@@ -14,8 +14,8 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
-app.use('/', authMiddleware, mealsRoutes)
 app.use('/auth', authRoutes)
+app.use('/', authMiddleware, mealsRoutes)
 
 // Routes
 app.get('/health', (req: Request, res: Response) => {
