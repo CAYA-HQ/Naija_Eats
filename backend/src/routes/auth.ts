@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { supabase } from "../config/supabase";
+import { _res } from "../utils/helper";
 
 const router = Router();
 
@@ -8,9 +9,7 @@ router.post("/register", async (req: Request, res: Response) => {
     const { full_name, email, phone_number, password } = req.body; 
 
     if (!full_name || !email || !phone_number|| !password) {
-      return res.status(400).json({
-        error: 'Full name, email, phone number and password are required'
-      });
+      return _res.error(400, res, 'Full name, email, phone number and password are required')
     }
 
     let { data, error } = await supabase.auth.signUp({
@@ -21,9 +20,7 @@ router.post("/register", async (req: Request, res: Response) => {
     console.log(data)
 
     if (error) {
-      return res.status(400).json({
-        error: error.message
-      });
+      return _res.error(400, res, error.message)
     }
 
     error = (await supabase.auth.updateUser({
@@ -31,38 +28,33 @@ router.post("/register", async (req: Request, res: Response) => {
     })).error;
 
     if (error) {
-      return res.status(400).json({
-        error: error.message
-      })
+      return _res.error(400, res, error.message)
     }
 
     error = (await supabase.from('profiles').insert({
       full_name,
       avatar_url: ""
     })).error
-
     
     if (error) {
-      return res.status(400).json({
-        error: error.message
-      })
+      return _res.error(400, res, error.message)
     }
-    res.status(201).json({
-      success: true, 
-      message: 'User registered successfully',
-      data: {
+
+    return _res.success(
+      201,
+      res,
+      'User registered successfully',
+      {
         user: {
           id: data.user?.id,
           email: data.user?.email
         },
         token: data.session?.access_token || null
       }
-    })
+    )
   } catch (err) {
     console.log(err)
-    res.status(500).json({
-      error: 'Server error during registration'
-    });
+    _res.error(500, res, 'Server error during registration')
   }
 });
 
@@ -70,7 +62,7 @@ router.post("/login", async (req: Request, res: Response) => {
   try {
     const {email, password} = req.body; 
 
-    if (!email || !password) return res.status(400).json({error: 'Email and password are required'})
+    if (!email || !password) return _res.error(400, res, 'Email and password are required')
     
     const {data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -78,20 +70,19 @@ router.post("/login", async (req: Request, res: Response) => {
     });
 
     if (error) {
-      return res.status(401).json({
-        error: error.message
-      })
+    return _res.error(401, res, error.message)
     }
 
-    res.status(200).json({
-      success: true, 
-      message: "User logged in successfully", 
-      data: {
+    return _res.success(
+      201,
+      res,
+      "User logged in successfully",
+      {
         token: data.session.access_token
-      }
-    });
+      })
   } catch (err){
-    res.status(500).json({ error: 'Server error'})
+    console.log(err)
+    return _res.error(500, res, 'Server error')
   }
 });
 
