@@ -1,15 +1,55 @@
-# backend
+# Naija Eats Backend
 
-To install dependencies:
+Backend API for Naija Eats, built with Bun, Express, TypeScript, and Supabase.
+
+## What It Does
+
+- Handles user registration and login through Supabase Auth.
+- Protects meal and meal-plan routes with bearer-token authentication.
+- Provides placeholder endpoints for preferences, meals, meal plans, and ingredients.
+- Uses shared JSON response helpers for consistent success and error payloads.
+
+## Quick Start
+
+Install dependencies:
 
 ```bash
 bun install
 ```
 
-To run:
+Create your environment file:
 
 ```bash
-bun run index.ts
+cp .env.example .env
 ```
 
-This project was created using `bun init` in bun v1.3.13. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Run the API in development mode:
+
+```bash
+bun run dev
+```
+
+The server listens on `PORT` from `.env`, or `3000` by default.
+
+## Scripts
+
+- `bun run dev`: starts the server with file watching.
+- `bun run start`: starts the server once.
+
+## Documentation
+
+- [Setup guide](docs/setup.md)
+- [API reference](docs/api.md)
+
+## Project Structure
+
+```text
+src/
+  app.ts                 Express app, middleware, and route mounting
+  server.ts              Runtime entry point
+  config/supabase.ts     Supabase client configuration
+  middleware/auth.ts     Bearer-token authentication middleware
+  routes/auth.ts         Registration and login routes
+  routes/meals.ts        Meal preference, meals, meal-plan, and ingredient routes
+  utils/helper.ts        Shared response helpers
+```
