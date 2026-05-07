@@ -9,12 +9,12 @@ const SignIn = () => {
   return (
     <>
       <Header />
-      <main className="flex-1 flex flex-col p-4 gap-6">
-        <div className="relative rounded-xl overflow-hidden h-48 w-full shadow-lg shrink-0">
+      <main className="flex-1 h-full flex flex-col p-4 gap-6 lg:grid lg:grid-cols-2 lg:gap-4">
+        <div className="relative rounded-xl overflow-hidden h-48 w-full shadow-lg shrink-0 lg:w-full lg:h-full">
           <img
             src="/images/sign-in-hero.webp"
             alt="Nigerian Jollof Rice"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover lg:hidden"
           />
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <h1 className="text-white font-display text-3xl font-bold text-center leading-tight px-4">
@@ -44,6 +44,7 @@ const SignIn = () => {
                 type="text"
                 placeholder="Enter your email or phone"
                 className="w-full border border-text-muted/25 px-4 py-3.5 text-sm font-inter font-medium focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                required
               />
             </div>
 
@@ -64,6 +65,7 @@ const SignIn = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="w-full border border-text-muted/25 px-4 py-3.5 text-sm font-inter font-medium focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all tracking-widest placeholder:tracking-widest"
+                  required
                 />
                 <button
                   type="button"
@@ -87,10 +89,7 @@ const SignIn = () => {
               </div>
             </div>
 
-            <Button
-              variant="primary"
-              className="mt-4"
-            >
+            <Button variant="primary" className="mt-4">
               Sign In
               <svg
                 width="20"

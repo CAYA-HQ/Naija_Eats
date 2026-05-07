@@ -16,7 +16,7 @@ const SignUp = () => {
     <>
       <Header />
 
-      <main className="flex-1 flex flex-col p-4 justify-center py-6">
+      <main className="flex-1 lg:max-w-xl lg:mx-auto flex flex-col p-4 justify-center py-6">
         <div className="bg-white rounded-sm p-6  border border-text-muted/25">
           <h1 className="font-display text-[2.2rem] text-text-primary font-extrabold mb-2 text-center tracking-tight">
             Join the Feast
