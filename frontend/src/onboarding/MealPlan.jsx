@@ -18,6 +18,10 @@ const MealPlan = () => {
   ];
 
   const navigate = useNavigate();
+  const onBoardUser = () => {
+    localStorage.setItem("onboarded", "true");
+    navigate("/weekly-plan");
+  };
 
   return (
     <div className="p-6 max-w-[500px] mx-auto bg-bg-background min-h-screen flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -30,7 +34,10 @@ const MealPlan = () => {
         </p>
       </div>
 
-      <div className="bg-[#2d4a1e] rounded-3xl overflow-hidden text-white relative shadow-[0_10px_25px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:-translate-y-1">
+      <div 
+        onClick={() => navigate("/meal/smoky-jollof-basil-chicken")}
+        className="bg-[#2d4a1e] rounded-3xl overflow-hidden text-white relative shadow-[0_10px_25px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:-translate-y-1 cursor-pointer"
+      >
         <div className="w-full h-[220px] relative">
           <img
             src="/images/jollof.webp"
@@ -71,7 +78,10 @@ const MealPlan = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="bg-[#2d4a1e] rounded-2xl flex items-center p-3 gap-4 text-white no-underline transition-colors duration-200 hover:bg-[#385a26] cursor-pointer">
+        <div 
+          onClick={() => navigate("/meal/garden-egg-salad")}
+          className="bg-[#2d4a1e] rounded-2xl flex items-center p-3 gap-4 text-white no-underline transition-colors duration-200 hover:bg-[#385a26] cursor-pointer"
+        >
           <img
             src="/images/salad.webp"
             alt="Garden Egg Salad"
@@ -91,7 +101,10 @@ const MealPlan = () => {
           <ChevronRightIcon className="w-5 h-5" />
         </div>
 
-        <div className="bg-[#2d4a1e] rounded-2xl flex items-center p-3 gap-4 text-white no-underline transition-colors duration-200 hover:bg-[#385a26] cursor-pointer">
+        <div 
+          onClick={() => navigate("/meal/lean-beef-egusi")}
+          className="bg-[#2d4a1e] rounded-2xl flex items-center p-3 gap-4 text-white no-underline transition-colors duration-200 hover:bg-[#385a26] cursor-pointer"
+        >
           <img
             src="/images/egusi.webp"
             alt="Lean Beef Egusi"
@@ -158,7 +171,7 @@ const MealPlan = () => {
       </div>
 
       <div className="flex flex-col gap-3 mt-2">
-        <Button variant="primary" onClick={() => navigate("/weekly-plan")}>
+        <Button variant="primary" onClick={onBoardUser}>
           View Full Plan
         </Button>
         <Button

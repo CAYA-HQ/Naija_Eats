@@ -163,7 +163,8 @@ const WeeklyPlan = () => {
               {dayPlan.meals.map((meal, mIdx) => (
                 <div
                   key={mIdx}
-                  className={`flex items-center gap-4 p-4 ${
+                  onClick={() => navigate(`/meal/${meal.name.toLowerCase().replace(/ /g, "-")}`)}
+                  className={`flex items-center gap-4 p-4 cursor-pointer hover:bg-black/5 transition-colors ${
                     mIdx !== dayPlan.meals.length - 1
                       ? "border-b border-text-muted/10"
                       : ""
