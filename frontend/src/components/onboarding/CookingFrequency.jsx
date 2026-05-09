@@ -1,7 +1,7 @@
 import { useState } from "react";
-import OnboardingLayout from "../components/OnboardingLayout";
-import CustomCheckbox from "../components/CustomCheckbox";
-import { GroupIcon, SweetTooth } from "../constants/icons";
+import OnboardingLayout from "../OnboardingLayout";
+import CustomCheckbox from "../CustomCheckbox";
+import { GroupIcon, SweetTooth } from "../../constants/icons";
 
 const CookingFrequency = () => {
   const [householdSize, setHouseholdSize] = useState("1");

@@ -9,7 +9,7 @@ import {
   LeafIcon,
   GrainIcon,
 } from "../constants/icons";
-import Button from "../components/Button";
+import Button from "../components/ui/Button";
 
 const MealDetail = () => {
   const { id } = useParams();

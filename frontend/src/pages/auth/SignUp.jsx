@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Header from "../../components/Header";
-import CustomCheckbox from "../../components/CustomCheckbox";
-import Button from "../../components/Button";
+import Header from "../../components/ui/Header";
+import CustomCheckbox from "../../components/ui/CustomCheckbox";
+import Button from "../../components/ui/Button";
 import { AppleIcon, GoogleIcon } from "../../constants/icons";
-import Footer from "../../components/Footer";
+import Footer from "../../components/ui/Footer";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);

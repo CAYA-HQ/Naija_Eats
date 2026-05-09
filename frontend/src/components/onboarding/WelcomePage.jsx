@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import Button from "../components/Button";
+import Button from "../ui/Button";
+import { ForkAndKnife } from "../../constants/icons";
 
 const WelcomePage = () => {
   return (
@@ -31,7 +32,9 @@ const WelcomePage = () => {
               />
             </div>
 
-            <div className="bg-text-primary rounded-[4px] col-start-5 col-end-7 row-start-2"></div>
+            <div className="bg-text-primary rounded-[4px] col-start-5 col-end-7 row-start-2">
+              <ForkAndKnife className={"w-full h-full"} />
+            </div>
           </div>
           <p className="font-normal mb-6 text-base font-inter text-center">
             Master your kitchen with personalized meal planning and smart
@@ -62,7 +65,7 @@ const WelcomePage = () => {
       </div>
 
       {/* desktop view  */}
-      <div className="py-15 relative px-6 h-full grid grid-cols-[569px_1fr] gap-6 place-items-center">
+      <div className="py-15 hidden lg:grid relative px-6 h-full grid-cols-[569px_1fr] gap-6 place-items-center">
         <img
           src="/images/naijaeats.webp"
           alt="Naija Eats Logo"

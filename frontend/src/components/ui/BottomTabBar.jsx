@@ -4,7 +4,7 @@ import {
   ForkAndKnife,
   ShoppingCartIcon,
   UserIcon,
-} from "../constants/icons";
+} from "../../constants/icons";
 
 const BottomTabBar = () => {
   const location = useLocation();

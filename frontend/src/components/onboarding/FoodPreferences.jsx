@@ -1,13 +1,13 @@
 import { useState } from "react";
-import OnboardingLayout from "../components/OnboardingLayout";
+import OnboardingLayout from "../OnboardingLayout";
 import {
   RhombusAlertIcon,
   CircleAlertIcon,
   CloseIcon,
   PlusIcon,
-} from "../constants/icons";
+} from "../../constants/icons";
 import { useNavigate } from "react-router-dom";
-import { Preferences } from "../constants/preferences";
+import { Preferences } from "../../constants/preferences";
 
 const FoodPreferences = () => {
   const navigate = useNavigate();

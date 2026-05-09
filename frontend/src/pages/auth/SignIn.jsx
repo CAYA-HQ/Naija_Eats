@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Header from "../../components/Header";
-import Button from "../../components/Button";
-import Footer from "../../components/Footer";
+import Header from "../../components/ui/Header";
+import Button from "../../components/ui/Button";
+import Footer from "../../components/ui/Footer";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);

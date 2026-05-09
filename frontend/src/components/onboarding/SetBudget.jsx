@@ -1,11 +1,11 @@
 import { useState } from "react";
-import OnboardingLayout from "../components/OnboardingLayout";
+import OnboardingLayout from "../OnboardingLayout";
 import {
   WeeklyIcon,
   MonthlyIcon,
   ProInsightIcon,
   CircleAlertIcon,
-} from "../constants/icons";
+} from "../../constants/icons";
 
 const SetBudget = () => {
   const [budgetTier, setBudgetTier] = useState("Standard");
