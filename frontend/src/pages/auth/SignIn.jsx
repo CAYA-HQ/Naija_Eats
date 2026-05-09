@@ -50,11 +50,11 @@ const SignIn = () => {
           <img
             src="/images/sign-in-hero.webp"
             alt="Nigerian Jollof Rice"
-            className="w-full h-full object-cover lg:hidden"
+            className="w-full h-full object-cover block lg:hidden"
           />
           <img
             src="/images/homepage-desktop-picture.jpeg"
-            alt="Nigerian Jollof Rice"
+            alt=""
             className="w-full h-full object-cover hidden lg:block"
           />
           <div className="absolute inset-0 bg-black/50 flex flex-col items-start justify-center px-4">

@@ -64,7 +64,7 @@ const WelcomePage = () => {
         />
         <div>
           <div className="w-auto mb-auto h-full flex flex-col justify-center items-center gap-6">
-            <h2 className="text-[72px] text-text-primary tracking-tight leading-20 font-bold text-left pb-2">
+            <h2 className="text-5xl text-text-primary tracking-tight leading-20 font-bold text-left pb-2">
               Stop stressing about what to cook
             </h2>
 
