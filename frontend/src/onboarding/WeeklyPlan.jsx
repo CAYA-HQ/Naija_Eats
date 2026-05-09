@@ -1,117 +1,11 @@
 // import React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
-import {
-  FilterIcon,
-  CoffeeIcon,
-  UtensilsIcon,
-  ForkAndKnife,
-  TrendDownIcon,
-  SnackIcon,
-  BurgerIcon,
-  SpagIcon,
-} from "../constants/icons";
+import { FilterIcon, TrendDownIcon } from "../constants/icons";
+import { WeekPlan } from "../constants/weekPlan";
 
 const WeeklyPlan = () => {
   const navigate = useNavigate();
-  const weeklyPlan = [
-    {
-      day: "Sunday",
-      color: "bg-green-800",
-      meals: [
-        {
-          type: "BREAKFAST",
-          name: "Bread & Egg",
-          price: "₦700",
-          icon: <SnackIcon className="text-text-primary" />,
-        },
-        {
-          type: "LUNCH",
-          name: "Jollof Rice & Grilled Fish",
-          price: "₦1,600",
-          icon: <BurgerIcon className="text-accent-orange" />,
-        },
-        {
-          type: "DINNER",
-          name: "Garri & Groundnut",
-          price: "₦400",
-          icon: <ForkAndKnife className="text-text-primary" />,
-        },
-      ],
-    },
-    {
-      day: "Monday",
-      color: "bg-orange-800",
-      meals: [
-        {
-          type: "BREAKFAST",
-          name: "Toast & Tea",
-          price: "₦600",
-          icon: <CoffeeIcon className="text-text-primary" />,
-        },
-        {
-          type: "LUNCH",
-          name: "Beans & Fried Plantain",
-          price: "₦900",
-          icon: <BurgerIcon className="text-accent-orange" />,
-        },
-        {
-          type: "DINNER",
-          name: "Indomie & Egg",
-          price: "₦700",
-          icon: <SpagIcon className="text-text-primary" />,
-        },
-      ],
-    },
-    {
-      day: "Tuesday",
-      color: "bg-green-900",
-      meals: [
-        {
-          type: "BREAKFAST",
-          name: "Pap & Akara",
-          price: "₦700",
-          icon: <SnackIcon className="text-text-primary" />,
-        },
-        {
-          type: "LUNCH",
-          name: "Simple Beef Suya & Bread",
-          price: "₦1,100",
-          icon: <UtensilsIcon className="text-accent-orange" />,
-        },
-        {
-          type: "DINNER",
-          name: "Rice & Stew",
-          price: "₦650",
-          icon: <ForkAndKnife className="text-text-primary" />,
-        },
-      ],
-    },
-    {
-      day: "Wednesday",
-      color: "bg-green-800",
-      meals: [
-        {
-          type: "BREAKFAST",
-          name: "Bread & Tea",
-          price: "₦500",
-          icon: <CoffeeIcon className="text-text-primary" />,
-        },
-        {
-          type: "LUNCH",
-          name: "Egusi & Pounded Yam",
-          price: "₦1,400",
-          icon: <UtensilsIcon className="text-accent-orange" />,
-        },
-        {
-          type: "DINNER",
-          name: "Fried Yam & Egg Sauce",
-          price: "₦900",
-          icon: <ForkAndKnife className="text-text-primary" />,
-        },
-      ],
-    },
-  ];
 
   return (
     <div className="bg-bg-background min-h-screen pb-20">
@@ -139,16 +33,16 @@ const WeeklyPlan = () => {
 
       {/* Title Header */}
       <div className="px-5 py-4 flex justify-between items-center">
-        <h2 className="text-2xl font-display font-extrabold text-text-primary">
+        <h2 className="text-2xl font-display font-extrabold text-text-primary lg:mb-6">
           Full Weekly Plan
         </h2>
         <FilterIcon className="text-text-primary w-6 h-6 opacity-80 cursor-pointer" />
       </div>
 
       {/* Plan List */}
-      <div className="px-4 space-y-6">
-        {weeklyPlan.map((dayPlan, idx) => (
-          <div key={idx} className="space-y-3">
+      <div className="px-4 space-y-6 lg:flex lg:flex-wrap lg:justify-center gap-6 w-full">
+        {WeekPlan.map((dayPlan, idx) => (
+          <div key={idx} className="space-y-3 lg:min-w-sm">
             <div className="flex items-center gap-2">
               <div className={`w-1.5 h-6 rounded-full ${dayPlan.color}`}></div>
               <h3 className="text-lg font-display font-bold text-text-primary">
@@ -156,7 +50,7 @@ const WeeklyPlan = () => {
               </h3>
             </div>
 
-            <div className="bg-white border border-text-muted/20 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-text-muted/20 rounded-2xl overflow-hidden shadow-sm ">
               {dayPlan.meals.map((meal, mIdx) => (
                 <div
                   key={mIdx}

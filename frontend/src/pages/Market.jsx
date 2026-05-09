@@ -26,7 +26,6 @@ const Market = () => {
 
   return (
     <main className="px-5 pt-6 flex flex-col gap-6">
-      {/* Page Title */}
       <h1 className="text-[2.5rem] font-display font-extrabold text-[#244421] leading-none">
         MARKET
       </h1>
