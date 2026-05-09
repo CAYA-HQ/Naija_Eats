@@ -85,7 +85,7 @@ const MenuPage = () => {
           placeholder="Search for Jollof, Egusi, Suya..."
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="w-full bg-white rounded-xl py-4 pl-12 pr-4 border border-text-muted outline-none placeholder:text-text-muted text-sm font-medium"
+          className="w-full max-w-xs bg-white rounded-xl py-4 pl-12 pr-4 border border-text-muted outline-none placeholder:text-text-muted text-sm font-medium"
         />
       </div>
 
@@ -105,7 +105,7 @@ const MenuPage = () => {
         ))}
       </div>
 
-      <div className="flex flex-col gap-6 pb-12">
+      <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6 pb-12">
         {filteredMeals.map((meal) => (
           <div
             key={meal.id}
@@ -147,7 +147,7 @@ const MenuPage = () => {
               </div>
             </div>
 
-            <div className="p-6 flex flex-col gap-3">
+            <div className="p-6 flex flex-col justify-between items-start gap-3">
               <div className="flex justify-between items-start">
                 <h3 className="text-xl font-display font-bold text-white max-w-[70%] leading-tight">
                   {meal.name}
@@ -160,7 +160,7 @@ const MenuPage = () => {
                 {meal.description}
               </p>
               <button
-                className="bg-accent-orange hover:bg-accent-orange/75 text-white py-3.5 rounded-xs font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 mt-2"
+                className="bg-accent-orange hover:bg-accent-orange/75 text-white py-3.5 rounded-xs font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 w-full max-w-xs mt-auto"
                 onClick={() =>
                   navigate(
                     `/meal/${meal.name.toLowerCase().replace(/ /g, "-")}`,

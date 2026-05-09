@@ -17,6 +17,7 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    state: "",
     phoneNumber: "",
     password: "",
   });
@@ -60,7 +61,7 @@ const SignUp = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen">
       <Header />
 
       <main className="flex-1 h-full flex flex-col p-4 gap-6 lg:grid lg:grid-cols-2 lg:gap-4">
@@ -95,12 +96,6 @@ const SignUp = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium">
-                {error}
-              </div>
-            )}
-
             <div className="flex flex-col gap-1.5">
               <label className="text-base font-inter font-bold text-text-primary">
                 Full Name
@@ -129,6 +124,17 @@ const SignUp = () => {
                 className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                 required
               />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-base font-inter font-bold text-text-primary">
+                State
+              </label>
+              <select
+                className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                onChange={handleInputChange}
+              >
+                <option value={formData.state}>Lagos state</option>
+              </select>
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -214,6 +220,11 @@ const SignUp = () => {
                 .
               </label>
             </div>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium">
+                {error}
+              </div>
+            )}
 
             <Button
               variant="primary"
@@ -274,7 +285,7 @@ const SignUp = () => {
       </main>
 
       <Footer />
-    </>
+    </div>
   );
 };
 

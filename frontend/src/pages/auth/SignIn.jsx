@@ -43,7 +43,7 @@ const SignIn = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen">
       <Header />
       <main className="flex-1 h-full flex flex-col p-4 gap-6 lg:grid lg:grid-cols-2 lg:gap-4">
         <div className="relative rounded-xl overflow-hidden h-48 w-full shadow-lg shrink-0 lg:w-full lg:h-full">
@@ -194,7 +194,7 @@ const SignIn = () => {
       </main>
 
       <Footer />
-    </>
+    </div>
   );
 };
 
