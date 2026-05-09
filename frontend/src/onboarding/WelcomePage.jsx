@@ -52,6 +52,12 @@ const WelcomePage = () => {
           >
             Sign in
           </Link>
+          <Link
+            to="/onboarding/set-budget"
+            className="hover:underline hover:underline-offset-5"
+          >
+            Continue as Guest
+          </Link>
         </div>
       </div>
 
@@ -91,6 +97,12 @@ const WelcomePage = () => {
               Sign in
             </Link>
           </div>
+          <Link
+            to="/onboarding/set-budget"
+            className="hover:underline hover:underline-offset-5"
+          >
+            Continue as Guest
+          </Link>
         </div>
 
         <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full h-full">

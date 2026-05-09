@@ -40,9 +40,9 @@ const OnboardingLayout = ({
         {/* Sidebar - Desktop Only */}
         <div className="hidden lg:flex w-full lg:w-[380px] flex-col p-12 border-r border-text-muted/10 relative z-20">
           <div className="mb-12">
-            <h2 className="text-sm font-bold text-text-muted uppercase tracking-widest mb-8">
+            {/* <h2 className="text-sm font-bold text-text-muted uppercase tracking-widest mb-8">
               Onboarding Progress
-            </h2>
+            </h2> */}
             <div className="flex flex-col gap-8">
               {STEPS.map((s) => {
                 const isCompleted = s.id < step;

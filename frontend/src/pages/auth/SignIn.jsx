@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import Button from "../../components/Button";
 import Footer from "../../components/Footer";
-import { authService } from "../../services/api";
 
 const SignIn = () => {
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -28,18 +26,6 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
-    try {
-      const response = await authService.login(formData);
-      console.log("Login successful:", response);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/");
-    } catch (err) {
-      setError(err.message || "Invalid email or password.");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (

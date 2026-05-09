@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import CustomCheckbox from "../../components/CustomCheckbox";
 import Button from "../../components/Button";
 import { AppleIcon, GoogleIcon } from "../../constants/icons";
 import Footer from "../../components/Footer";
-import { authService } from "../../services/api";
 
 const SignUp = () => {
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isTerms, setTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,22 +40,7 @@ const SignUp = () => {
     }
 
     setIsLoading(true);
-    setError("");
-
-    try {
-      const response = await authService.register({
-        ...formData,
-        phoneNumber: `+234${formData.phoneNumber}`,
-      });
-      console.log("Registration successful:", response);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/onboarding/welcome");
-    } catch (err) {
-      setError(err.message || "Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    setError("No API yet!");
   };
 
   return (
