@@ -5,12 +5,9 @@ import {
   CircleAlertIcon,
   CloseIcon,
   PlusIcon,
-  ForkAndKnife,
-  StopWatch,
-  LeafIcon,
-  SnackIcon,
 } from "../constants/icons";
 import { useNavigate } from "react-router-dom";
+import { Preferences } from "../constants/preferences";
 
 const FoodPreferences = () => {
   const navigate = useNavigate();
@@ -22,38 +19,15 @@ const FoodPreferences = () => {
     { label: "Nut-Free", active: false },
   ]);
 
-  const preferences = [
-    {
-      category: "Traditional Nigerian Meals",
-      image: "/images/traditional-meals.webp",
-      icon: <ForkAndKnife />,
-    },
-    {
-      category: "Quick Meals",
-      image: "/images/quick-meals.webp",
-      icon: <StopWatch />,
-    },
-    {
-      category: "Light Snacks",
-      image: "/images/light-snacks.webp",
-      icon: <SnackIcon />,
-    },
-    {
-      category: "Vegetarian Options",
-      image: "/images/vegetarian-options.webp",
-      icon: <LeafIcon />,
-    },
-  ];
-
-  const handleTogglePref = (idx) => {
+  const handleTogglePref = (id) => {
     setSelectedPrefs((prev) =>
-      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx],
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
-  const handleToggleTag = (idx) => {
+  const handleToggleTag = (id) => {
     setDietaryTags((prev) =>
-      prev.map((tag, i) => (i === idx ? { ...tag, active: !tag.active } : tag)),
+      prev.map((tag, i) => (i === id ? { ...tag, active: !tag.active } : tag)),
     );
   };
 
@@ -72,20 +46,20 @@ const FoodPreferences = () => {
       nextLabel="Generate Your Plan"
     >
       {/* Title */}
-      <h1 className="text-[28px] font-bold leading-tight mb-2">
+      <h1 className="text-[28px] lg:text-5xl font-bold leading-tight mb-2">
         What do you enjoy eating?
       </h1>
-      <p className="text-sm text-body mb-6">
+      <p className="text-sm lg:text-base text-body mb-6">
         Tell your flavour so we can help curate the best experience for you!
       </p>
 
       {/* Food Category Grid */}
-      <div className="grid grid-cols-2 gap-3 mb-8">
-        {preferences.map((pref, idx) => (
+      <div className="grid grid-cols-2 l:grid-cols-4 gap-3 mb-8">
+        {Preferences.map((pref, id) => (
           <button
-            key={idx}
-            onClick={() => handleTogglePref(idx)}
-            className="group relative rounded-2xl overflow-hidden h-36 cursor-pointer transition-all duration-300 "
+            key={id}
+            onClick={() => handleTogglePref(id)}
+            className="group relative rounded-2xl overflow-hidden h-36 lg:h-72 cursor-pointer transition-all duration-300 "
           >
             <img
               src={pref.image}
@@ -94,19 +68,19 @@ const FoodPreferences = () => {
             />
             {/* Overlay */}
             <div
-              className={` transition-all absolute inset-0 ${selectedPrefs.includes(idx) ? "bg-text-primary/70 group-hover:bg-text-primary/70" : "bg-none group-hover:bg-white/50"}`}
+              className={` transition-all absolute inset-0 ${selectedPrefs.includes(id) ? "bg-text-primary/70 group-hover:bg-text-primary/70" : "bg-none group-hover:bg-white/50"}`}
             ></div>
             {/* Icon + Label */}
             <div
-              className={`group-hover:bottom-2 transition-all w-[90%] absolute -bottom-20 h-20 left-1/2 -translate-x-1/2 right-0 flex flex-col items-center justify-center gap-2  py-1 px-2 rounded-sm ${selectedPrefs.includes(idx) ? "bottom-2 bg-text-primary/75 text-white" : "-bottom-20 bg-white group-hover:bg-white "}`}
+              className={`group-hover:bottom-2 transition-all w-[90%] absolute -bottom-20 h-20 left-1/2 -translate-x-1/2 right-0 flex flex-col items-center justify-center gap-2  py-1 px-2 rounded-sm ${selectedPrefs.includes(id) ? "bottom-2 bg-text-primary/75 text-white" : "-bottom-20 bg-white group-hover:bg-white "}`}
             >
               <span
-                className={`text-lg  drop-shadow-md ${selectedPrefs.includes(idx) ? "text-white" : "text-accent-orange"}`}
+                className={`text-lg  drop-shadow-md ${selectedPrefs.includes(id) ? "text-white" : "text-accent-orange"}`}
               >
                 {pref.icon}
               </span>
               <span
-                className={`${selectedPrefs.includes(idx) ? "text-white" : "text-text-primary"} text-xs font-bold leading-tight drop-shadow-md`}
+                className={`${selectedPrefs.includes(id) ? "text-white" : "text-text-primary"} text-xs font-bold leading-tight drop-shadow-md`}
               >
                 {pref.category}
               </span>
@@ -119,10 +93,14 @@ const FoodPreferences = () => {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <RhombusAlertIcon className={"text-lg text-accent-orange"} />
-          <h2 className="text-base font-bold">Dietary Requirements</h2>
+          <h2 className="text-base lg:text-2xl font-bold">
+            Dietary Requirements
+          </h2>
         </div>
 
-        <p className="text-sm font-medium mb-3">Do you have any allergies?</p>
+        <p className="text- lg:text-base font-medium mb-3">
+          Do you have any allergies?
+        </p>
 
         {/* Allergy Input */}
         <div className="relative mb-4">
@@ -138,10 +116,10 @@ const FoodPreferences = () => {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {dietaryTags.map((tag, idx) => (
+          {dietaryTags.map((tag, id) => (
             <button
-              key={idx}
-              onClick={() => handleToggleTag(idx)}
+              key={id}
+              onClick={() => handleToggleTag(id)}
               className={`py-2 px-4 rounded-sm text-xs font-semibold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                 tag.active
                   ? "bg-text-primary/20 text-text-primary border "

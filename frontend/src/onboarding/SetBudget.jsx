@@ -38,31 +38,31 @@ const SetBudget = () => {
       nextTo="/onboarding/cooking-frequency"
       nextLabel="Start Cooking"
     >
-      <h1 className="text-subheading tracking-tight font-bold leading-tight mb-1">
+      <h1 className="text-subheading lg:text-5xl tracking-tight font-bold leading-tight mb-2">
         Set your weekly budget
       </h1>
-      <p className="text-base text-text-primary font-inter mb-6">
+      <p className="text-base lg:text-desktop-body text-text-primary font-inter mb-8">
         We'll tailor meal plans that fit your wallet.
       </p>
 
-      <div className="bg-text-muted/10 rounded-2xl p-5 mb-5 relative">
+      <div className="bg-text-muted/10 rounded-2xl p-6 mb-6 relative">
         <input
           type="text"
           value={budgetValue}
           onChange={(e) => setBudgetValue(e.target.value)}
-          className="text-base font-bold w-full border-none font-inter pl-6 py-2 focus:border-b-2 focus:border-b-text-primary focus:outline-0"
+          className="text-lg lg:text-2xl font-bold w-full border-none font-inter pl-8 py-3 focus:border-b-2 focus:border-b-text-primary focus:outline-0 transition-all"
         />
-        <span className="text-base text-text-primary absolute top-1/2 -translate-y-1/2 left-6 font-bold">
+        <span className="text-lg lg:text-2xl text-text-primary absolute top-1/2 -translate-y-1/2 left-6 font-bold">
           ₦
-        </span>{" "}
+        </span>
       </div>
 
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-4 mb-3">
         {tiers.map((tier) => (
           <button
             key={tier}
             onClick={() => handleTierChange(tier)}
-            className={`py-2 px-4 rounded-full text-xs font-semibold font-inter transition-all duration-300 cursor-pointer ${
+            className={`py-3 px-6 rounded-full text-sm font-semibold font-inter transition-all duration-300 cursor-pointer ${
               budgetTier === tier
                 ? "border-2 border-accent-orange text-accent-orange bg-accent-orange/5"
                 : "border-2 border-text-muted/30 text-text-muted"

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <header className="flex items-center justify-between px-5 py-2.5 sticky top-0 left-0 w-full bg-bg-background z-1000">
+    <header className="flex items-center justify-between px-5 py-2.5 sticky top-0 left-0 w-full bg-bg-background z-1000 lg:px-14">
       <div className="flex justify-start items-center gap-4">
         {/* <HamburgerIcon className={"text-text-primary"} /> */}
         <Link to="/" className="w-20 block">
