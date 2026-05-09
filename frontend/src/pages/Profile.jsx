@@ -5,17 +5,17 @@ const Profile = () => {
       items: [
         {
           icon: (
-            <div className="w-10 h-10 bg-[#E8F5E9] rounded-xl flex items-center justify-center text-[#2E7D32]">
+            <div className="w-10 h-10 bg-[#E8F5E9] rounded-xl flex items-center justify-center text-text-primary">
               <svg
-                width="20"
-                height="20"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24px"
+                height="24px"
                 viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
               >
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <path d="M2 10h20m-5-5v14" />
+                <path
+                  fill="currentColor"
+                  d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2.28A2 2 0 0 0 22 15V9a2 2 0 0 0-1-1.72V5a2 2 0 0 0-2-2zm0 2h14v2h-6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6v2H5zm8 4h7v6h-7zm3 1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5"
+                ></path>
               </svg>
             </div>
           ),
@@ -25,7 +25,7 @@ const Profile = () => {
         },
         {
           icon: (
-            <div className="w-10 h-10 bg-[#FFF3E0] rounded-xl flex items-center justify-center text-[#E65100]">
+            <div className="w-10 h-10 bg-[#FFF3E0] rounded-xl flex items-center justify-center text-accent-orange">
               <svg
                 width="20"
                 height="20"
@@ -118,7 +118,7 @@ const Profile = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        <button className="absolute bottom-1 right-1 bg-[#FF7A1A] w-8 h-8 rounded-full flex items-center justify-center border-4 border-[#F8F8DF] text-white">
+        <button className="absolute bottom-1 right-1 bg-accent-orange w-8 h-8 rounded-full flex items-center justify-center border-4 border-[#F8F8DF] text-white">
           <svg
             width="14"
             height="14"
@@ -134,7 +134,7 @@ const Profile = () => {
 
       {/* User Info */}
       <div className="text-center mt-6">
-        <h1 className="text-4xl font-display font-extrabold text-[#244421]">
+        <h1 className="text-4xl font-display font-extrabold text-text-primary">
           John Doe
         </h1>
         <p className="text-sm font-medium text-gray-500 mt-1">
@@ -146,7 +146,7 @@ const Profile = () => {
       <div className="w-full mt-10 flex flex-col gap-8">
         {settingsGroups.map((group, gIdx) => (
           <div key={gIdx} className="flex flex-col gap-3">
-            <h2 className="text-lg font-display font-bold text-[#244421]">
+            <h2 className="text-lg font-display font-bold text-text-primary">
               {group.title}
             </h2>
             <div className="bg-white rounded-3xl shadow-sm border border-black/5 overflow-hidden">
@@ -161,11 +161,11 @@ const Profile = () => {
                 >
                   {item.icon}
                   <div className="flex-1 text-left">
-                    <div className="text-sm font-bold text-[#244421]">
+                    <div className="text-sm font-bold text-text-primary">
                       {item.label}
                     </div>
                     {item.sublabel && (
-                      <div className="text-[11px] text-gray-400 font-medium">
+                      <div className="text-[11px] text-text-muted/75 font-medium">
                         {item.sublabel}
                       </div>
                     )}

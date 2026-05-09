@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { SearchIcon } from "../constants/icons";
+import { useNavigate } from "react-router-dom";
 
 const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -67,6 +68,7 @@ const MenuPage = () => {
 
     return matchesCategory && matchesSearch;
   });
+  const navigate = useNavigate();
 
   return (
     <main className="px-5 pt-8 flex flex-col gap-6">
@@ -157,7 +159,14 @@ const MenuPage = () => {
               <p className="text-[11px] text-white/60 leading-relaxed font-medium">
                 {meal.description}
               </p>
-              <button className="bg-[#FF7A1A] hover:bg-[#e66a13] text-white py-3.5 rounded-xs font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 mt-2">
+              <button
+                className="bg-accent-orange hover:bg-accent-orange/75 text-white py-3.5 rounded-xs font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 mt-2"
+                onClick={() =>
+                  navigate(
+                    `/meal/${meal.name.toLowerCase().replace(/ /g, "-")}`,
+                  )
+                }
+              >
                 View Meal
                 <svg
                   width="16"

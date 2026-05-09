@@ -129,7 +129,7 @@ const HomePage = () => {
               name: "Toast and Tea",
               duration: "20 mins",
               price: "₦1,500",
-              img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=200",
+              img: "/images/tea-bread-small-image.png",
             },
           ].map((meal, i) => (
             <div

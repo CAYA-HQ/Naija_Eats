@@ -134,9 +134,6 @@ const WeeklyPlan = () => {
           >
             Adjust
           </Button>
-          {/* Decorative circles */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full"></div>
-          <div className="absolute -bottom-20 -left-10 w-60 h-60 bg-white/5 rounded-full"></div>
         </div>
       </div>
 
@@ -163,7 +160,11 @@ const WeeklyPlan = () => {
               {dayPlan.meals.map((meal, mIdx) => (
                 <div
                   key={mIdx}
-                  onClick={() => navigate(`/meal/${meal.name.toLowerCase().replace(/ /g, "-")}`)}
+                  onClick={() =>
+                    navigate(
+                      `/meal/${meal.name.toLowerCase().replace(/ /g, "-")}`,
+                    )
+                  }
                   className={`flex items-center gap-4 p-4 cursor-pointer hover:bg-black/5 transition-colors ${
                     mIdx !== dayPlan.meals.length - 1
                       ? "border-b border-text-muted/10"

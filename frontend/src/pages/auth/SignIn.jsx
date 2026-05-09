@@ -1,10 +1,46 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Button from "../../components/Button";
+import Footer from "../../components/Footer";
+import { authService } from "../../services/api";
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await authService.login(formData);
+      console.log("Login successful:", response);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Invalid email or password.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -16,18 +52,25 @@ const SignIn = () => {
             alt="Nigerian Jollof Rice"
             className="w-full h-full object-cover lg:hidden"
           />
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <h1 className="text-white font-display text-3xl font-bold text-center leading-tight px-4">
+          <img
+            src="/images/homepage-desktop-picture.jpeg"
+            alt="Nigerian Jollof Rice"
+            className="w-full h-full object-cover hidden lg:block"
+          />
+          <div className="absolute inset-0 bg-black/50 flex flex-col items-start justify-center px-4">
+            <h1 className="text-white font-display text-3xl lg:text-[4rem] font-bold text-center tracking-tight lg:text-left leading-tight lg:mb-6">
               Heritage Flavors,
               <br />
-              Modern
-              <br />
-              Convenience.
+              Modern Convenience.
             </h1>
+            <p className="hidden lg:block text-base text-white font-semibold text-left">
+              Experience the finest Nigerian cuisine delivered with precision
+              and pride. Your journey to the heart of our kitchen starts here.
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-sm p-6 border border-text-muted/25 pb-8">
+        <div className="bg-white rounded-sm lg:rounded-xl p-6 border border-text-muted/25 pb-8">
           <h2 className="text-3xl text-text-primary font-extrabold mb-1.5">
             Welcome Back
           </h2>
@@ -35,14 +78,23 @@ const SignIn = () => {
             Sign in to explore Nigeria's premium tastes.
           </p>
 
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium">
+                {error}
+              </div>
+            )}
+
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-inter font-bold text-text-primary uppercase tracking-wide">
-                Email or Phone
+                Email Address
               </label>
               <input
-                type="text"
-                placeholder="Enter your email or phone"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Enter your email"
                 className="w-full border border-text-muted/25 px-4 py-3.5 text-sm font-inter font-medium focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                 required
               />
@@ -63,6 +115,9 @@ const SignIn = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
                   placeholder="••••••••"
                   className="w-full border border-text-muted/25 px-4 py-3.5 text-sm font-inter font-medium focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all tracking-widest placeholder:tracking-widest"
                   required
@@ -89,21 +144,28 @@ const SignIn = () => {
               </div>
             </div>
 
-            <Button variant="primary" className="mt-4">
-              Sign In
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
+            <Button
+              variant="primary"
+              type="submit"
+              className="mt-4"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing In..." : "Sign In"}
+              {!isLoading && (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              )}
             </Button>
 
             <div className="flex items-center gap-4 my-2">
@@ -112,7 +174,7 @@ const SignIn = () => {
               <div className="h-px bg-gray-200 flex-1"></div>
             </div>
 
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" type="button" className="w-full">
               Continue as Guest
             </Button>
 
@@ -131,32 +193,7 @@ const SignIn = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 flex flex-col items-center gap-4 text-sm text-gray-500 mt-auto px-4">
-        <div className="flex gap-2">
-          <a
-            href="#"
-            className="text-sm hover:text-text-primary transition-colors"
-          >
-            Privacy Policy
-          </a>
-          <a
-            href="#"
-            className="text-sm hover:text-text-primary transition-colors"
-          >
-            Terms of Service
-          </a>
-          <a
-            href="#"
-            className="text-sm hover:text-text-primary transition-colors"
-          >
-            Help Center
-          </a>
-        </div>
-        <p className="text-center text-xs text-gray-400">
-          © 2026 NaijaEats Corporate. All Rights Reserved.
-        </p>
-      </footer>
+      <Footer />
     </>
   );
 };

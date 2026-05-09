@@ -20,7 +20,7 @@ const MealDetail = () => {
   const meal = {
     id: id,
     name: "Jollof Rice & Grilled Fish",
-    image: "/images/jollof.webp",
+    image: "/images/jollof_fish_plantains.png",
     isPremium: true,
     time: "45 MINS",
     cost: "LOW COST",
@@ -61,14 +61,14 @@ const MealDetail = () => {
         color: "bg-[#8B4513]/10",
       },
       {
-        icon: <LeafIcon className="w-6 h-6 text-[#2D5A27]" />,
+        icon: <LeafIcon className="w-6 h-6 text-text-primary" />,
         text: "Adjust heat to medium-low once rice is added to prevent burning. Slow cooking ensures every grain is perfectly tender without sticking to the bottom of the pot.",
         color: "bg-[#2D5A27]/10",
       },
       {
-        icon: <GrainIcon className="w-6 h-6 text-[#FF7A1A]" />,
+        icon: <GrainIcon className="w-6 h-6 text-accent-orange" />,
         text: "Garnish with fresh onions for extra crunch. Adding them in the last 2 minutes of steaming allows them to soften slightly while maintaining a fresh bite.",
-        color: "bg-[#FF7A1A]/10",
+        color: "bg-accent-oranetext-accent-orange/10",
       },
     ],
     proTip: {
@@ -101,6 +101,7 @@ const MealDetail = () => {
           alt={meal.name}
           className="w-full h-full object-cover"
         />
+        <div className="absolute bg-linear-to-b inset-0 from-transparent via-transparent to-white/50"></div>
         <div className="absolute top-4 left-4">
           <button
             onClick={() => navigate(-1)}
@@ -111,7 +112,6 @@ const MealDetail = () => {
         </div>
       </div>
 
-      {/* Info Card */}
       <div className="px-5 -mt-10 relative z-10">
         <div className="bg-white rounded-[32px] p-6 shadow-xl border border-black/5">
           <div className="flex justify-between items-start mb-2">
@@ -179,7 +179,6 @@ const MealDetail = () => {
         </div>
       </div>
 
-      {/* Tab Content */}
       <div className="px-5 py-6 mb-24">
         {activeTab === "INGREDIENTS" && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
