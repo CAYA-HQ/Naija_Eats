@@ -27,37 +27,74 @@ router.post("/preference", async (req: Request, res: Response) => {
   } = req.body;
 
   try {
-    // Upsert budget — one budget row per user
-    const { error: budgetError } = await supabase
+    const { data: existingBudget } = await supabase
       .from("budgets")
-      .upsert(
-        { user_id: user.id, amount, frequency, fluctuation_buffer },
-        { onConflict: "user_id" }
-      );
-    if (budgetError) return _res.error(500, res, budgetError.message);
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existingBudget) {
+      const { error: budgetError } = await supabase
+        .from("budgets")
+        .update({ amount, frequency, fluctuation_buffer })
+        .eq("user_id", user.id);
+      if (budgetError) return _res.error(500, res, budgetError.message);
+    } else {
+      const { error: budgetError } = await supabase
+        .from("budgets")
+        .insert({ user_id: user.id, amount, frequency, fluctuation_buffer });
+      if (budgetError) return _res.error(500, res, budgetError.message);
+    }
 
     // Upsert household profile
-    const { error: householdError } = await supabase
+    const { data: existingProfile } = await supabase
       .from("household_profiles")
-      .upsert(
-        { user_id: user.id, household_size, daily_meals, is_dessert, cooking_frequency },
-        { onConflict: "user_id" }
-      );
-    if (householdError) return _res.error(500, res, householdError.message);
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existingProfile) {
+      const { error: householdError } = await supabase
+        .from("household_profiles")
+        .update({ household_size, daily_meals, is_dessert, cooking_frequency })
+        .eq("user_id", user.id);
+      if (householdError) return _res.error(500, res, householdError.message);
+    } else {
+      const { error: householdError } = await supabase
+        .from("household_profiles")
+        .insert({
+          user_id: user.id,
+          household_size,
+          daily_meals,
+          is_dessert,
+          cooking_frequency,
+        });
+      if (householdError) return _res.error(500, res, householdError.message);
+    }
 
     // Insert preferences (delete old ones first to avoid duplicates)
     if (preferences && Array.isArray(preferences) && preferences.length > 0) {
       await supabase.from("user_preferences").delete().eq("user_id", user.id);
-      const prefRows = preferences.map((p: string) => ({ user_id: user.id, preference: p }));
-      const { error: prefError } = await supabase.from("user_preferences").insert(prefRows);
+      const prefRows = preferences.map((p: string) => ({
+        user_id: user.id,
+        preference: p,
+      }));
+      const { error: prefError } = await supabase
+        .from("user_preferences")
+        .insert(prefRows);
       if (prefError) return _res.error(500, res, prefError.message);
     }
 
     // Insert allergies (delete old ones first to avoid duplicates)
     if (allergies && Array.isArray(allergies) && allergies.length > 0) {
       await supabase.from("user_allergies").delete().eq("user_id", user.id);
-      const allergyRows = allergies.map((a: string) => ({ user_id: user.id, allergy: a }));
-      const { error: allergyError } = await supabase.from("user_allergies").insert(allergyRows);
+      const allergyRows = allergies.map((a: string) => ({
+        user_id: user.id,
+        allergy: a,
+      }));
+      const { error: allergyError } = await supabase
+        .from("user_allergies")
+        .insert(allergyRows);
       if (allergyError) return _res.error(500, res, allergyError.message);
     }
 
@@ -120,16 +157,14 @@ router.post("/meals-plan/generate", async (req: Request, res: Response) => {
     if (planError) return _res.error(500, res, planError.message);
 
     // 2. Insert all meal plan items linked to this plan
-    const itemRows = items.map((item: {
-      meal_id: string;
-      day_of_week: string;
-      meal_slot: string;
-    }) => ({
-      plan_id: plan.id,
-      meal_id: item.meal_id,
-      day_of_week: item.day_of_week,
-      meal_slot: item.meal_slot,
-    }));
+    const itemRows = items.map(
+      (item: { meal_id: string; day_of_week: string; meal_slot: string }) => ({
+        plan_id: plan.id,
+        meal_id: item.meal_id,
+        day_of_week: item.day_of_week,
+        meal_slot: item.meal_slot,
+      }),
+    );
 
     const { error: itemsError } = await supabase
       .from("meal_plan_items")
@@ -139,7 +174,8 @@ router.post("/meals-plan/generate", async (req: Request, res: Response) => {
     // 3. Return the plan with all its items and meal details
     const { data: fullPlan, error: fetchError } = await supabase
       .from("meal_plans")
-      .select(`
+      .select(
+        `
         *,
         meal_plan_items (
           id,
@@ -155,7 +191,8 @@ router.post("/meals-plan/generate", async (req: Request, res: Response) => {
             dietary_tags
           )
         )
-      `)
+      `,
+      )
       .eq("id", plan.id)
       .single();
     if (fetchError) return _res.error(500, res, fetchError.message);
@@ -175,7 +212,8 @@ router.get("/meals-plan/:id", async (req: Request, res: Response) => {
   try {
     const { data, error } = await supabase
       .from("meal_plans")
-      .select(`
+      .select(
+        `
         *,
         meal_plan_items (
           id,
@@ -192,7 +230,8 @@ router.get("/meals-plan/:id", async (req: Request, res: Response) => {
             instructions
           )
         )
-      `)
+      `,
+      )
       .eq("id", id)
       .eq("user_id", user.id) // ensures users can only access their own plans
       .single();
