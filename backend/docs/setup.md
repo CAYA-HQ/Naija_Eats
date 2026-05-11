@@ -7,6 +7,7 @@ This project runs on Bun with an Express API server and Supabase for authenticat
 - Bun installed locally.
 - A Supabase project.
 - Supabase URL and anon key available in environment variables.
+- `curl` and `jq` if you want to run the smoke-test scripts.
 
 ## Installation
 
@@ -19,7 +20,7 @@ bun install
 Create a local environment file:
 
 ```bash
-cp .env.example .env
+touch .env
 ```
 
 Update `.env` with values for your Supabase project:
@@ -31,6 +32,22 @@ PORT=3000
 ```
 
 `src/config/supabase.ts` reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` at startup. If either value is missing, the server throws an error and does not start.
+
+## Supabase Data Model
+
+The backend expects these Supabase tables to exist:
+
+- `profiles`: receives a row with `full_name` and `avatar_url` during registration.
+- `budgets`: upserted by `POST /preference` with `user_id`, `amount`, `frequency`, and `fluctuation_buffer`.
+- `household_profiles`: upserted by `POST /preference` with `user_id`, `household_size`, `daily_meals`, `is_dessert`, and `cooking_frequency`.
+- `user_preferences`: replaced by `POST /preference` when a `preferences` array is provided.
+- `user_allergies`: replaced by `POST /preference` when an `allergies` array is provided.
+- `meals`: read by `GET /meals`.
+- `meal_plans`: written and read by meal-plan routes.
+- `meal_plan_items`: written and read by meal-plan routes.
+- `shopping_list_items`: read by `GET /ingredients/:planId`.
+
+The route handlers rely on Supabase Auth user IDs. Row-level security policies should allow authenticated users to access only their own rows where applicable.
 
 ## Running The Server
 
@@ -48,6 +65,12 @@ bun run start
 
 By default, the API runs on port `3000` unless `PORT` is set.
 
+Check the running server:
+
+```bash
+curl http://localhost:3000/health
+```
+
 ## Authentication Flow
 
 1. A user registers with `POST /auth/register`.
@@ -60,6 +83,16 @@ Authorization: Bearer <access_token>
 ```
 
 The auth middleware validates the token through Supabase before allowing the request to continue.
+
+## Smoke Testing
+
+With the API running, run:
+
+```bash
+./test.sh http://localhost:3000
+```
+
+The script creates a temporary test email, exercises health, auth, and protected routes, and prints pass/fail results. It requires a working Supabase project and `jq` installed locally. `./test-live.sh` currently contains the same live API test flow.
 
 ## Response Shape
 
@@ -83,3 +116,5 @@ Error responses follow this shape:
   "message": "Error message"
 }
 ```
+
+When a route does not pass a data payload, the helper sets `data` to `undefined`, so the serialized JSON response omits that key.
