@@ -73,7 +73,7 @@ const WelcomePage = () => {
         />
         <div>
           <div className="w-auto mb-auto h-full flex flex-col justify-center items-center gap-6">
-            <h2 className="text-5xl text-text-primary tracking-tight leading-20 font-bold text-left pb-2">
+            <h2 className="text-[52px] text-text-primary tracking-tight leading-17 font-bold text-left pb-2">
               Stop stressing about what to cook
             </h2>
 
@@ -89,7 +89,7 @@ const WelcomePage = () => {
             </Button>
           </div>
 
-          <div className=" hidden lg:flex justify-start items-center gap-4 mt-4 mr-auto">
+          <div className=" hidden lg:flex justify-start items-center gap-3 mt-4 mr-auto">
             <p className="text-text-muted/75 text-base text-left">
               Already have an account?
             </p>
@@ -108,7 +108,7 @@ const WelcomePage = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full h-full">
+        <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full max-w-md h-full max-h-80">
           <div className="col-span-4 row-span-2">
             <img
               src="/images/nigerian-jollof-rice.webp"

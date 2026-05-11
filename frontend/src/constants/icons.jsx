@@ -580,3 +580,116 @@ export const AppleIcon = ({ className }) => (
     ></path>
   </svg>
 );
+
+export const StarIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    className={className}
+  >
+    <path
+      fill="currentColor"
+      d="m8.58 17.25l.92-3.89l-3-2.58l3.95-.37L12 6.8l1.55 3.65l3.95.33l-3 2.58l.92 3.89L12 15.19zM12 2a10 10 0 0 1 10 10a10 10 0 0 1-10 10A10 10 0 0 1 2 12A10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8a8 8 0 0 0 8 8a8 8 0 0 0 8-8a8 8 0 0 0-8-8"
+    ></path>
+  </svg>
+);
+export const BasketIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    className={className}
+  >
+    <path
+      fill="currentColor"
+      d="M22 9h-4.79l-4.38-6.56a.997.997 0 0 0-1.66.01L6.79 9H2c-.55 0-1 .45-1 1c0 .09 0 .18.04.27l2.54 9.27c.23.84 1 1.46 1.92 1.46h13c.92 0 1.69-.62 1.93-1.46l2.54-9.27L23 10c0-.55-.45-1-1-1M12 4.8L14.8 9H9.2zM18.5 19h-13l-2.19-8H20.7zM12 13c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2"
+    ></path>
+  </svg>
+);
+
+export const GenerateIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24px"
+    height="24px"
+    viewBox="0 0 16 16"
+    className={className}
+  >
+    <path
+      fill="currentColor"
+      d="m7.187 13.528l-.034.056a.2.2 0 0 1-.306 0l-.034-.056l-.069-.175l.256.101l.255-.1zM6.813 2.472a.2.2 0 0 1 .374 0L8.219 5.09a3 3 0 0 0 1.69 1.69l2.444.963l.101.256l-.1.255l-2.445.964l-.143.06a3 3 0 0 0-1.547 1.63l-.964 2.444l-.255.101l-.256-.1l-.963-2.445a3 3 0 0 0-1.547-1.63l-.143-.06l-2.62-1.032a.2.2 0 0 1 0-.374l.175-.069l2.445-.963a3 3 0 0 0 1.63-1.547l.06-.143zm-.102 2.986A4 4 0 0 1 4.648 7.63l-.19.08l-.733.29l.733.289a4 4 0 0 1 2.253 2.253l.289.732l.29-.732a4 4 0 0 1 2.252-2.253L10.274 8l-.732-.29A4 4 0 0 1 7.37 5.649l-.08-.19L7 4.725zm5.817 2.355a.2.2 0 0 1 0 .374l-.175.068l.101-.255l-.1-.256zm-.165-4.947c.224.401.579.716 1.011.887l.39.154a.1.1 0 0 1 0 .186l-.087.034l-.303.12l-.188.086a2 2 0 0 0-.939 1.041l-.12.303l-.034.087l-.016.028a.1.1 0 0 1-.154 0l-.016-.028l-.035-.087l-.12-.303a2 2 0 0 0-.937-1.041l-.189-.086l-.39-.154a.1.1 0 0 1 0-.186l.086-.035l.304-.12c.432-.17.786-.485 1.01-.886L12 2.723zm-.456-.63a.1.1 0 0 1 .186 0l.154.39q.05.124.116.24L12 2.723l-.364.143l.031-.052l.086-.188zm.519 6.951a.08.08 0 0 1 .148 0a3.97 3.97 0 0 0 2.239 2.239a.08.08 0 0 1 0 .148l-.07.03a3.97 3.97 0 0 0-2.169 2.209l-.012.022a.08.08 0 0 1-.123 0l-.013-.023a3.97 3.97 0 0 0-2.049-2.158l-.19-.08a.08.08 0 0 1 0-.148a3.97 3.97 0 0 0 2.239-2.239m.074 1.784q-.245.285-.53.529q.285.245.53.528q.245-.284.528-.528a5 5 0 0 1-.528-.53"
+    ></path>
+  </svg>
+);
+export const SidebarIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    className={className}
+  >
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M9 4.5v15m-4.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125"
+    ></path>
+  </svg>
+);
+export const ChartIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    className={className}
+  >
+    <path
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeWidth={2}
+      d="M17 5v15m-5-9v9m-5-6v6"
+    ></path>
+  </svg>
+);
+export const BookmarkIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    className={className}
+  >
+    <path
+      fill="currentColor"
+      d="M5 21V5q0-.825.588-1.412T7 3h10q.825 0 1.413.588T19 5v16l-7-3zm2-3.05l5-2.15l5 2.15V5H7zM7 5h10z"
+    ></path>
+  </svg>
+);
+export const TrendUpIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    className={className}
+  >
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+    >
+      <path d="m3 17l6-6l4 4l8-8"></path>
+      <path d="M17 7h4v4"></path>
+    </g>
+  </svg>
+);

@@ -17,7 +17,7 @@ const BottomTabBar = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-4 px-6 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-4 px-6 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
       {tabs.map((tab) => {
         const isActive = location.pathname === tab.path;
         const Icon = tab.icon;
@@ -30,7 +30,7 @@ const BottomTabBar = () => {
               isActive ? "text-accent-orange" : "opacity-30 hover:opacity-100"
             }`}
           >
-            <Icon className="w-6 h-6" />
+            <Icon className="w-5 h-5" />
             <span className="text-[10px] font-bold uppercase tracking-widest">
               {tab.label}
             </span>

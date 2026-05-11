@@ -105,7 +105,7 @@ const MealDetail = () => {
         <div className="absolute top-4 left-4">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg"
+            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg cursor-pointer"
           >
             <ChevronRightIcon className="w-6 h-6 rotate-180 text-text-primary" />
           </button>
@@ -164,15 +164,15 @@ const MealDetail = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-xs font-bold tracking-widest transition-all relative ${
+              className={`pb-3 text-xs font-bold tracking-widest transition-all relative cursor-pointer ${
                 activeTab === tab
-                  ? "text-text-link"
+                  ? "text-accent-orange"
                   : "text-text-primary/40 hover:text-text-primary/60"
               }`}
             >
               {tab}
               {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-text-link" />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-accent-orange" />
               )}
             </button>
           ))}

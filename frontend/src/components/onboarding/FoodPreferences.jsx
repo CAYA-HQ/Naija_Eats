@@ -1,5 +1,5 @@
 import { useState } from "react";
-import OnboardingLayout from "../OnboardingLayout";
+import OnboardingLayout from "../layout/OnboardingLayout";
 import {
   RhombusAlertIcon,
   CircleAlertIcon,

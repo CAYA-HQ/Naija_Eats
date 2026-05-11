@@ -1,6 +1,6 @@
 import { useState } from "react";
-import OnboardingLayout from "../OnboardingLayout";
-import CustomCheckbox from "../CustomCheckbox";
+import OnboardingLayout from "../layout/OnboardingLayout";
+import CustomCheckbox from "../ui/CustomCheckbox";
 import { GroupIcon, SweetTooth } from "../../constants/icons";
 
 const CookingFrequency = () => {

@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import CustomCheckbox from "../../components/ui/CustomCheckbox";
 import Button from "../../components/ui/Button";
 import { AppleIcon, GoogleIcon } from "../../constants/icons";
 import Footer from "../../components/ui/Footer";
+import { authService } from "../../services/api";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isTerms, setTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -15,7 +17,7 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    state: "",
+    state: "Lagos state",
     phoneNumber: "",
     password: "",
   });
@@ -40,7 +42,16 @@ const SignUp = () => {
     }
 
     setIsLoading(true);
-    setError("No API yet!");
+    setError("");
+
+    try {
+      await authService.signUp(formData);
+      navigate("/sign-in"); // Redirect to sign in page after successful sign up
+    } catch (err) {
+      setError(err.message || "An error occurred during sign up. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -113,10 +124,12 @@ const SignUp = () => {
                 State
               </label>
               <select
+                name="state"
+                value={formData.state}
                 className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                 onChange={handleInputChange}
               >
-                <option value={formData.state}>Lagos state</option>
+                <option value="Lagos state">Lagos state</option>
               </select>
             </div>
 

@@ -1,5 +1,5 @@
-import Button from "../Button";
-import Header from "../Header";
+import Button from "../ui/Button";
+import Header from "../ui/Header";
 
 const STEPS = [
   { id: 1, label: "Budget & Buffer" },

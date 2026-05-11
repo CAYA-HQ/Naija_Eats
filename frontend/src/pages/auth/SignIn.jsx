@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import Button from "../../components/ui/Button";
 import Footer from "../../components/ui/Footer";
+import { authService } from "../../services/api";
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,6 +28,15 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+
+    try {
+      await authService.signIn(formData.email, formData.password);
+      navigate("/"); // Redirect to home page
+    } catch (err) {
+      setError(err.message || "An error occurred during sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
