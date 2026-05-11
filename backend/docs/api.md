@@ -2,6 +2,14 @@
 
 The API is mounted from `src/app.ts`.
 
+## Base URL
+
+Local development defaults to:
+
+```text
+http://localhost:3000
+```
+
 ## Health
 
 ### `GET /health`
@@ -52,6 +60,8 @@ Success response:
 }
 ```
 
+Validation errors return `400`. Supabase signup errors also return `400`. Unexpected server errors return `500`.
+
 ### `POST /auth/login`
 
 Logs in an existing user with Supabase Auth.
@@ -77,6 +87,8 @@ Success response:
 }
 ```
 
+Invalid credentials return `401`. Missing email or password returns `400`.
+
 ## Protected Routes
 
 The routes below require:
@@ -85,74 +97,202 @@ The routes below require:
 Authorization: Bearer <access_token>
 ```
 
-The current implementation returns placeholder data for these endpoints.
+The token is validated with `supabase.auth.getUser(token)`. Missing, malformed, invalid, or expired tokens return `401`.
 
 ### `POST /preference`
 
-Saves or retrieves meal preference data.
+Saves onboarding data for the authenticated user. The handler upserts one budget row and one household profile row, then replaces preference and allergy rows when arrays are provided.
 
-Current response:
+Request body:
+
+```json
+{
+  "amount": 50000,
+  "frequency": "monthly",
+  "fluctuation_buffer": 5000,
+  "household_size": 4,
+  "daily_meals": 3,
+  "is_dessert": false,
+  "cooking_frequency": "daily",
+  "preferences": ["high-protein", "local-meals"],
+  "allergies": ["peanuts"]
+}
+```
+
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "preference retrieved successfully",
-  "data": {}
+  "message": "Preferences saved successfully"
 }
 ```
 
 ### `GET /meals`
 
-Returns available meals.
+Returns meals from the Supabase `meals` table, ordered by `name`.
 
-Current response:
+Optional query parameters:
+
+```text
+category=breakfast|lunch|dinner
+```
+
+Example:
+
+```http
+GET /meals?category=breakfast
+```
+
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "meals retrieved successfully",
-  "data": {}
+  "message": "Meals retrieved successfully",
+  "data": [
+    {
+      "id": "meal-id",
+      "name": "Akara and Pap",
+      "category": "breakfast",
+      "price_min": 1500,
+      "price_max": 2500,
+      "prep_time_mins": 30,
+      "dietary_tags": ["vegetarian"]
+    }
+  ]
 }
 ```
 
 ### `POST /meals-plan/generate`
 
-Generates a meal plan.
+Creates a new active meal plan for the authenticated user and inserts the selected meal items.
 
-Current response:
+Request body:
+
+```json
+{
+  "items": [
+    {
+      "meal_id": "meal-id-1",
+      "day_of_week": "monday",
+      "meal_slot": "breakfast"
+    },
+    {
+      "meal_id": "meal-id-2",
+      "day_of_week": "monday",
+      "meal_slot": "lunch"
+    }
+  ]
+}
+```
+
+`items` is required and must be a non-empty array. Missing or empty `items` returns `400`.
+
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "meals plan generated successfully",
-  "data": {}
+  "message": "Meal plan generated successfully",
+  "data": {
+    "id": "plan-id",
+    "user_id": "user-id",
+    "status": "active",
+    "meal_plan_items": [
+      {
+        "id": "item-id",
+        "day_of_week": "monday",
+        "meal_slot": "breakfast",
+        "meals": {
+          "id": "meal-id-1",
+          "name": "Akara and Pap",
+          "category": "breakfast",
+          "price_min": 1500,
+          "price_max": 2500,
+          "prep_time_mins": 30,
+          "dietary_tags": ["vegetarian"]
+        }
+      }
+    ]
+  }
 }
 ```
 
 ### `GET /meals-plan/:id`
 
-Returns one meal plan by ID.
+Returns one saved meal plan that belongs to the authenticated user. Users cannot fetch another user's plan through this endpoint.
 
-Current response:
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "meals plan generated successfully",
-  "data": {}
+  "message": "Meal plan retrieved successfully",
+  "data": {
+    "id": "plan-id",
+    "user_id": "user-id",
+    "status": "active",
+    "meal_plan_items": [
+      {
+        "id": "item-id",
+        "day_of_week": "monday",
+        "meal_slot": "breakfast",
+        "meals": {
+          "id": "meal-id",
+          "name": "Akara and Pap",
+          "category": "breakfast",
+          "price_min": 1500,
+          "price_max": 2500,
+          "prep_time_mins": 30,
+          "dietary_tags": ["vegetarian"],
+          "instructions": "Preparation instructions"
+        }
+      }
+    ]
+  }
 }
 ```
 
+If the plan does not exist or does not belong to the authenticated user, the route returns `404`.
+
 ### `GET /ingredients/:planId`
 
-Returns ingredients for a meal plan.
+Returns shopping-list ingredients for a meal plan that belongs to the authenticated user. Items are grouped by `category`, which represents the market section.
 
-Current response:
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "ingredients retrieved successfully",
-  "data": {}
+  "message": "Ingredients retrieved successfully",
+  "data": {
+    "plan_id": "plan-id",
+    "sections": {
+      "Produce": [
+        {
+          "id": "item-id",
+          "meal_plan_id": "plan-id",
+          "name": "Tomatoes",
+          "quantity": "6",
+          "category": "Produce"
+        }
+      ],
+      "Other": []
+    }
+  }
+}
+```
+
+If the plan does not exist or does not belong to the authenticated user, the route returns `404`.
+
+## Error Response Shape
+
+Errors use the shared helper in `src/utils/helper.ts`:
+
+```json
+{
+  "success": false,
+  "message": "Error message"
 }
 ```
