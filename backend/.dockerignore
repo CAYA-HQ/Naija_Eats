@@ -1,0 +1,10 @@
+.codex
+.env
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+docs
+node_modules
+npm-debug.log
+bun-error.log

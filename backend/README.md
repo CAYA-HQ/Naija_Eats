@@ -31,6 +31,21 @@ bun run dev
 
 The server listens on `PORT` from `.env`, or `3000` by default.
 
+## Docker
+
+Build and start the API with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Or build and run the image directly:
+
+```bash
+docker build -t naija-eats-backend .
+docker run --env-file .env -p 3000:3000 naija-eats-backend
+```
+
 ## Scripts
 
 - `bun run dev`: starts the server with file watching.
