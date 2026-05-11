@@ -10,6 +10,7 @@
   --color-body: #43493d;
   --color-text-muted: #64748b;
   --text-subheading: 2rem;
+  --text-desktop-body: 18px;
   --font-display: "Playfair Display", serif;
   --font-inter: "Inter", sans-serif;
 }
@@ -28,6 +29,7 @@ body {
 #root {
   width: inherit;
   height: inherit;
+  /* min-height: 100vh; */
 }
 
 h1,

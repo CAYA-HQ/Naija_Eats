@@ -1,23 +1,87 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import Header from "../../components/Header";
-import CustomCheckbox from "../../components/CustomCheckbox";
-import Button from "../../components/Button";
+import { useNavigate, Link } from "react-router-dom";
+import Header from "../../components/ui/Header";
+import CustomCheckbox from "../../components/ui/CustomCheckbox";
+import Button from "../../components/ui/Button";
 import { AppleIcon, GoogleIcon } from "../../constants/icons";
+import Footer from "../../components/ui/Footer";
+import { authService } from "../../services/api";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isTerms, setTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    state: "Lagos state",
+    phoneNumber: "",
+    password: "",
+  });
+
   const handleToggleTerms = () => {
     setTerms(!isTerms);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isTerms) {
+      setError("Please agree to the Terms of Service and Privacy Policy.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await authService.signUp(formData);
+      navigate("/sign-in"); // Redirect to sign in page after successful sign up
+    } catch (err) {
+      setError(err.message || "An error occurred during sign up. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <>
+    <div className="min-h-screen">
       <Header />
 
-      <main className="flex-1 flex flex-col p-4 justify-center py-6">
-        <div className="bg-white rounded-sm p-6  border border-text-muted/25">
+      <main className="flex-1 h-full flex flex-col p-4 gap-6 lg:grid lg:grid-cols-2 lg:gap-4">
+        <div className="relative rounded-xl overflow-hidden h-48 w-full shadow-lg shrink-0 hidden lg:block lg:w-full lg:h-full">
+          <img
+            src="/images/sign-in-hero.webp"
+            alt="Nigerian Jollof Rice"
+            className="w-full h-full object-cover lg:hidden"
+          />
+          <img
+            src="/images/homepage-desktop-picture.jpeg"
+            alt="Nigerian Jollof Rice"
+            className="w-full h-full object-cover hidden lg:block"
+          />
+          <div className="absolute inset-0 bg-black/50 flex flex-col items-start justify-center px-4">
+            <h1 className="text-white font-display text-3xl lg:text-[4rem] font-bold text-center tracking-tight lg:text-left leading-tight lg:mb-6">
+              Heritage Flavors,
+              <br /> Modern Convenience.
+            </h1>
+            <p className="hidden lg:block text-base text-white font-semibold text-left">
+              Experience the finest Nigerian cuisine delivered with precision
+              and pride. Your journey to the heart of our kitchen starts here.
+            </p>
+          </div>
+        </div>
+        <div className="bg-white rounded-sm lg:rounded-xl p-6 border border-text-muted/25 pb-8">
           <h1 className="font-display text-[2.2rem] text-text-primary font-extrabold mb-2 text-center tracking-tight">
             Join the Feast
           </h1>
@@ -25,13 +89,16 @@ const SignUp = () => {
             Join us now and say good bye to food making decision paralysis!
           </p>
 
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-base font-inter font-bold text-text-primary">
                 Full Name
               </label>
               <input
                 type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
                 placeholder="Enter your full name"
                 className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                 required
@@ -44,10 +111,26 @@ const SignUp = () => {
               </label>
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
                 placeholder="name@example.com"
                 className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                 required
               />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-base font-inter font-bold text-text-primary">
+                State
+              </label>
+              <select
+                name="state"
+                value={formData.state}
+                className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
+                onChange={handleInputChange}
+              >
+                <option value="Lagos state">Lagos state</option>
+              </select>
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -63,6 +146,9 @@ const SignUp = () => {
                 />
                 <input
                   type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
                   placeholder="8012345678"
                   className="flex-1 border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm w-full focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                   required
@@ -77,6 +163,9 @@ const SignUp = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
                   placeholder="Create a strong password"
                   className="w-full border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                   required
@@ -127,22 +216,34 @@ const SignUp = () => {
                 .
               </label>
             </div>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm font-medium">
+                {error}
+              </div>
+            )}
 
-            <Button variant="primary" className="mt-4">
-              Create Account
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
+            <Button
+              variant="primary"
+              type="submit"
+              className="mt-4"
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
+              {!isLoading && (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              )}
             </Button>
 
             <div className="flex items-center gap-4 my-2">
@@ -154,11 +255,11 @@ const SignUp = () => {
             </div>
 
             <div className="flex gap-4">
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" type="button" className="flex-1">
                 <GoogleIcon />
                 Google
               </Button>
-              <Button variant="outline" className="flex-1 group">
+              <Button variant="outline" type="button" className="flex-1 group">
                 <AppleIcon className={"group-hover:text-white"} />
                 Apple
               </Button>
@@ -179,21 +280,8 @@ const SignUp = () => {
         </div>
       </main>
 
-      <footer className="py-6 flex flex-col items-center gap-4 text-[13px] text-gray-500 px-4 bg-[#ececd6] mt-auto">
-        <div className="flex gap-3 font-medium">
-          <a href="#" className="hover:text-text-link transition-colors">
-            Help Center
-          </a>
-          <a href="#" className="hover:text-text-link transition-colors">
-            Privacy
-          </a>
-          <a href="#" className="hover:text-text-link transition-colors">
-            Terms
-          </a>
-          <span className="text-gray-400">© 2026 NaijaEats</span>
-        </div>
-      </footer>
-    </>
+      <Footer />
+    </div>
   );
 };
 

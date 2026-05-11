@@ -1,35 +1,77 @@
-import Header from "./components/Header";
 import "./globals.css";
+import HomePageLayout from "./components/layout/HomePageLayout";
 import HomePage from "./pages/HomePage";
-import CookingFrequency from "./onboarding/CookingFrequency";
-import SetBudget from "./onboarding/SetBudget";
+import CookingFrequency from "./components/onboarding/CookingFrequency";
+import SetBudget from "./components/onboarding/SetBudget";
 
-import WelcomePage from "./onboarding/WelcomePage";
-import { Routes, Route, useLocation } from "react-router-dom";
+import WelcomePage from "./components/onboarding/WelcomePage";
+import { Routes, Route } from "react-router-dom";
 import { RequireOnboarding } from "./RequireOnboarding";
 // import Buffer from "./onboarding/Buffer";
-import FoodPreferences from "./onboarding/FoodPreferences";
+import FoodPreferences from "./components/onboarding/FoodPreferences";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
-import GeneratingPlan from "./onboarding/GeneratingPlan";
-import MealPlan from "./onboarding/MealPlan";
-import WeeklyPlan from "./pages/WeeklyPlan";
+import GeneratingPlan from "./components/onboarding/GeneratingPlan";
+import MealPlan from "./components/onboarding/MealPlan";
+import WeeklyPlan from "./components/onboarding/WeeklyPlan";
 import Market from "./pages/Market";
+import MenuPage from "./pages/MenuPage";
+import Profile from "./pages/Profile";
+import MealDetail from "./pages/MealDetail";
 
 function App() {
-  const location = useLocation();
-  const hideGlobalHeader =
-    location.pathname.includes("/onboarding/welcome") ||
-    location.pathname.includes("/onboarding/generating-plan") ||
-    location.pathname.includes("/sign-in") ||
-    location.pathname.includes("/sign-up");
-
   return (
     <>
-      {!hideGlobalHeader && <Header />}
       <Routes>
         <Route element={<RequireOnboarding />}>
-          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/"
+            element={
+              <HomePageLayout>
+                <HomePage />
+              </HomePageLayout>
+            }
+          />
+          <Route
+            path="/market"
+            element={
+              <HomePageLayout>
+                <Market />
+              </HomePageLayout>
+            }
+          />
+          <Route
+            path="/menu-page"
+            element={
+              <HomePageLayout>
+                <MenuPage />
+              </HomePageLayout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <HomePageLayout>
+                <Profile />
+              </HomePageLayout>
+            }
+          />
+          <Route
+            path="/weekly-plan"
+            element={
+              <HomePageLayout>
+                <WeeklyPlan />
+              </HomePageLayout>
+            }
+          />
+          <Route
+            path="/meal/:id"
+            element={
+              <HomePageLayout>
+                <MealDetail />
+              </HomePageLayout>
+            }
+          />
         </Route>
         <Route path="/onboarding/welcome" element={<WelcomePage />} />
         <Route path="/onboarding/set-budget" element={<SetBudget />} />
@@ -48,8 +90,6 @@ function App() {
           element={<GeneratingPlan />}
         />
         <Route path="/onboarding/meal-plan" element={<MealPlan />} />
-        <Route path="/weekly-plan" element={<WeeklyPlan />} />
-        <Route path="/market" element={<Market />} />
       </Routes>
     </>
   );

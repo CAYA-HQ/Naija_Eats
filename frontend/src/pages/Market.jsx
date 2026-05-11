@@ -1,16 +1,15 @@
 import { useState } from "react";
-import Button from "../components/Button";
-import {
-  SearchIcon,
-  HomeIcon,
-  ForkAndKnife,
-  ShoppingCartIcon,
-  UserIcon,
-} from "../constants/icons";
+import { SearchIcon, ShoppingCartIcon } from "../constants/icons";
 import { MarketData } from "../constants/market";
 
 const Market = () => {
   const [marketData, setMarketData] = useState(MarketData);
+  const [activeFilter, setActiveFilter] = useState("Today's Meals");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
   const toggleBought = (catIdx, itemIdx) => {
     setMarketData((prevData) =>
@@ -28,128 +27,197 @@ const Market = () => {
     );
   };
 
+  const filters = ["Today's Meals", "This Week's Meals", "All"];
+
   return (
-    <div className="bg-bg-background min-h-screen pb-32 pt-6 px-5 flex flex-col gap-6">
-      {/* Page Title */}
-      <h1 className="text-4xl font-display font-extrabold text-text-primary tracking-tight">
+    <main className="px-5 pt-6 flex flex-col gap-6 relative">
+      <h1 className="text-[2.5rem] font-display font-extrabold text-text-primary leading-none">
         MARKET
       </h1>
 
+      {/* Filter Tabs */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
+              activeFilter === filter
+                ? "bg-accent-orange text-white shadow-lg shadow-orange-200"
+                : "bg-black/5 text-text-muted hover:bg-black/10"
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
       {/* Search Bar */}
-      <div className="relative group">
-        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted/70 w-5 h-5 group-focus-within:text-accent-orange transition-colors" />
+      <div className="relative">
+        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted w-5 h-5" />
         <input
           type="text"
           placeholder="Search items..."
-          className="w-full bg-white border border-text-muted/20 rounded-xl py-4 pl-12 pr-4 shadow-sm outline-none focus:border-accent-orange/50 transition-all text-sm"
+          name="item-search"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 shadow-sm outline-none placeholder:text-text-muted text-sm"
         />
       </div>
+
+      {/* Featured Card: Today's Meal */}
+      <section className="flex flex-col gap-4">
+        <div className="flex justify-between items-end">
+          <h2 className="text-2xl font-display font-extrabold text-text-primary">
+            Today's Meal
+          </h2>
+          <button className="text-accent-orange text-xs font-bold flex items-center gap-1 hover:underline">
+            Swap Meal
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path d="m21 2-5 5m-11 5 5 5m0-10 8 8" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="bg-text-primary rounded-3xl p-5 text-white flex flex-col gap-4">
+          <div className="flex gap-4">
+            <div className="w-32 h-32 shrink-0 rounded-2xl overflow-hidden border-2 border-white/10">
+              <img
+                src="/images/jollof_fish_plantains.png"
+                alt="Jollof Rice"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-2">
+                <span className="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">
+                  Lunch
+                </span>
+                <span className="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">
+                  Served 1
+                </span>
+              </div>
+              <h3 className="text-xl font-display font-bold leading-tight mt-1">
+                Jollof Rice & Grilled Fish
+              </h3>
+              <p className="text-[10px] text-white/70 leading-relaxed line-clamp-3 font-medium">
+                A spicy, aromatic classic paired with ocean-fresh tilapia,
+                slow-grilled with herb butter.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h4 className="text-[11px] font-bold uppercase tracking-widest text-white/50">
+              Ingredients Needed:
+            </h4>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+              {["Rice", "Chicken", "Peppers", "Spices"].map((ing) => (
+                <div key={ing} className="flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-accent-orange" />
+                  <span className="text-[11px] font-medium text-white/90">
+                    {ing}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button className="bg-accent-orange hover:bg-[#e66a13] text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors">
+            <ShoppingCartIcon className="w-4 h-4" />
+            Add All to Cart
+          </button>
+        </div>
+      </section>
 
       {/* Market Categories */}
       <div className="flex flex-col gap-8">
         {marketData.map((section, catIdx) => (
           <div key={catIdx} className="flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{section.icon}</span>
+            <div className="flex items-center gap-2 opacity-80">
+              <span className="text-xl text-text-muted/50">{section.icon}</span>
               <h2 className="text-lg font-display font-bold text-text-primary">
                 {section.category}
               </h2>
             </div>
 
             <div className="flex flex-col gap-2">
-              {section.items.map((item, itemIdx) => (
-                <div
-                  key={itemIdx}
-                  onClick={() => toggleBought(catIdx, itemIdx)}
-                  className="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm cursor-pointer active:scale-[0.98] transition-transform border border-transparent hover:border-accent-orange/10"
-                >
+              {section.items.map((item, itemIdx) => {
+                if (
+                  searchTerm &&
+                  !item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                  return null;
+
+                return (
                   <div
-                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                      item.bought
-                        ? "bg-accent-orange border-accent-orange"
-                        : "border-text-muted/40"
-                    }`}
+                    key={itemIdx}
+                    onClick={() => toggleBought(catIdx, itemIdx)}
+                    className="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm cursor-pointer active:scale-[0.98] transition-all border border-transparent"
                   >
-                    {item.bought && (
-                      <svg
-                        width="12"
-                        height="9"
-                        viewBox="0 0 12 9"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M1 4L4.5 7.5L11 1"
-                          stroke="white"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <div className="flex-1 flex flex-col">
-                    <span
-                      className={`text-sm font-bold ${
+                    <div
+                      className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                         item.bought
-                          ? "text-text-muted/70 line-through"
-                          : "text-text-primary"
+                          ? "bg-accent-orange border-accent-orange"
+                          : "border-text-muted"
                       }`}
                     >
-                      {item.name}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {item.qty && (
-                      <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">
-                        {item.qty}
+                      {item.bought && (
+                        <svg
+                          width="12"
+                          height="9"
+                          viewBox="0 0 12 9"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 4L4.5 7.5L11 1"
+                            stroke="white"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1 flex flex-col">
+                      <span
+                        className={`text-sm font-bold ${
+                          item.bought
+                            ? "text-text-muted line-through"
+                            : "text-text-primary"
+                        }`}
+                      >
+                        {item.name}
                       </span>
-                    )}
-                    <span className="text-[11px] font-bold text-orange-900">
-                      {item.price}
-                    </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {item.qty && (
+                        <span className="bg-[#F8F8DF] text-text-primary text-[10px] font-bold px-3 py-1 rounded-lg border border-text-primary/10">
+                          {item.qty}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-24 left-5 right-5 z-50">
-        <Button variant="primary" className="w-full rounded-2xl">
+      <div className="">
+        <button className="bg-accent-orange text-white w-full rounded-2xl h-14 text-sm font-bold shadow-orange-200 hover:bg-[#e66a13] transition-colors">
           Mark all as bought
-        </Button>
+        </button>
       </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-text-muted/20 flex justify-around py-3 px-6 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-        <div className="flex flex-col items-center gap-1 opacity-40 cursor-pointer">
-          <HomeIcon className="w-6 h-6" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">
-            Home
-          </span>
-        </div>
-        <div className="flex flex-col items-center gap-1 opacity-40 cursor-pointer">
-          <ForkAndKnife className="w-6 h-6" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">
-            Meals
-          </span>
-        </div>
-        <div className="flex flex-col items-center gap-1 text-accent-orange cursor-pointer">
-          <ShoppingCartIcon className="w-6 h-6" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">
-            Market
-          </span>
-        </div>
-        <div className="flex flex-col items-center gap-1 opacity-40 cursor-pointer">
-          <UserIcon className="w-6 h-6" />
-          <span className="text-[10px] font-bold uppercase tracking-widest">
-            You
-          </span>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 };
 
