@@ -15,10 +15,9 @@ const SignUp = () => {
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    full_name: "",
     email: "",
-    state: "Lagos state",
-    phoneNumber: "",
+    phone_number: "",
     password: "",
   });
 
@@ -45,10 +44,17 @@ const SignUp = () => {
     setError("");
 
     try {
-      await authService.signUp(formData);
-      navigate("/sign-in"); // Redirect to sign in page after successful sign up
+      const payload = {
+        ...formData,
+        phone_number: `+234${formData.phone_number}`,
+      };
+      await authService.signUp(payload);
+      navigate("/sign-in");
     } catch (err) {
-      setError(err.message || "An error occurred during sign up. Please try again.");
+      setError(
+        err.message || "An error occurred during sign up. Please try again.",
+      );
+      console.error("Error", err);
     } finally {
       setIsLoading(false);
     }
@@ -96,8 +102,8 @@ const SignUp = () => {
               </label>
               <input
                 type="text"
-                name="fullName"
-                value={formData.fullName}
+                name="full_name"
+                value={formData.full_name}
                 onChange={handleInputChange}
                 placeholder="Enter your full name"
                 className="border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
@@ -119,7 +125,7 @@ const SignUp = () => {
                 required
               />
             </div>
-            <div className="flex flex-col gap-1.5">
+            {/* <div className="flex flex-col gap-1.5">
               <label className="text-base font-inter font-bold text-text-primary">
                 State
               </label>
@@ -131,7 +137,7 @@ const SignUp = () => {
               >
                 <option value="Lagos state">Lagos state</option>
               </select>
-            </div>
+            </div> */}
 
             <div className="flex flex-col gap-1.5">
               <label className="text-base font-inter font-bold text-text-primary">
@@ -146,8 +152,8 @@ const SignUp = () => {
                 />
                 <input
                   type="tel"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
+                  name="phone_number"
+                  value={formData.phone_number}
                   onChange={handleInputChange}
                   placeholder="8012345678"
                   className="flex-1 border border-text-muted/25 font-inter rounded-lg px-4 py-3 text-sm w-full focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"

@@ -9,23 +9,49 @@ import {
 
 const SetBudget = () => {
   const [budgetTier, setBudgetTier] = useState("Standard");
-  const [budgetValue, setBudgetValue] = useState("7000-10000");
   const [frequency, setFrequency] = useState("Weekly");
   const [selectedBuffer, setSelectedBuffer] = useState("10%");
+  // const [error, setError] = useState("")
+  const [budgetData, setBudgetData] = useState({
+    budgetValue: "",
+  });
 
-  const handleTierChange = (tier, currentFreq = frequency) => {
-    setBudgetTier(tier);
-    if (currentFreq === "Weekly") {
-      if (tier === "Low cost") setBudgetValue("4500-7000");
-      else if (tier === "Standard") setBudgetValue("7000-10000");
-      else if (tier === "Premium") setBudgetValue("10000-15000");
+  const getBudgetValuePlaceholder = (tier, freq) => {
+    if (freq === "Weekly") {
+      if (tier === "Low cost") return "4,500 - 7,000";
+      if (tier === "Standard") return "7,000 - 10,000";
+      if (tier === "Premium") return "10,000 - 15,000";
     } else {
-      if (tier === "Low cost") setBudgetValue("30000-50000");
-      else if (tier === "Standard") setBudgetValue("50000-70000");
-      else if (tier === "Premium") setBudgetValue("70000-100000");
+      if (tier === "Low cost") return "30,000 - 50,000";
+      if (tier === "Standard") return "50,000 - 70,000";
+      if (tier === "Premium") return "70,000 - 100,000";
     }
   };
 
+  const handleTierChange = (tier) => {
+    setBudgetTier(tier);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setBudgetData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // const handleSubmitBudget =async (e) => {
+  //     e.preventDefault();
+  //     setError("");
+
+  //     try {
+  //       await (budgetData);
+
+  //     } catch (err) {
+  //       setError(
+  //         err.message || "An error occurred during sign in. Please try again.",
+  //       );
+  //     }     };
   const tiers = ["Low cost", "Standard", "Premium"];
   const bufferOptions = ["10%", "15%", "20%", "Custom"];
 
@@ -37,6 +63,7 @@ const SetBudget = () => {
       prevTo="/onboarding/welcome"
       nextTo="/onboarding/cooking-frequency"
       nextLabel="Start Cooking"
+      // submitFunction={handleSubmitBudget}
     >
       <h1 className="text-subheading lg:text-5xl tracking-tight font-bold leading-tight mb-2">
         Set your weekly budget
@@ -47,10 +74,12 @@ const SetBudget = () => {
 
       <div className="bg-text-muted/10 rounded-2xl p-6 mb-6 relative">
         <input
-          type="text"
-          value={budgetValue}
-          onChange={(e) => setBudgetValue(e.target.value)}
-          className="text-lg lg:text-2xl font-bold w-full border-none font-inter pl-8 py-3 focus:border-b-2 focus:border-b-text-primary focus:outline-0 transition-all"
+          type="number"
+          value={budgetData.budgetValue}
+          onChange={handleInputChange}
+          placeholder={getBudgetValuePlaceholder(budgetTier, frequency)}
+          className="text-lg lg:text-2xl font-bold w-full border-none font-inter pl-8 py-3 focus:border-b-2 focus:border-b-text-primary focus:outline-0 transition-all placeholder:text-text-muted/40"
+          required
         />
         <span className="text-lg lg:text-2xl text-text-primary absolute top-1/2 -translate-y-1/2 left-6 font-bold">
           ₦
@@ -85,7 +114,6 @@ const SetBudget = () => {
             key={freq}
             onClick={() => {
               setFrequency(freq);
-              handleTierChange(budgetTier, freq);
             }}
             className={`flex-1 py-4 px-4 rounded-xl flex flex-col items-center gap-2 transition-all duration-300 cursor-pointer ${
               frequency === freq

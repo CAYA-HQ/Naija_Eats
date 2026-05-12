@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://naija-eats-api-demo.herokuapp.com/api"; // Demo base URL. Replace with real URL later.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const authService = {
   async signIn(email, password) {
@@ -7,18 +7,18 @@ export const authService = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || "Failed to sign in");
     }
-    
+
     // Store token if available
     if (data.token) {
       localStorage.setItem("token", data.token);
     }
-    
+
     return data;
   },
 
@@ -28,13 +28,13 @@ export const authService = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
     });
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || "Failed to sign up");
     }
-    
+
     return data;
   },
 

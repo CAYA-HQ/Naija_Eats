@@ -52,19 +52,6 @@ const Market = () => {
         ))}
       </div>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted w-5 h-5" />
-        <input
-          type="text"
-          placeholder="Search items..."
-          name="item-search"
-          value={searchTerm}
-          onChange={handleSearch}
-          className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 shadow-sm outline-none placeholder:text-text-muted text-sm"
-        />
-      </div>
-
       {/* Featured Card: Today's Meal */}
       <section className="flex flex-col gap-4">
         <div className="flex justify-between items-end">
@@ -86,8 +73,8 @@ const Market = () => {
           </button>
         </div>
 
-        <div className="bg-text-primary rounded-3xl p-5 text-white flex flex-col gap-4">
-          <div className="flex gap-4">
+        <div className="bg-text-primary rounded-3xl p-5 text-white flex flex-col gap-4 max-w-xs">
+          <div className="flex gap-4 ">
             <div className="w-32 h-32 shrink-0 rounded-2xl overflow-hidden border-2 border-white/10">
               <img
                 src="/images/jollof_fish_plantains.png"
@@ -119,7 +106,7 @@ const Market = () => {
               Ingredients Needed:
             </h4>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-              {["Rice", "Chicken", "Peppers", "Spices"].map((ing) => (
+              {["Rice", "Fish", "Plantain", "Spices"].map((ing) => (
                 <div key={ing} className="flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-accent-orange" />
                   <span className="text-[11px] font-medium text-white/90">
@@ -137,6 +124,19 @@ const Market = () => {
         </div>
       </section>
 
+      {/* Search Bar */}
+      <div className="relative">
+        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted w-5 h-5" />
+        <input
+          type="text"
+          placeholder="Search items..."
+          name="item-search"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 shadow-sm outline-none placeholder:text-text-muted text-sm"
+        />
+      </div>
+
       {/* Market Categories */}
       <div className="flex flex-col gap-8">
         {marketData.map((section, catIdx) => (
@@ -148,7 +148,7 @@ const Market = () => {
               </h2>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col lg:grid lg:grid-cols-2 gap-2">
               {section.items.map((item, itemIdx) => {
                 if (
                   searchTerm &&

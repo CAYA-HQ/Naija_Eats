@@ -16,6 +16,7 @@ const OnboardingLayout = ({
   nextLabel = "Start Cooking",
   onNext,
   children,
+  submitFunction,
 }) => {
   return (
     <div className="min-h-screen flex flex-col bg-bg-background overflow-hidden">
@@ -161,6 +162,7 @@ const OnboardingLayout = ({
                 <Button
                   variant="primary"
                   to={nextTo}
+                  onClick={submitFunction}
                   className="py-4 px-10 text-sm font-bold min-w-[160px]"
                 >
                   {nextLabel} <span className="ml-2">→</span>

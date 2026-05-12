@@ -65,7 +65,7 @@ const WelcomePage = () => {
       </div>
 
       {/* desktop view  */}
-      <div className="py-15 hidden lg:grid relative px-6 h-full grid-cols-[569px_1fr] gap-6 place-items-center">
+      <div className="py-15 hidden lg:grid relative px-10 h-full grid-cols-[569px_1fr] gap-6 place-items-center">
         <img
           src="/images/naijaeats.webp"
           alt="Naija Eats Logo"
@@ -73,7 +73,7 @@ const WelcomePage = () => {
         />
         <div>
           <div className="w-auto mb-auto h-full flex flex-col justify-center items-center gap-6">
-            <h2 className="text-[52px] text-text-primary tracking-tight leading-17 font-bold text-left pb-2">
+            <h2 className="text-[52px] text-text-primary tracking-tight leading-15 font-bold text-left pb-2">
               Stop stressing about what to cook
             </h2>
 
@@ -100,12 +100,6 @@ const WelcomePage = () => {
               Sign in
             </Link>
           </div>
-          <Link
-            to="/onboarding/set-budget"
-            className="hover:underline hover:underline-offset-5"
-          >
-            Continue as Guest
-          </Link>
         </div>
 
         <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full max-w-md h-full max-h-80">

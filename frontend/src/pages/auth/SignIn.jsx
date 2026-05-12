@@ -31,9 +31,13 @@ const SignIn = () => {
 
     try {
       await authService.signIn(formData.email, formData.password);
-      navigate("/"); // Redirect to home page
+      localStorage.getItem("onboarded")
+        ? navigate("/")
+        : navigate("/onboarding/welcome");
     } catch (err) {
-      setError(err.message || "An error occurred during sign in. Please try again.");
+      setError(
+        err.message || "An error occurred during sign in. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -116,7 +120,7 @@ const SignIn = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="••••••••"
-                  className="w-full border border-text-muted/25 px-4 py-3.5 text-sm font-inter font-medium focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all tracking-widest placeholder:tracking-widest"
+                  className="w-full border border-text-muted/25 px-4 py-3.5 text-sm font-inter font-medium focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition-all"
                   required
                 />
                 <button
@@ -166,12 +170,17 @@ const SignIn = () => {
             </Button>
 
             <div className="flex items-center gap-4 my-2">
-              <div className="h-px bg-gray-200 flex-1"></div>
+              <div className="h-px bg-text-muted flex-1"></div>
               <span className="text-gray-400 text-[13px] font-medium">OR</span>
-              <div className="h-px bg-gray-200 flex-1"></div>
+              <div className="h-px bg-text-muted flex-1"></div>
             </div>
 
-            <Button variant="outline" type="button" className="w-full">
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full"
+              onClick={() => navigate("/onboarding/welcome")}
+            >
               Continue as Guest
             </Button>
 
