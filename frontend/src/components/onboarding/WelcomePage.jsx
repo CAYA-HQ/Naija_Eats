@@ -1,22 +1,24 @@
 import { Link } from "react-router-dom";
 import Button from "../ui/Button";
-import { ForkAndKnife } from "../../constants/icons";
+// import { ForkAndKnife } from "../../constants/icons";
 
 const WelcomePage = () => {
   return (
     <>
       {/* mobile view */}
-      <div className="py-12 lg:hidden relative px-4 h-full flex flex-col gap-6 items-center">
-        <img
-          src="/images/naijaeats.webp"
-          alt="Naija Eats Logo"
-          className="w-40"
-        />
-        <div className="w-full max-w-xs mb-auto h-full flex flex-col justify-center items-center gap-6">
+      <div className=" lg:hidden relative h-full flex flex-col gap-4 items-center">
+        <div className="w-full relative basis-[50%]">
+          <img
+            src="/images/welcome_image.webp"
+            alt="Naija Eats Logo"
+            className="object-cover w-full h-full"
+          />
+        </div>
+        <div className="w-full max-w-xs mb-auto h-auto flex flex-col justify-center items-center gap-4 bg-bg-background relative rounded-2xl p-4">
           <h2 className="text-subheading text-text-primary tracking-tight leading-10 font-bold text-center pb-2">
             Stop stressing about what to cook
           </h2>
-          <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full h-50">
+          {/* <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full h-50">
             <div className="col-span-4 row-span-2">
               <img
                 src="/images/nigerian-jollof-rice.webp"
@@ -35,7 +37,7 @@ const WelcomePage = () => {
             <div className="bg-text-primary rounded-[4px] col-start-5 col-end-7 row-start-2">
               <ForkAndKnife className={"w-full h-full"} />
             </div>
-          </div>
+          </div> */}
           <p className="font-normal mb-6 text-base font-inter text-center">
             Master your kitchen with personalized meal planning and smart
             budgeting tailored to your local market prices.
@@ -45,7 +47,7 @@ const WelcomePage = () => {
           </Button>
         </div>
 
-        <div className="flex flex-col justify-between items-center gap-4 mt-auto">
+        <div className="flex flex-col justify-between items-center gap-4 pb-4">
           <p className="text-text-muted/75 text-base text-center">
             Already have an account?
           </p>
@@ -65,15 +67,15 @@ const WelcomePage = () => {
       </div>
 
       {/* desktop view  */}
-      <div className="py-15 hidden lg:grid relative px-10 h-full grid-cols-[569px_1fr] gap-6 place-items-center">
+      <div className=" hidden lg:grid relative  h-full grid-cols-2 gap-6 place-items-center">
         <img
           src="/images/naijaeats.webp"
           alt="Naija Eats Logo"
           className="w-25 absolute top-6 left-8"
         />
-        <div>
+        <div className="pt-15 pl-10">
           <div className="w-auto mb-auto h-full flex flex-col justify-center items-center gap-6">
-            <h2 className="text-[52px] text-text-primary tracking-tight leading-15 font-bold text-left pb-2">
+            <h2 className="text-[52px] text-text-primary tracking-tight leading-17 font-bold text-left ">
               Stop stressing about what to cook
             </h2>
 
@@ -89,7 +91,7 @@ const WelcomePage = () => {
             </Button>
           </div>
 
-          <div className=" hidden lg:flex justify-start items-center gap-3 mt-4 mr-auto">
+          <div className=" hidden lg:flex justify-start items-center gap-3 mt-4 mr-auto ">
             <p className="text-text-muted/75 text-base text-left">
               Already have an account?
             </p>
@@ -101,8 +103,15 @@ const WelcomePage = () => {
             </Link>
           </div>
         </div>
+        <div className=" w-full h-full overflow-hidden relative">
+          <img
+            src="/images/welcome_image.webp"
+            alt="Naija Eats Logo"
+            className="object-cover w-full h-full"
+          />
+        </div>
 
-        <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full max-w-md h-full max-h-80">
+        {/* <div className="grid grid-cols-6 grid-rows-2 gap-3 w-full max-w-md h-full max-h-80">
           <div className="col-span-4 row-span-2">
             <img
               src="/images/nigerian-jollof-rice.webp"
@@ -119,7 +128,7 @@ const WelcomePage = () => {
           </div>
 
           <div className="bg-text-primary rounded-[4px] col-start-5 col-end-7 row-start-2"></div>
-        </div>
+        </div> */}
       </div>
     </>
   );

@@ -31,11 +31,6 @@ const FoodPreferences = () => {
     );
   };
 
-  // const handleGeneratePlan = () => {
-  //   // Navigate to home or generate plan
-  //   Navigate("/onboarding/generating-plan");
-  // };
-
   return (
     <OnboardingLayout
       step={3}
@@ -46,20 +41,20 @@ const FoodPreferences = () => {
       nextLabel="Generate Your Plan"
     >
       {/* Title */}
-      <h1 className="text-[28px] lg:text-5xl font-bold leading-tight mb-2">
+      <h1 className="text-[28px] font-bold leading-tight mb-2">
         What do you enjoy eating?
       </h1>
-      <p className="text-sm lg:text-base text-body mb-6">
+      <p className="text-sm text-body mb-6">
         Tell your flavour so we can help curate the best experience for you!
       </p>
 
       {/* Food Category Grid */}
-      <div className="grid grid-cols-2 l:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {Preferences.map((pref, id) => (
           <button
             key={id}
             onClick={() => handleTogglePref(id)}
-            className="group relative rounded-2xl overflow-hidden h-36 lg:h-72 cursor-pointer transition-all duration-300 "
+            className="group relative rounded-2xl overflow-hidden h-36 cursor-pointer transition-all duration-300 "
           >
             <img
               src={pref.image}
@@ -90,17 +85,13 @@ const FoodPreferences = () => {
       </div>
 
       {/* Dietary Requirements Section */}
-      <div className="mb-6">
+      <div className="mb-3">
         <div className="flex items-center gap-2 mb-3">
           <RhombusAlertIcon className={"text-lg text-accent-orange"} />
-          <h2 className="text-base lg:text-2xl font-bold">
-            Dietary Requirements
-          </h2>
+          <h2 className="text-base font-bold">Dietary Requirements</h2>
         </div>
 
-        <p className="text- lg:text-base font-medium mb-3">
-          Do you have any allergies?
-        </p>
+        <p className="text-sm font-medium mb-3">Do you have any allergies?</p>
 
         {/* Allergy Input */}
         <div className="relative mb-4">
@@ -108,7 +99,7 @@ const FoodPreferences = () => {
             value={allergyInput}
             onChange={(e) => setAllergyInput(e.target.value)}
             placeholder="e.g. Peanuts, Shellfish, Gluten..."
-            className="w-full bg-white/50 border border-body/20 rounded-xl p-4 text-sm resize-none h-20 outline-none focus:border-accent-orange transition-colors"
+            className="w-full bg-white/50 border border-body/20 rounded-xl p-3 text-sm resize-none h-20 outline-none focus:border-accent-orange transition-colors"
           />
           <CircleAlertIcon
             className={"text-body text-xs absolute bottom-2 right-2"}

@@ -136,7 +136,7 @@ const OnboardingLayout = ({
             {children}
           </div>
 
-          <div className="px-6 py-6 mt-auto w-full max-w-5xl mx-auto">
+          <div className="px-3 py-6 mt-auto w-full max-w-5xl mx-auto">
             <div className="flex items-center justify-between gap-4">
               {prevTo ? (
                 <Button
