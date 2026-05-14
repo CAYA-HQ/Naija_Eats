@@ -59,9 +59,21 @@ By default, the API runs on port `3000` unless `PORT` is set.
 Authorization: Bearer <access_token>
 ```
 
-The auth middleware validates the token through Supabase before allowing the request to continue.
+## Database Schema
 
-## Response Shape
+The backend expects the following tables to be present in your Supabase project:
+
+- `profiles`: User profiles (full name, avatar URL).
+- `meals`: Catalogue of available meals.
+- `budgets`: User meal budgets.
+- `household_profiles`: User household information (size, daily meals, etc.).
+- `user_preferences`: Specific dietary preferences for users.
+- `user_allergies`: User food allergies.
+- `meal_plans`: Saved meal plans.
+- `meal_plan_items`: Individual meals linked to a plan, categorized by day and slot.
+- `shopping_list_items`: Ingredients for meal plans, categorized for the market.
+
+Ensure that Row Level Security (RLS) is configured appropriately on these tables to protect user data.
 
 Most routes use the shared `_res` helper in `src/utils/helper.ts`.
 

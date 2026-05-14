@@ -85,74 +85,150 @@ The routes below require:
 Authorization: Bearer <access_token>
 ```
 
-The current implementation returns placeholder data for these endpoints.
+The authentication middleware validates the token through Supabase and attaches the user object to the request.
 
 ### `POST /preference`
 
-Saves or retrieves meal preference data.
+Saves or updates onboarding and preference data for the authenticated user. This data is distributed across `budgets`, `household_profiles`, `user_preferences`, and `user_allergies` tables.
 
-Current response:
+Request body:
+
+```json
+{
+  "amount": 50000,
+  "frequency": "monthly",
+  "fluctuation_buffer": 5000,
+  "household_size": 4,
+  "daily_meals": 3,
+  "is_dessert": false,
+  "cooking_frequency": "daily",
+  "preferences": ["vegetarian", "spicy"],
+  "allergies": ["peanuts"]
+}
+```
+
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "preference retrieved successfully",
-  "data": {}
+  "message": "Preferences saved successfully"
 }
 ```
 
 ### `GET /meals`
 
-Returns available meals.
+Returns the catalogue of available meals. Can be filtered by category.
 
-Current response:
+Query parameters:
+- `category` (optional): `breakfast`, `lunch`, or `dinner`.
+
+Example: `GET /meals?category=lunch`
+
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "meals retrieved successfully",
-  "data": {}
+  "message": "Meals retrieved successfully",
+  "data": [
+    {
+      "id": "uuid",
+      "name": "Jollof Rice",
+      "category": "lunch",
+      "price_min": 1500,
+      "price_max": 2500,
+      "prep_time_mins": 45,
+      "dietary_tags": ["spicy", "popular"]
+    }
+  ]
 }
 ```
 
 ### `POST /meals-plan/generate`
 
-Generates a meal plan.
+Creates a new meal plan for the user based on selected meals.
 
-Current response:
+Request body:
+
+```json
+{
+  "items": [
+    { "meal_id": "uuid", "day_of_week": "monday", "meal_slot": "breakfast" },
+    { "meal_id": "uuid", "day_of_week": "monday", "meal_slot": "lunch" }
+  ]
+}
+```
+
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "meals plan generated successfully",
-  "data": {}
+  "message": "Meal plan generated successfully",
+  "data": {
+    "id": "plan-uuid",
+    "user_id": "user-uuid",
+    "status": "active",
+    "created_at": "timestamp",
+    "meal_plan_items": [
+      {
+        "id": "item-uuid",
+        "day_of_week": "monday",
+        "meal_slot": "breakfast",
+        "meals": {
+          "id": "meal-uuid",
+          "name": "Yam and Egg",
+          "category": "breakfast",
+          "price_min": 1000,
+          "price_max": 1500,
+          "prep_time_mins": 20,
+          "dietary_tags": ["protein"]
+        }
+      }
+    ]
+  }
 }
 ```
 
 ### `GET /meals-plan/:id`
 
-Returns one meal plan by ID.
+Retrieves a specific meal plan by its ID, including all its meal items.
 
-Current response:
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "meals plan generated successfully",
-  "data": {}
+  "message": "Meal plan retrieved successfully",
+  "data": {
+    "id": "plan-uuid",
+    "meal_plan_items": [ ... ],
+    ...
+  }
 }
 ```
 
 ### `GET /ingredients/:planId`
 
-Returns ingredients for a meal plan.
+Returns all ingredients for a meal plan, grouped by market category (e.g., "Vegetables", "Proteins").
 
-Current response:
+Success response:
 
 ```json
 {
   "success": true,
-  "message": "ingredients retrieved successfully",
-  "data": {}
+  "message": "Ingredients retrieved successfully",
+  "data": {
+    "plan_id": "plan-uuid",
+    "sections": {
+      "Vegetables": [
+        { "id": "uuid", "name": "Tomatoes", "quantity": "4 large", "category": "Vegetables" }
+      ],
+      "Proteins": [
+        { "id": "uuid", "name": "Chicken", "quantity": "1kg", "category": "Proteins" }
+      ]
+    }
+  }
 }
 ```

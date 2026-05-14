@@ -6,7 +6,8 @@ Backend API for Naija Eats, built with Bun, Express, TypeScript, and Supabase.
 
 - Handles user registration and login through Supabase Auth.
 - Protects meal and meal-plan routes with bearer-token authentication.
-- Provides placeholder endpoints for preferences, meals, meal plans, and ingredients.
+- Provides endpoints for managing user preferences, meal catalogue, meal plans, and categorized shopping lists.
+- Integrates with Supabase for authentication and database persistence.
 - Uses shared JSON response helpers for consistent success and error payloads.
 
 ## Quick Start
