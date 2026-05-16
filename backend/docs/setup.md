@@ -1,12 +1,11 @@
 # Setup Guide
 
-This project runs on Bun with an Express API server and Supabase for authentication.
+This project runs on Bun with an Express API server, Prisma ORM, and PostgreSQL.
 
 ## Requirements
 
 - Bun installed locally.
-- A Supabase project.
-- Supabase URL and anon key available in environment variables.
+- A PostgreSQL database (local or hosted).
 - `curl` and `jq` if you want to run the smoke-test scripts.
 
 ## Installation
@@ -20,34 +19,48 @@ bun install
 Create a local environment file:
 
 ```bash
-touch .env
+cp .env.example .env
 ```
 
-Update `.env` with values for your Supabase project:
+Update `.env` with your database connection and secrets:
 
 ```env
-SUPABASE_URL=your-supabase-project-url
-SUPABASE_ANON_KEY=your-supabase-anon-key
+DATABASE_URL="postgresql://user:password@localhost:5432/naija_eats"
+JWT_SECRET="your-secure-jwt-secret"
 PORT=3000
 ```
 
-`src/config/supabase.ts` reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` at startup. If either value is missing, the server throws an error and does not start.
+## Database Setup
 
-## Supabase Data Model
+The project uses Prisma to manage the database schema.
 
-The backend expects these Supabase tables to exist:
+### 1. Initialize the Database
 
-- `profiles`: receives a row with `full_name` and `avatar_url` during registration.
-- `budgets`: upserted by `POST /preference` with `user_id`, `amount`, `frequency`, and `fluctuation_buffer`.
-- `household_profiles`: upserted by `POST /preference` with `user_id`, `household_size`, `daily_meals`, `is_dessert`, and `cooking_frequency`.
-- `user_preferences`: replaced by `POST /preference` when a `preferences` array is provided.
-- `user_allergies`: replaced by `POST /preference` when an `allergies` array is provided.
-- `meals`: read by `GET /meals`.
-- `meal_plans`: written and read by meal-plan routes.
-- `meal_plan_items`: written and read by meal-plan routes.
-- `shopping_list_items`: read by `GET /ingredients/:planId`.
+Run migrations to create the tables in your PostgreSQL instance:
 
-The route handlers rely on Supabase Auth user IDs. Row-level security policies should allow authenticated users to access only their own rows where applicable.
+```bash
+bun x prisma migrate dev --name init
+```
+
+### 2. Generate Prisma Client
+
+```bash
+bun x prisma generate
+```
+
+## Data Model (Prisma)
+
+The backend defines the following models in `prisma/schema.prisma`:
+
+- `User`: Core user account (email, hashed password, phone).
+- `Profile`: Extended user info (full name, avatar).
+- `budgets`: User financial preferences.
+- `household_profiles`: Family size and cooking frequency.
+- `user_preferences` / `user_allergies`: Dietary constraints.
+- `meals`: Catalogue of available meals.
+- `meal_plans`: Grouped meal planning sessions.
+- `meal_plan_items`: Individual meal assignments within a plan.
+- `shopping_list_items`: Ingredients for the market.
 
 ## Running The Server
 
@@ -75,24 +88,24 @@ curl http://localhost:3000/health
 
 1. A user registers with `POST /auth/register`.
 2. A user logs in with `POST /auth/login`.
-3. The login response includes a Supabase access token.
+3. The login response includes a JWT access token.
 4. Protected routes require the token in the `Authorization` header:
 
 ```http
-Authorization: Bearer <access_token>
+Authorization: Bearer <jwt_token>
 ```
 
-The auth middleware validates the token through Supabase before allowing the request to continue.
+The `authMiddleware` in `src/middleware/auth.ts` handles token verification and user context attachment.
 
 ## Smoke Testing
 
-With the API running, run:
+With the API running, you can run the smoke tests:
 
 ```bash
 ./test.sh http://localhost:3000
 ```
 
-The script creates a temporary test email, exercises health, auth, and protected routes, and prints pass/fail results. It requires a working Supabase project and `jq` installed locally. `./test-live.sh` currently contains the same live API test flow.
+The script exercises health, auth, and protected routes. It requires `jq` installed locally.
 
 ## Response Shape
 
@@ -116,5 +129,3 @@ Error responses follow this shape:
   "message": "Error message"
 }
 ```
-
-When a route does not pass a data payload, the helper sets `data` to `undefined`, so the serialized JSON response omits that key.

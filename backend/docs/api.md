@@ -31,7 +31,7 @@ Auth routes are mounted under `/auth` and do not require a bearer token.
 
 ### `POST /auth/register`
 
-Registers a new user with Supabase Auth, stores the user's phone number through Supabase Auth, and inserts a profile row.
+Registers a new user, hashes their password, and creates a profile.
 
 Request body:
 
@@ -52,19 +52,17 @@ Success response:
   "message": "User registered successfully",
   "data": {
     "user": {
-      "id": "user-id",
+      "id": "user-uuid",
       "email": "user@example.com"
     },
-    "token": "access-token-or-null"
+    "token": "jwt-token"
   }
 }
 ```
 
-Validation errors return `400`. Supabase signup errors also return `400`. Unexpected server errors return `500`.
-
 ### `POST /auth/login`
 
-Logs in an existing user with Supabase Auth.
+Logs in an existing user and returns a JWT.
 
 Request body:
 
@@ -82,26 +80,24 @@ Success response:
   "success": true,
   "message": "User logged in successfully",
   "data": {
-    "token": "access-token"
+    "token": "jwt-token"
   }
 }
 ```
-
-Invalid credentials return `401`. Missing email or password returns `400`.
 
 ## Protected Routes
 
 The routes below require:
 
 ```http
-Authorization: Bearer <access_token>
+Authorization: Bearer <jwt_token>
 ```
 
-The token is validated with `supabase.auth.getUser(token)`. Missing, malformed, invalid, or expired tokens return `401`.
+The authentication middleware validates the JWT and attaches the user object (queried from the database via Prisma) to the request.
 
 ### `POST /preference`
 
-Saves onboarding data for the authenticated user. The handler upserts one budget row and one household profile row, then replaces preference and allergy rows when arrays are provided.
+Saves or updates onboarding and preference data for the authenticated user. This data is stored across `budgets`, `household_profiles`, `user_preferences`, and `user_allergies` models.
 
 Request body:
 
@@ -130,7 +126,7 @@ Success response:
 
 ### `GET /meals`
 
-Returns meals from the Supabase `meals` table, ordered by `name`.
+Returns the catalogue of available meals. Can be filtered by category.
 
 Optional query parameters:
 
@@ -138,11 +134,7 @@ Optional query parameters:
 category=breakfast|lunch|dinner
 ```
 
-Example:
-
-```http
-GET /meals?category=breakfast
-```
+Example: `GET /meals?category=lunch`
 
 Success response:
 
@@ -152,13 +144,13 @@ Success response:
   "message": "Meals retrieved successfully",
   "data": [
     {
-      "id": "meal-id",
-      "name": "Akara and Pap",
-      "category": "breakfast",
+      "id": "meal-uuid",
+      "name": "Jollof Rice",
+      "category": "lunch",
       "price_min": 1500,
       "price_max": 2500,
-      "prep_time_mins": 30,
-      "dietary_tags": ["vegetarian"]
+      "prep_time_mins": 45,
+      "dietary_tags": ["spicy", "popular"]
     }
   ]
 }
@@ -174,20 +166,18 @@ Request body:
 {
   "items": [
     {
-      "meal_id": "meal-id-1",
+      "meal_id": "meal-uuid-1",
       "day_of_week": "monday",
       "meal_slot": "breakfast"
     },
     {
-      "meal_id": "meal-id-2",
+      "meal_id": "meal-uuid-2",
       "day_of_week": "monday",
       "meal_slot": "lunch"
     }
   ]
 }
 ```
-
-`items` is required and must be a non-empty array. Missing or empty `items` returns `400`.
 
 Success response:
 
@@ -196,22 +186,22 @@ Success response:
   "success": true,
   "message": "Meal plan generated successfully",
   "data": {
-    "id": "plan-id",
-    "user_id": "user-id",
+    "id": "plan-uuid",
+    "user_id": "user-uuid",
     "status": "active",
     "meal_plan_items": [
       {
-        "id": "item-id",
+        "id": "item-uuid",
         "day_of_week": "monday",
         "meal_slot": "breakfast",
         "meals": {
-          "id": "meal-id-1",
-          "name": "Akara and Pap",
+          "id": "meal-uuid-1",
+          "name": "Yam and Egg",
           "category": "breakfast",
-          "price_min": 1500,
-          "price_max": 2500,
-          "prep_time_mins": 30,
-          "dietary_tags": ["vegetarian"]
+          "price_min": 1000,
+          "price_max": 1500,
+          "prep_time_mins": 20,
+          "dietary_tags": ["protein"]
         }
       }
     ]
@@ -221,7 +211,7 @@ Success response:
 
 ### `GET /meals-plan/:id`
 
-Returns one saved meal plan that belongs to the authenticated user. Users cannot fetch another user's plan through this endpoint.
+Retrieves a specific meal plan by its ID, including all its meal items. Users can only fetch their own plans.
 
 Success response:
 
@@ -230,22 +220,22 @@ Success response:
   "success": true,
   "message": "Meal plan retrieved successfully",
   "data": {
-    "id": "plan-id",
-    "user_id": "user-id",
+    "id": "plan-uuid",
+    "user_id": "user-uuid",
     "status": "active",
     "meal_plan_items": [
       {
-        "id": "item-id",
+        "id": "item-uuid",
         "day_of_week": "monday",
         "meal_slot": "breakfast",
         "meals": {
-          "id": "meal-id",
-          "name": "Akara and Pap",
+          "id": "meal-uuid",
+          "name": "Yam and Egg",
           "category": "breakfast",
-          "price_min": 1500,
-          "price_max": 2500,
-          "prep_time_mins": 30,
-          "dietary_tags": ["vegetarian"],
+          "price_min": 1000,
+          "price_max": 1500,
+          "prep_time_mins": 20,
+          "dietary_tags": ["protein"],
           "instructions": "Preparation instructions"
         }
       }
@@ -254,11 +244,9 @@ Success response:
 }
 ```
 
-If the plan does not exist or does not belong to the authenticated user, the route returns `404`.
-
 ### `GET /ingredients/:planId`
 
-Returns shopping-list ingredients for a meal plan that belongs to the authenticated user. Items are grouped by `category`, which represents the market section.
+Returns shopping-list ingredients for a meal plan, grouped by market category (e.g., "Produce", "Proteins").
 
 Success response:
 
@@ -267,24 +255,30 @@ Success response:
   "success": true,
   "message": "Ingredients retrieved successfully",
   "data": {
-    "plan_id": "plan-id",
+    "plan_id": "plan-uuid",
     "sections": {
       "Produce": [
         {
-          "id": "item-id",
-          "meal_plan_id": "plan-id",
+          "id": "item-uuid",
+          "meal_plan_id": "plan-uuid",
           "name": "Tomatoes",
-          "quantity": "6",
+          "quantity": "6 large",
           "category": "Produce"
         }
       ],
-      "Other": []
+      "Proteins": [
+        {
+          "id": "item-uuid",
+          "meal_plan_id": "plan-uuid",
+          "name": "Chicken",
+          "quantity": "1kg",
+          "category": "Proteins"
+        }
+      ]
     }
   }
 }
 ```
-
-If the plan does not exist or does not belong to the authenticated user, the route returns `404`.
 
 ## Error Response Shape
 
