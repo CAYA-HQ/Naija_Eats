@@ -2,6 +2,14 @@
 
 The API is mounted from `src/app.ts`.
 
+## Base URL
+
+Local development defaults to:
+
+```text
+http://localhost:3000
+```
+
 ## Health
 
 ### `GET /health`
@@ -23,7 +31,7 @@ Auth routes are mounted under `/auth` and do not require a bearer token.
 
 ### `POST /auth/register`
 
-Registers a new user with Supabase Auth, stores the user's phone number through Supabase Auth, and inserts a profile row.
+Registers a new user, hashes their password, and creates a profile.
 
 Request body:
 
@@ -44,17 +52,17 @@ Success response:
   "message": "User registered successfully",
   "data": {
     "user": {
-      "id": "user-id",
+      "id": "user-uuid",
       "email": "user@example.com"
     },
-    "token": "access-token-or-null"
+    "token": "jwt-token"
   }
 }
 ```
 
 ### `POST /auth/login`
 
-Logs in an existing user with Supabase Auth.
+Logs in an existing user and returns a JWT.
 
 Request body:
 
@@ -72,7 +80,7 @@ Success response:
   "success": true,
   "message": "User logged in successfully",
   "data": {
-    "token": "access-token"
+    "token": "jwt-token"
   }
 }
 ```
@@ -82,14 +90,14 @@ Success response:
 The routes below require:
 
 ```http
-Authorization: Bearer <access_token>
+Authorization: Bearer <jwt_token>
 ```
 
-The authentication middleware validates the token through Supabase and attaches the user object to the request.
+The authentication middleware validates the JWT and attaches the user object (queried from the database via Prisma) to the request.
 
 ### `POST /preference`
 
-Saves or updates onboarding and preference data for the authenticated user. This data is distributed across `budgets`, `household_profiles`, `user_preferences`, and `user_allergies` tables.
+Saves or updates onboarding and preference data for the authenticated user. This data is stored across `budgets`, `household_profiles`, `user_preferences`, and `user_allergies` models.
 
 Request body:
 
@@ -102,7 +110,7 @@ Request body:
   "daily_meals": 3,
   "is_dessert": false,
   "cooking_frequency": "daily",
-  "preferences": ["vegetarian", "spicy"],
+  "preferences": ["high-protein", "local-meals"],
   "allergies": ["peanuts"]
 }
 ```
@@ -120,8 +128,11 @@ Success response:
 
 Returns the catalogue of available meals. Can be filtered by category.
 
-Query parameters:
-- `category` (optional): `breakfast`, `lunch`, or `dinner`.
+Optional query parameters:
+
+```text
+category=breakfast|lunch|dinner
+```
 
 Example: `GET /meals?category=lunch`
 
@@ -133,7 +144,7 @@ Success response:
   "message": "Meals retrieved successfully",
   "data": [
     {
-      "id": "uuid",
+      "id": "meal-uuid",
       "name": "Jollof Rice",
       "category": "lunch",
       "price_min": 1500,
@@ -147,15 +158,23 @@ Success response:
 
 ### `POST /meals-plan/generate`
 
-Creates a new meal plan for the user based on selected meals.
+Creates a new active meal plan for the authenticated user and inserts the selected meal items.
 
 Request body:
 
 ```json
 {
   "items": [
-    { "meal_id": "uuid", "day_of_week": "monday", "meal_slot": "breakfast" },
-    { "meal_id": "uuid", "day_of_week": "monday", "meal_slot": "lunch" }
+    {
+      "meal_id": "meal-uuid-1",
+      "day_of_week": "monday",
+      "meal_slot": "breakfast"
+    },
+    {
+      "meal_id": "meal-uuid-2",
+      "day_of_week": "monday",
+      "meal_slot": "lunch"
+    }
   ]
 }
 ```
@@ -170,14 +189,13 @@ Success response:
     "id": "plan-uuid",
     "user_id": "user-uuid",
     "status": "active",
-    "created_at": "timestamp",
     "meal_plan_items": [
       {
         "id": "item-uuid",
         "day_of_week": "monday",
         "meal_slot": "breakfast",
         "meals": {
-          "id": "meal-uuid",
+          "id": "meal-uuid-1",
           "name": "Yam and Egg",
           "category": "breakfast",
           "price_min": 1000,
@@ -193,7 +211,7 @@ Success response:
 
 ### `GET /meals-plan/:id`
 
-Retrieves a specific meal plan by its ID, including all its meal items.
+Retrieves a specific meal plan by its ID, including all its meal items. Users can only fetch their own plans.
 
 Success response:
 
@@ -203,15 +221,32 @@ Success response:
   "message": "Meal plan retrieved successfully",
   "data": {
     "id": "plan-uuid",
-    "meal_plan_items": [ ... ],
-    ...
+    "user_id": "user-uuid",
+    "status": "active",
+    "meal_plan_items": [
+      {
+        "id": "item-uuid",
+        "day_of_week": "monday",
+        "meal_slot": "breakfast",
+        "meals": {
+          "id": "meal-uuid",
+          "name": "Yam and Egg",
+          "category": "breakfast",
+          "price_min": 1000,
+          "price_max": 1500,
+          "prep_time_mins": 20,
+          "dietary_tags": ["protein"],
+          "instructions": "Preparation instructions"
+        }
+      }
+    ]
   }
 }
 ```
 
 ### `GET /ingredients/:planId`
 
-Returns all ingredients for a meal plan, grouped by market category (e.g., "Vegetables", "Proteins").
+Returns shopping-list ingredients for a meal plan, grouped by market category (e.g., "Produce", "Proteins").
 
 Success response:
 
@@ -222,13 +257,36 @@ Success response:
   "data": {
     "plan_id": "plan-uuid",
     "sections": {
-      "Vegetables": [
-        { "id": "uuid", "name": "Tomatoes", "quantity": "4 large", "category": "Vegetables" }
+      "Produce": [
+        {
+          "id": "item-uuid",
+          "meal_plan_id": "plan-uuid",
+          "name": "Tomatoes",
+          "quantity": "6 large",
+          "category": "Produce"
+        }
       ],
       "Proteins": [
-        { "id": "uuid", "name": "Chicken", "quantity": "1kg", "category": "Proteins" }
+        {
+          "id": "item-uuid",
+          "meal_plan_id": "plan-uuid",
+          "name": "Chicken",
+          "quantity": "1kg",
+          "category": "Proteins"
+        }
       ]
     }
   }
+}
+```
+
+## Error Response Shape
+
+Errors use the shared helper in `src/utils/helper.ts`:
+
+```json
+{
+  "success": false,
+  "message": "Error message"
 }
 ```

@@ -1,6 +1,18 @@
 import { useState, useEffect } from "react";
 import { SearchIcon } from "../constants/icons";
 import { useNavigate } from "react-router-dom";
+import EmptyState from "../pages/EmptyState";
+import BudgetWarning from "../pages/BudgetWarning";
+
+// ─── TODO: replace with real API data later ───────────────────────────
+const MOCK_PLAN = {
+  name: "Premium Jollof Pack",
+  cost: 6200,
+  meals: 14,
+  days: 7,
+};
+const MOCK_BUDGET = { limit: 5000 };
+// ─────────────────────────────────────────────────────────────────────
 
 const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -8,11 +20,16 @@ const MenuPage = () => {
   const [value, setValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
 
+  // ─── plan state (replace with real API flags later) ─────────────────
+  const hasPlan = true;
+  const budgetExceeded = true;
+  const [warningDismissed, setWarningDismissed] = useState(false);
+  // ────────────────────────────────────────────────────────────────────
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedValue(value);
     }, 300);
-
     return () => clearTimeout(timer);
   }, [value]);
 
@@ -58,6 +75,7 @@ const MenuPage = () => {
       category: ["Rice Dishes", "Soups"],
     },
   ];
+
   const filteredMeals = meals.filter((meal) => {
     const matchesCategory =
       activeCategory === "All" ||
@@ -65,10 +83,24 @@ const MenuPage = () => {
     const matchesSearch =
       meal.name.toLowerCase().includes(debouncedValue.toLowerCase()) ||
       meal.description.toLowerCase().includes(debouncedValue.toLowerCase());
-
     return matchesCategory && matchesSearch;
   });
+
   const navigate = useNavigate();
+
+  // ─── state gates ─────────────────────────────────────────────────────
+  if (!hasPlan) return <EmptyState />;
+
+  if (budgetExceeded && !warningDismissed) {
+    return (
+      <BudgetWarning
+        plan={MOCK_PLAN}
+        budget={MOCK_BUDGET}
+        onContinue={() => setWarningDismissed(true)}
+      />
+    );
+  }
+  // ─────────────────────────────────────────────────────────────────────
 
   return (
     <main className="px-5 pt-8 flex flex-col gap-6">
@@ -148,7 +180,7 @@ const MenuPage = () => {
             </div>
 
             <div className="p-6 flex flex-col justify-between items-start gap-3">
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start w-full">
                 <h3 className="text-xl font-display font-bold text-white max-w-[70%] leading-tight">
                   {meal.name}
                 </h3>

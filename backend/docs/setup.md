@@ -1,12 +1,12 @@
 # Setup Guide
 
-This project runs on Bun with an Express API server and Supabase for authentication.
+This project runs on Bun with an Express API server, Prisma ORM, and PostgreSQL.
 
 ## Requirements
 
 - Bun installed locally.
-- A Supabase project.
-- Supabase URL and anon key available in environment variables.
+- A PostgreSQL database (local or hosted).
+- `curl` and `jq` if you want to run the smoke-test scripts.
 
 ## Installation
 
@@ -22,15 +22,45 @@ Create a local environment file:
 cp .env.example .env
 ```
 
-Update `.env` with values for your Supabase project:
+Update `.env` with your database connection and secrets:
 
 ```env
-SUPABASE_URL=your-supabase-project-url
-SUPABASE_ANON_KEY=your-supabase-anon-key
+DATABASE_URL="postgresql://user:password@localhost:5432/naija_eats"
+JWT_SECRET="your-secure-jwt-secret"
 PORT=3000
 ```
 
-`src/config/supabase.ts` reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` at startup. If either value is missing, the server throws an error and does not start.
+## Database Setup
+
+The project uses Prisma to manage the database schema.
+
+### 1. Initialize the Database
+
+Run migrations to create the tables in your PostgreSQL instance:
+
+```bash
+bun x prisma migrate dev --name init
+```
+
+### 2. Generate Prisma Client
+
+```bash
+bun x prisma generate
+```
+
+## Data Model (Prisma)
+
+The backend defines the following models in `prisma/schema.prisma`:
+
+- `User`: Core user account (email, hashed password, phone).
+- `Profile`: Extended user info (full name, avatar).
+- `budgets`: User financial preferences.
+- `household_profiles`: Family size and cooking frequency.
+- `user_preferences` / `user_allergies`: Dietary constraints.
+- `meals`: Catalogue of available meals.
+- `meal_plans`: Grouped meal planning sessions.
+- `meal_plan_items`: Individual meal assignments within a plan.
+- `shopping_list_items`: Ingredients for the market.
 
 ## Running The Server
 
@@ -48,32 +78,36 @@ bun run start
 
 By default, the API runs on port `3000` unless `PORT` is set.
 
+Check the running server:
+
+```bash
+curl http://localhost:3000/health
+```
+
 ## Authentication Flow
 
 1. A user registers with `POST /auth/register`.
 2. A user logs in with `POST /auth/login`.
-3. The login response includes a Supabase access token.
+3. The login response includes a JWT access token.
 4. Protected routes require the token in the `Authorization` header:
 
 ```http
-Authorization: Bearer <access_token>
+Authorization: Bearer <jwt_token>
 ```
 
-## Database Schema
+The `authMiddleware` in `src/middleware/auth.ts` handles token verification and user context attachment.
 
-The backend expects the following tables to be present in your Supabase project:
+## Smoke Testing
 
-- `profiles`: User profiles (full name, avatar URL).
-- `meals`: Catalogue of available meals.
-- `budgets`: User meal budgets.
-- `household_profiles`: User household information (size, daily meals, etc.).
-- `user_preferences`: Specific dietary preferences for users.
-- `user_allergies`: User food allergies.
-- `meal_plans`: Saved meal plans.
-- `meal_plan_items`: Individual meals linked to a plan, categorized by day and slot.
-- `shopping_list_items`: Ingredients for meal plans, categorized for the market.
+With the API running, you can run the smoke tests:
 
-Ensure that Row Level Security (RLS) is configured appropriately on these tables to protect user data.
+```bash
+./test.sh http://localhost:3000
+```
+
+The script exercises health, auth, and protected routes. It requires `jq` installed locally.
+
+## Response Shape
 
 Most routes use the shared `_res` helper in `src/utils/helper.ts`.
 

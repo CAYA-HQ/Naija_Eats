@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MealIcon } from "../constants/icons";
+import { MealIcon } from "../../constants/icons";
 
 const GeneratingPlan = () => {
   const [currentStep, setCurrentStep] = useState(1);

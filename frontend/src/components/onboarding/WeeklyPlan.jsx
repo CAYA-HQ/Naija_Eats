@@ -1,8 +1,8 @@
 // import React from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/Button";
-import { FilterIcon, TrendDownIcon } from "../constants/icons";
-import { WeekPlan } from "../constants/weekPlan";
+import Button from "../ui/Button";
+import { FilterIcon, TrendDownIcon } from "../../constants/icons";
+import { WeekPlan } from "../../constants/weekPlan";
 
 const WeeklyPlan = () => {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ const WeeklyPlan = () => {
       {/* Plan List */}
       <div className="px-4 space-y-6 lg:flex lg:flex-wrap lg:justify-center gap-6 w-full">
         {WeekPlan.map((dayPlan, idx) => (
-          <div key={idx} className="space-y-3 lg:min-w-sm">
+          <div key={idx} className="space-y-3 lg:min-w-xs">
             <div className="flex items-center gap-2">
               <div className={`w-1.5 h-6 rounded-full ${dayPlan.color}`}></div>
               <h3 className="text-lg font-display font-bold text-text-primary">
@@ -87,7 +87,7 @@ const WeeklyPlan = () => {
       </div>
 
       {/* Bottom Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-bg-background/80 backdrop-blur-md space-y-3 z-50">
+      <div className="fixed bottom-15 left-0 right-0 p-4 bg-bg-background/80 backdrop-blur-md space-y-3 z-50">
         <Button
           variant="primary"
           className="w-full"

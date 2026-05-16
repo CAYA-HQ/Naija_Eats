@@ -1,81 +1,45 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const request = async (endpoint, options = {}) => {
-  if (USE_MOCKS) {
-    return mockResponse(endpoint, options);
-  }
-
-  const token = localStorage.getItem('token');
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
+export const authService = {
+  async signIn(email, password) {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'API Error');
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to sign in");
+    }
+
+    // Store token if available
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+    }
+
     return data;
-  } catch (error) {
-    console.error(`API Error [${endpoint}]:`, error);
-    throw error;
+  },
+
+  async signUp(userData) {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to sign up");
+    }
+
+    return data;
+  },
+
+  logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }
-};
-
-const mockResponse = async (endpoint,) => {
-  await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
-
-  if (endpoint === '/auth/register' || endpoint === '/auth/login') {
-    return {
-      success: true,
-      message: 'Success (Mocked)',
-      data: { token: 'mock-jwt-token', user: { id: '123', email: 'user@example.com' } }
-    };
-  }
-
-  if (endpoint === '/meals') {
-    return {
-      success: true,
-      message: 'Meals retrieved (Mocked)',
-      data: [
-        { id: 1, name: 'Jollof Rice', description: 'Classic Nigerian Jollof', price: 2500 },
-        { id: 2, name: 'Pounded Yam & Egusi', description: 'Traditional favorite', price: 3500 }
-      ]
-    };
-  }
-
-  // Fallback for other endpoints
-  return { success: true, message: 'Mocked Response', data: {} };
-};
-
-export const authService = {
-  register: (userData) => request('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify({
-      full_name: userData.fullName,
-      email: userData.email,
-      phone_number: userData.phoneNumber,
-      password: userData.password
-    })
-  }),
-  login: (credentials) => request('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(credentials)
-  }),
-};
-
-export const mealService = {
-  getMeals: () => request('/meals'),
-  savePreference: (pref) => request('/preference', { method: 'POST', body: JSON.stringify(pref) }),
-  generatePlan: (data) => request('/meals-plan/generate', { method: 'POST', body: JSON.stringify(data) }),
-  getIngredients: (planId) => request(`/ingredients/${planId}`),
 };

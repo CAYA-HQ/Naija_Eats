@@ -1,19 +1,19 @@
 import "./globals.css";
-import HomePageLayout from "./components/HomePageLayout";
+import HomePageLayout from "./components/layout/HomePageLayout";
 import HomePage from "./pages/HomePage";
-import CookingFrequency from "./onboarding/CookingFrequency";
-import SetBudget from "./onboarding/SetBudget";
+import CookingFrequency from "./components/onboarding/CookingFrequency";
+import SetBudget from "./components/onboarding/SetBudget";
 
-import WelcomePage from "./onboarding/WelcomePage";
+import WelcomePage from "./components/onboarding/WelcomePage";
 import { Routes, Route } from "react-router-dom";
 import { RequireOnboarding } from "./RequireOnboarding";
 // import Buffer from "./onboarding/Buffer";
-import FoodPreferences from "./onboarding/FoodPreferences";
+import FoodPreferences from "./components/onboarding/FoodPreferences";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
-import GeneratingPlan from "./onboarding/GeneratingPlan";
-import MealPlan from "./onboarding/MealPlan";
-import WeeklyPlan from "./onboarding/WeeklyPlan";
+import GeneratingPlan from "./components/onboarding/GeneratingPlan";
+import MealPlan from "./components/onboarding/MealPlan";
+import WeeklyPlan from "./components/onboarding/WeeklyPlan";
 import Market from "./pages/Market";
 import MenuPage from "./pages/MenuPage";
 import Profile from "./pages/Profile";

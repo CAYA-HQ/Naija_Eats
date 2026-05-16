@@ -1,5 +1,5 @@
-import Button from "./Button";
-import Header from "./Header";
+import Button from "../ui/Button";
+import Header from "../ui/Header";
 
 const STEPS = [
   { id: 1, label: "Budget & Buffer" },
@@ -16,6 +16,7 @@ const OnboardingLayout = ({
   nextLabel = "Start Cooking",
   onNext,
   children,
+  submitFunction,
 }) => {
   return (
     <div className="min-h-screen flex flex-col bg-bg-background overflow-hidden">
@@ -40,9 +41,6 @@ const OnboardingLayout = ({
         {/* Sidebar - Desktop Only */}
         <div className="hidden lg:flex w-full lg:w-[380px] flex-col p-12 border-r border-text-muted/10 relative z-20">
           <div className="mb-12">
-            <h2 className="text-sm font-bold text-text-muted uppercase tracking-widest mb-8">
-              Onboarding Progress
-            </h2>
             <div className="flex flex-col gap-8">
               {STEPS.map((s) => {
                 const isCompleted = s.id < step;
@@ -138,7 +136,7 @@ const OnboardingLayout = ({
             {children}
           </div>
 
-          <div className="px-6 py-6 mt-auto w-full max-w-5xl mx-auto">
+          <div className="px-3 py-6 mt-auto w-full max-w-5xl mx-auto">
             <div className="flex items-center justify-between gap-4">
               {prevTo ? (
                 <Button
@@ -164,6 +162,7 @@ const OnboardingLayout = ({
                 <Button
                   variant="primary"
                   to={nextTo}
+                  onClick={submitFunction}
                   className="py-4 px-10 text-sm font-bold min-w-[160px]"
                 >
                   {nextLabel} <span className="ml-2">→</span>

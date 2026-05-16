@@ -1,7 +1,7 @@
 import { useState } from "react";
-import OnboardingLayout from "../components/OnboardingLayout";
-import CustomCheckbox from "../components/CustomCheckbox";
-import { GroupIcon, SweetTooth } from "../constants/icons";
+import OnboardingLayout from "../layout/OnboardingLayout";
+import CustomCheckbox from "../ui/CustomCheckbox";
+import { GroupIcon, SweetTooth } from "../../constants/icons";
 
 const CookingFrequency = () => {
   const [householdSize, setHouseholdSize] = useState("1");
@@ -42,10 +42,10 @@ const CookingFrequency = () => {
       nextTo="/onboarding/food-preferences"
       nextLabel="Start Cooking"
     >
-      <h1 className="text-[28px] lg:text-5xl font-bold leading-tight mb-2">
+      <h1 className="text-subheading font-bold leading-tight mb-2">
         Your Daily Rhythm
       </h1>
-      <p className="text-base lg:text-desktop-body text-body font-inter mb-6">
+      <p className="text-base text-body font-inter mb-6">
         Tell us how you'd like to experience your meals so we can tailor the
         perfect plan for your household.
       </p>
@@ -53,9 +53,7 @@ const CookingFrequency = () => {
         <div className="bg-white/50 rounded-2xl p-5 mb-4">
           <div className="flex items-center gap-2 mb-4">
             <GroupIcon className={"text-lg"} />
-            <span className="text-sm lg:text-base font-bold font-inter">
-              Household Size
-            </span>
+            <span className="text-sm font-bold font-inter">Household Size</span>
           </div>
           <div className="flex gap-2">
             {householdOptions.map((opt) => (
@@ -68,10 +66,10 @@ const CookingFrequency = () => {
                     : "bg-white/80 text-text-primary border border-body/20"
                 }`}
               >
-                <span className="text-lg lg:text-xl font-bold font-inter">
+                <span className="text-lg  font-bold font-inter">
                   {opt.number}
                 </span>
-                <span className="text-[10px] lg:text-sm font-semibold font-inter uppercase tracking-wider">
+                <span className="text-[10px]  font-semibold font-inter uppercase tracking-wider">
                   {opt.label}
                 </span>
               </button>
@@ -80,10 +78,10 @@ const CookingFrequency = () => {
         </div>
 
         <div className="bg-white/50 rounded-2xl p-5 mb-4">
-          <span className="text-sm lg:text-base font-bold font-inter mb-1">
+          <span className="text-sm  font-bold font-inter mb-1">
             Daily Meals
           </span>
-          <p className="text-xs lg:text-sm text-body font-inter mb-4">
+          <p className="text-xs  text-body font-inter mb-4">
             How many meals daily?
           </p>
           <div className="flex gap-2">
@@ -91,7 +89,7 @@ const CookingFrequency = () => {
               <button
                 key={count}
                 onClick={() => setDailyMeals(count)}
-                className={`flex-1 py-1.5 lg:py-3 rounded-full text-sm font-semibold font-inter transition-all duration-300 cursor-pointer ${
+                className={`flex-1 py-1.5  rounded-full text-sm font-semibold font-inter transition-all duration-300 cursor-pointer ${
                   dailyMeals === count
                     ? "bg-text-primary text-bg-background"
                     : "bg-transparent text-body"
@@ -106,16 +104,12 @@ const CookingFrequency = () => {
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 place-items-stretch">
         <div className="bg-white/50 rounded-2xl p-5 mb-6">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-sm lg:text-base font-bold font-inter">
-              Sweet Tooth
-            </span>
+            <span className="text-sm font-bold font-inter">Sweet Tooth</span>
             <SweetTooth className={"text-lg text-accent-orange/50"} />
           </div>
-          <p className="text-xs lg:text-sm text-body font-inter mb-4">
-            Include desserts?
-          </p>
+          <p className="text-xs text-body font-inter mb-4">Include desserts?</p>
           <div className="flex items-center justify-between">
-            <span className="text-xs lg:text-base font-semibold font-inter text-body">
+            <span className="text-xs font-semibold font-inter text-body">
               NO
             </span>
             <button
@@ -130,14 +124,14 @@ const CookingFrequency = () => {
                 }`}
               ></div>
             </button>
-            <span className="text-xs lg:text-base font-semibold font-inter text-body">
+            <span className="text-xs font-semibold font-inter text-body">
               YES
             </span>
           </div>
         </div>
 
         <div className="bg-white/50 rounded-2xl p-5">
-          <span className="text-sm lg:text-base font-bold font-inter mb-4">
+          <span className="text-sm font-bold font-inter mb-4">
             How often do you cook?
           </span>
           <ul className="flex flex-col gap-1">
@@ -150,9 +144,7 @@ const CookingFrequency = () => {
                 <CustomCheckbox
                   checked={selectedFrequencies.includes(option)}
                 />
-                <span className="text-sm lg:text-base font-medium font-inter">
-                  {option}
-                </span>
+                <span className="text-sm font-medium font-inter">{option}</span>
               </li>
             ))}
           </ul>
