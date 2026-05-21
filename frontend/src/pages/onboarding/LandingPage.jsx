@@ -12,6 +12,7 @@ import {
   ShoppingCartIcon,
 } from "../../constants/icons";
 import Footer from "../../components/ui/Footer";
+import DropdownNav from "../../components/ui/DropdownNav";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -27,39 +28,7 @@ const LandingPage = () => {
       <Header toggleSidebar={toggleMobileMenu} />
 
       {/* Mobile Navigation Dropdown */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
-          onClick={toggleMobileMenu}
-        >
-          <div
-            className="absolute top-16 left-0 w-full bg-bg-background border-b border-text-primary/10 shadow-2xl py-6 px-8 flex flex-col gap-4 animate-in slide-in-from-top-5 duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Link
-              to="/sign-up"
-              className="py-3 px-4 bg-accent-orange text-white rounded-xl text-center font-bold hover:bg-orange-600 transition-colors"
-              onClick={toggleMobileMenu}
-            >
-              Sign Up
-            </Link>
-            <Link
-              to="/sign-in"
-              className="py-3 px-4 border border-text-primary text-text-primary rounded-xl text-center font-bold hover:bg-text-primary hover:text-white transition-all"
-              onClick={toggleMobileMenu}
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/onboarding/set-budget"
-              className="py-3 px-4 text-center text-text-primary/70 font-semibold hover:text-text-primary"
-              onClick={toggleMobileMenu}
-            >
-              Explore as Guest
-            </Link>
-          </div>
-        </div>
-      )}
+      {isMobileMenuOpen && <DropdownNav toggleMobileMenu={toggleMobileMenu} />}
 
       {/* 2. Hero Section */}
       <section className="relative w-full min-h-screen md:h-162.5 flex items-center justify-center text-center pb-20 px-6 overflow-hidden">
@@ -68,14 +37,14 @@ const LandingPage = () => {
           <img
             src="/images/welcome_image.webp"
             alt="Delicious Nigerian Dish Background"
-            className="w-full h-full object-cover filter brightness-75 contrast-105"
+            className="w-full h-full object-cover filter contrast-105"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-text-primary/70 via-black/40 to-black/60 z-0"></div>
+          <div className="absolute inset-0 bg-linear-to-t from-text-primary/70 via-black/50 to-black/30 z-0"></div>
         </div>
 
         {/* Hero Content Box */}
         <div className="relative z-10 max-w-4xl mt-auto mx-auto flex flex-col items-center gap-6 text-white animate-in fade-in zoom-in duration-700">
-          <h1 className="text-5xl md:text-6xl font-display font-extrabold leading-normal max-w-3xl">
+          <h1 className="text-3xl md:text-6xl font-display font-extrabold leading-normal max-w-3xl">
             Stop Stressing <br />
             About What to Eat
           </h1>

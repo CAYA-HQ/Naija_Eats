@@ -1,9 +1,17 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import LandingPage from "./pages/onboarding/LandingPage";
 
 export const RequireOnboarding = () => {
+  const location = useLocation();
   const onboarded = localStorage.getItem("onboarded");
+
   if (!onboarded) {
-    return <Navigate to={"/onboarding/welcome"} />;
+    if (location.pathname === "/") {
+      return <LandingPage />;
+    }
+
+    return <Navigate to="/onboarding/welcome" replace />;
   }
+
   return <Outlet />;
 };

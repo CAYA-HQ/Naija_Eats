@@ -38,7 +38,10 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/onboarding" element={<Navigate to="/onboarding/welcome" replace />} />
+        <Route
+          path="/onboarding"
+          element={<Navigate to="/onboarding/setbudget" replace />}
+        />
         <Route element={<RequireOnboarding />}>
           <Route
             path="/"
@@ -72,14 +75,7 @@ function App() {
               </HomePageLayout>
             }
           />
-          <Route
-            path="/weekly-plan"
-            element={
-              // <HomePageLayout>
-              <WeeklyPlan />
-              // </HomePageLayout>
-            }
-          />
+          <Route path="/weekly-plan" element={<WeeklyPlan />} />
           <Route
             path="/meal/:id"
             element={
@@ -89,7 +85,7 @@ function App() {
             }
           />
         </Route>
-        <Route path="/onboarding/welcome" element={<LandingPage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding/set-budget" element={<SetBudget />} />
         <Route
           path="/onboarding/cooking-frequency"
@@ -106,7 +102,10 @@ function App() {
           element={<GeneratingPlan />}
         />
         <Route path="/onboarding/meal-plan" element={<MealPlan />} />
-        <Route path="*" element={<Navigate to="/onboarding/welcome" replace />} />
+        <Route
+          path="*"
+          element={<Navigate to="/onboarding/welcome" replace />}
+        />
       </Routes>
     </>
   );

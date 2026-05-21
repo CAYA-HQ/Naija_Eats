@@ -95,9 +95,9 @@ const SetBudget = () => {
       step={1}
       totalSteps={3}
       label="Budget & Buffer"
-      prevTo="/onboarding/welcome"
+      prevTo="/"
       nextTo="/onboarding/cooking-frequency"
-      nextLabel="Set Cooking Frequency"
+      nextLabel="Set Frequency"
       submitFunction={saveData}
     >
       <h1 className="text-subheading tracking-tight font-bold leading-tight mb-2">
