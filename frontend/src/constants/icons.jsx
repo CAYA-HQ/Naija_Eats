@@ -735,3 +735,73 @@ export const TrendUpIcon = ({ className }) => (
     </g>
   </svg>
 );
+
+export const RootsIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 512 512"
+    className={className}
+  >
+    <path d="M0 0h512v512H0z" fill="none" />
+    <path
+      fill="currentColor"
+      d="M167.2 20.48L147 189.6s-44.4 17.3-60.77 33.7c-32.1 32.1-65.98 119.2-65.98 119.2l51.51-53.6L107.2 323l-18.73-51.5l6.76-7s51.27-44.3 80.97-39.7c36 5.6 78.8 75.7 78.8 75.7l-18.2 80.9c-54.1 26.1-106.6 55.2-159.39 83.9l79.29-22.2l12 47.9l15-50.3s38-30.2 60.8-31.5c20.8-1.1 58.4 22.5 58.4 22.5l-37.4 40.5l78.7-32.2l-62.3-45c30.7-52.3 39.3-96.6 28.5-156.7c14-11.5 38.3-23.6 59.9-13.5l-18.2 30.5l46.7 59.4l-15.4-53l10.3-21.2c26.2 23.9 42.8 62.7 44.2 96.8c1.5 34.9-48.4 92.9-48.4 92.9c63.4-39.8 78.2-86.1 67.7-133.4c11.4 1.2 23.2-1.9 36.3-4.2c-30.9-10.9-39.8-21.6-51.4-37.3c-7.7-15.6-17.4-31-28.2-46.2l1.9-16.9l-30.4-22.9l-37.5 9l-25.5-157.82z"
+    />
+  </svg>
+);
+
+export const ShopIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    className={className}
+  >
+    <path d="M0 0h24v24H0z" fill="none" />
+    <path
+      fill="currentColor"
+      d="M22 5H2a1 1 0 0 0-1 1v4a3 3 0 0 0 2 2.82V22a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-9.18A3 3 0 0 0 23 10V6a1 1 0 0 0-1-1m-7 2h2v3a1 1 0 0 1-2 0Zm-4 0h2v3a1 1 0 0 1-2 0ZM7 7h2v3a1 1 0 0 1-2 0Zm-3 4a1 1 0 0 1-1-1V7h2v3a1 1 0 0 1-1 1m10 10h-4v-2a2 2 0 0 1 4 0Zm5 0h-3v-2a4 4 0 0 0-8 0v2H5v-8.18a3.2 3.2 0 0 0 1-.6a3 3 0 0 0 4 0a3 3 0 0 0 4 0a3 3 0 0 0 4 0a3.2 3.2 0 0 0 1 .6Zm2-11a1 1 0 0 1-2 0V7h2ZM4.3 3H20a1 1 0 0 0 0-2H4.3a1 1 0 0 0 0 2"
+    />
+  </svg>
+);
+
+export const ArrowRightIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <line x1="5" x2="19" y1="12" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+);
+
+export const CookIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 48 48"
+    className={className}
+  >
+    <path d="M0 0h48v48H0z" fill="none" />
+    <path
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="4"
+      d="M42 36V20H14v16a6 6 0 0 0 6 6h16a6 6 0 0 0 6-6M4 20h40M18 8v4m10-6v6m10-4v4"
+    />
+  </svg>
+);

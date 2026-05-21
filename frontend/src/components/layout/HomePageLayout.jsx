@@ -12,7 +12,6 @@ const HomePageLayout = ({ children }) => {
       <div className="flex flex-1 min-w-0">
         <Sidebar
           isExpanded={isSidebarExpanded}
-          setIsExpanded={setIsSidebarExpanded}
         />
         <main className="flex-1 pb-32 lg:pb-12 overflow-x-hidden">
           {children}

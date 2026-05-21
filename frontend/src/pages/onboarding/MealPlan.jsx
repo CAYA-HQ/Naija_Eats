@@ -1,6 +1,6 @@
 // import React from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../ui/Button";
+import Button from "../../components/ui/Button";
 import {
   HeartIcon,
   ChevronRightIcon,
@@ -8,7 +8,7 @@ import {
   StopWatch,
   BoltIcon,
 } from "../../constants/icons";
-import HomePageLayout from "../layout/HomePageLayout";
+// import HomePageLayout from "../layout/HomePageLayout";
 import {
   budgetStats,
   featuredMeal,
@@ -20,12 +20,27 @@ const MealPlan = () => {
   const navigate = useNavigate();
 
   const onBoardUser = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/sign-in");
+      return;
+    }
     localStorage.setItem("onboarded", "true");
     navigate("/weekly-plan");
   };
 
+  const onRegeneratePlan = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/sign-in");
+      return;
+    }
+    // Logic for regenerating plan would go here
+    navigate("/onboarding/generating-plan");
+  };
+
   return (
-    <HomePageLayout>
+    <>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         {/* Page Header */}
         <header className="mb-10">
@@ -80,6 +95,7 @@ const MealPlan = () => {
                 <Button
                   variant="outline"
                   className="w-full py-4 rounded-2xl border-[#2d4a1e] text-[#2d4a1e] hover:bg-[#2d4a1e] hover:text-white transition-all"
+                  onClick={onRegeneratePlan}
                 >
                   Regenerate Plan
                 </Button>
@@ -252,7 +268,7 @@ const MealPlan = () => {
           ))}
         </div>
       </div>
-    </HomePageLayout>
+    </>
   );
 };
 

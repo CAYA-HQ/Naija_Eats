@@ -75,10 +75,7 @@ const BudgetWarning = ({ plan, budget, onContinue }) => {
       </div>
 
       {/* action buttons */}
-      <Button
-        onClick={() => navigate("/onboarding/set-budget")}
-        className="w-full"
-      >
+      <Button onClick={() => navigate("/weekly-plan")} className="w-full">
         Adjust Plan
       </Button>
 

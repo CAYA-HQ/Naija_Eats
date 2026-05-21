@@ -1,4 +1,5 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   HomeIcon,
@@ -7,8 +8,23 @@ import {
   UserIcon,
 } from "../../constants/icons";
 
-const Sidebar = ({ isExpanded, setIsExpanded }) => {
+const Sidebar = ({ isExpanded }) => {
   const location = useLocation();
+  const [userName, setUserName] = useState("John Doe");
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        if (user.full_name) {
+          setUserName(user.full_name);
+        }
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+      }
+    }
+  }, []);
 
   const navItems = [
     { label: "Home", icon: HomeIcon, path: "/" },
@@ -30,7 +46,7 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
         <div className="w-10 h-10 rounded-full overflow-hidden bg-text-muted/60 shrink-0">
           <img
             src="/images/Avatar.png"
-            alt="John Doe"
+            alt={userName}
             className="w-full h-full object-cover"
           />
         </div>
@@ -38,7 +54,7 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
           className={`flex flex-col transition-opacity duration-300 ${isExpanded ? "opacity-100" : "opacity-0"}`}
         >
           <span className="text-sm font-bold text-text-primary whitespace-nowrap">
-            John Doe
+            {userName}
           </span>
           <span className="text-[10px] text-text-muted whitespace-nowrap">
             Premium Member

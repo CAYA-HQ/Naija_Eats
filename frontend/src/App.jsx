@@ -1,28 +1,44 @@
 import "./globals.css";
 import HomePageLayout from "./components/layout/HomePageLayout";
 import HomePage from "./pages/HomePage";
-import CookingFrequency from "./components/onboarding/CookingFrequency";
-import SetBudget from "./components/onboarding/SetBudget";
-
-import WelcomePage from "./components/onboarding/WelcomePage";
-import { Routes, Route } from "react-router-dom";
+import CookingFrequency from "./pages/onboarding/CookingFrequency";
+import SetBudget from "./pages/onboarding/SetBudget";
+import LandingPage from "./pages/onboarding/LandingPage";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { RequireOnboarding } from "./RequireOnboarding";
 // import Buffer from "./onboarding/Buffer";
-import FoodPreferences from "./components/onboarding/FoodPreferences";
+import FoodPreferences from "./pages/onboarding/FoodPreferences";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
-import GeneratingPlan from "./components/onboarding/GeneratingPlan";
-import MealPlan from "./components/onboarding/MealPlan";
-import WeeklyPlan from "./components/onboarding/WeeklyPlan";
+import GeneratingPlan from "./pages/onboarding/GeneratingPlan";
+import MealPlan from "./pages/onboarding/MealPlan";
+import WeeklyPlan from "./pages/onboarding/WeeklyPlan";
 import Market from "./pages/Market";
 import MenuPage from "./pages/MenuPage";
 import Profile from "./pages/Profile";
 import MealDetail from "./pages/MealDetail";
+import SplashScreen from "./pages/onboarding/SplashScreen";
+
+import { useState, useEffect } from "react";
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500); // 2.5 seconds splash screen
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return <SplashScreen />;
+  }
+
   return (
     <>
       <Routes>
+        <Route path="/onboarding" element={<Navigate to="/onboarding/welcome" replace />} />
         <Route element={<RequireOnboarding />}>
           <Route
             path="/"
@@ -59,9 +75,9 @@ function App() {
           <Route
             path="/weekly-plan"
             element={
-              <HomePageLayout>
-                <WeeklyPlan />
-              </HomePageLayout>
+              // <HomePageLayout>
+              <WeeklyPlan />
+              // </HomePageLayout>
             }
           />
           <Route
@@ -73,7 +89,7 @@ function App() {
             }
           />
         </Route>
-        <Route path="/onboarding/welcome" element={<WelcomePage />} />
+        <Route path="/onboarding/welcome" element={<LandingPage />} />
         <Route path="/onboarding/set-budget" element={<SetBudget />} />
         <Route
           path="/onboarding/cooking-frequency"
@@ -90,6 +106,7 @@ function App() {
           element={<GeneratingPlan />}
         />
         <Route path="/onboarding/meal-plan" element={<MealPlan />} />
+        <Route path="*" element={<Navigate to="/onboarding/welcome" replace />} />
       </Routes>
     </>
   );

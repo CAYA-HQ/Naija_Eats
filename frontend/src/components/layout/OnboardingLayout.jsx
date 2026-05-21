@@ -13,7 +13,7 @@ const OnboardingLayout = ({
   label,
   prevTo,
   nextTo,
-  nextLabel = "Start Cooking",
+  nextLabel = "Set Daily Rhythm",
   onNext,
   children,
   submitFunction,
@@ -39,7 +39,7 @@ const OnboardingLayout = ({
         />
 
         {/* Sidebar - Desktop Only */}
-        <div className="hidden lg:flex w-full lg:w-[380px] flex-col p-12 border-r border-text-muted/10 relative z-20">
+        <div className="hidden lg:flex w-full lg:w-[300px] flex-col p-12 border-r border-text-muted/10 relative z-20">
           <div className="mb-12">
             <div className="flex flex-col gap-8">
               {STEPS.map((s) => {

@@ -1,6 +1,6 @@
 // import React from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../ui/Button";
+import Button from "../../components/ui/Button";
 import { FilterIcon, TrendDownIcon } from "../../constants/icons";
 import { WeekPlan } from "../../constants/weekPlan";
 
@@ -8,7 +8,7 @@ const WeeklyPlan = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-bg-background min-h-screen pb-20">
+    <div className="bg-bg-background min-h-screen pb-50 lg:pb-30">
       {/* Weekly Budget Summary Card */}
       <div className="p-4">
         <div className="bg-text-link rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
@@ -87,7 +87,7 @@ const WeeklyPlan = () => {
       </div>
 
       {/* Bottom Buttons */}
-      <div className="fixed bottom-15 left-0 right-0 p-4 bg-bg-background/80 backdrop-blur-md space-y-3 z-50">
+      <div className="fixed bottom-0 left-0 right-0 py-4 px-2 bg-bg-background/80 backdrop-blur-md space-y-3 z-50 flex flex-col lg:flex-row gap-4">
         <Button
           variant="primary"
           className="w-full"
@@ -95,10 +95,7 @@ const WeeklyPlan = () => {
         >
           Accept Plan
         </Button>
-        <Button
-          variant="outline"
-          className="w-full bg-white border-green-900 text-green-900"
-        >
+        <Button variant="outline" className="w-full ">
           Regenerate
         </Button>
       </div>

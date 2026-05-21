@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import CustomCheckbox from "../../components/ui/CustomCheckbox";
 import Button from "../../components/ui/Button";
 import { AppleIcon, GoogleIcon } from "../../constants/icons";
 import Footer from "../../components/ui/Footer";
-import { authService } from "../../services/api";
+import { authService } from "../../services/auth.api";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || (localStorage.getItem("onboarded") ? "/" : "/onboarding/welcome");
   const [showPassword, setShowPassword] = useState(false);
   const [isTerms, setTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +51,7 @@ const SignUp = () => {
         phone_number: `+234${formData.phone_number}`,
       };
       await authService.signUp(payload);
-      navigate("/sign-in");
+      navigate("/onboarding/set-budget");
     } catch (err) {
       setError(
         err.message || "An error occurred during sign up. Please try again.",
@@ -82,8 +84,8 @@ const SignUp = () => {
               <br /> Modern Convenience.
             </h1>
             <p className="hidden lg:block text-base text-white font-semibold text-left">
-              Experience the finest Nigerian cuisine delivered with precision
-              and pride. Your journey to the heart of our kitchen starts here.
+              Build a personalized Nigerian meal plan with flavors you love,
+              goals you choose, and a weekly rhythm that fits your life.
             </p>
           </div>
         </div>
@@ -277,6 +279,7 @@ const SignUp = () => {
               </span>
               <Link
                 to="/sign-in"
+                state={{ from }}
                 className="text-accent-orange font-bold hover:underline text-base"
               >
                 Sign In

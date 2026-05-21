@@ -14,9 +14,11 @@ export const authService = {
       throw new Error(data.message || "Failed to sign in");
     }
 
-    // Store token if available
-    if (data.token) {
-      localStorage.setItem("token", data.token);
+    if (data.data?.token) {
+      localStorage.setItem("token", data.data.token);
+      if (data.data.user) {
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+      }
     }
 
     return data;
@@ -30,9 +32,13 @@ export const authService = {
     });
 
     const data = await response.json();
+    console.log(data)
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to sign up");
+    if (data.data?.token) {
+      localStorage.setItem("token", data.data.token);
+      if (data.data.user) {
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+      }
     }
 
     return data;

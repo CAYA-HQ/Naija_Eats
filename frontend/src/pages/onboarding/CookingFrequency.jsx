@@ -1,7 +1,7 @@
 import { useState } from "react";
-import OnboardingLayout from "../layout/OnboardingLayout";
-import CustomCheckbox from "../ui/CustomCheckbox";
+import OnboardingLayout from "../../components/layout/OnboardingLayout";
 import { GroupIcon, SweetTooth } from "../../constants/icons";
+import CustomRadio from "../../components/ui/CustomRadio";
 
 const CookingFrequency = () => {
   const [householdSize, setHouseholdSize] = useState("1");
@@ -25,12 +25,24 @@ const CookingFrequency = () => {
     "Rarely (1-2 Days)",
   ];
 
-  const handleFrequencyToggle = (option) => {
-    setSelectedFrequencies((prev) =>
-      prev.includes(option)
-        ? prev.filter((item) => item !== option)
-        : [...prev, option],
-    );
+  const handleFrequencySelect = (option) => {
+    setSelectedFrequencies([option]);
+  };
+
+  const saveData = () => {
+    const freqMap = {
+      "Daily (7 Days)": "daily",
+      "Most Days (5-6 Days)": "most-days",
+      "Once in a while (3-4 Days)": "sometimes",
+      "Rarely (1-2 Days)": "rarely",
+    };
+    const data = {
+      household_size: parseInt(householdSize),
+      daily_meals: parseInt(dailyMeals),
+      is_dessert: includeDesserts,
+      cooking_frequency: freqMap[selectedFrequencies[0]] || "daily",
+    };
+    localStorage.setItem("onboarding_frequency", JSON.stringify(data));
   };
 
   return (
@@ -40,7 +52,8 @@ const CookingFrequency = () => {
       label="Frequency"
       prevTo="/onboarding/set-budget"
       nextTo="/onboarding/food-preferences"
-      nextLabel="Start Cooking"
+      nextLabel="Set Preferences"
+      submitFunction={saveData}
     >
       <h1 className="text-subheading font-bold leading-tight mb-2">
         Your Daily Rhythm
@@ -139,11 +152,9 @@ const CookingFrequency = () => {
               <li
                 key={option}
                 className="flex items-center gap-3 py-3 cursor-pointer"
-                onClick={() => handleFrequencyToggle(option)}
+                onClick={() => handleFrequencySelect(option)}
               >
-                <CustomCheckbox
-                  checked={selectedFrequencies.includes(option)}
-                />
+                <CustomRadio checked={selectedFrequencies.includes(option)} />
                 <span className="text-sm font-medium font-inter">{option}</span>
               </li>
             ))}

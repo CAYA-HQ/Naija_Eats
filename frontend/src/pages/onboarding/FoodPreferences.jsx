@@ -1,5 +1,5 @@
 import { useState } from "react";
-import OnboardingLayout from "../layout/OnboardingLayout";
+import OnboardingLayout from "../../components/layout/OnboardingLayout";
 import {
   RhombusAlertIcon,
   CircleAlertIcon,
@@ -37,7 +37,17 @@ const FoodPreferences = () => {
       totalSteps={3}
       label="Preferences"
       prevTo="/onboarding/cooking-frequency"
-      onNext={() => navigate("/onboarding/generating-plan")}
+      onNext={() => {
+        const data = {
+          preferences: selectedPrefs.map((id) => Preferences[id].category),
+          allergies: allergyInput
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s !== ""),
+        };
+        localStorage.setItem("onboarding_preferences", JSON.stringify(data));
+        navigate("/onboarding/generating-plan");
+      }}
       nextLabel="Generate Your Plan"
     >
       {/* Title */}

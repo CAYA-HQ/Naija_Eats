@@ -20,11 +20,10 @@ const MenuPage = () => {
   const [value, setValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
 
-  // ─── plan state (replace with real API flags later) ─────────────────
+  // plan state
   const hasPlan = true;
   const budgetExceeded = true;
   const [warningDismissed, setWarningDismissed] = useState(false);
-  // ────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -88,7 +87,7 @@ const MenuPage = () => {
 
   const navigate = useNavigate();
 
-  // ─── state gates ─────────────────────────────────────────────────────
+  // state gates
   if (!hasPlan) return <EmptyState />;
 
   if (budgetExceeded && !warningDismissed) {
@@ -100,7 +99,7 @@ const MenuPage = () => {
       />
     );
   }
-  // ─────────────────────────────────────────────────────────────────────
+  //
 
   return (
     <main className="px-5 pt-8 flex flex-col gap-6">

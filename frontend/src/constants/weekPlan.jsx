@@ -17,7 +17,7 @@ export const WeekPlan = [
         name: "Bread & Egg",
         price: "₦700",
         icon: <SnackIcon className="text-text-primary" />,
-        image: "/images/tea-bread-small-image.png",
+        image: "/images/bread_scrambled_egg.jpg",
       },
       {
         type: "LUNCH",

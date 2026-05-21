@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import Button from "../../components/ui/Button";
 import Footer from "../../components/ui/Footer";
-import { authService } from "../../services/api";
+import { authService } from "../../services/auth.api";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from =
+    location.state?.from ||
+    (localStorage.getItem("onboarded") ? "/" : "/onboarding/set-budget");
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,9 +36,8 @@ const SignIn = () => {
 
     try {
       await authService.signIn(formData.email, formData.password);
-      localStorage.getItem("onboarded")
-        ? navigate("/")
-        : navigate("/onboarding/welcome");
+
+      navigate(from, { replace: true });
     } catch (err) {
       setError(
         err.message || "An error occurred during sign in. Please try again.",
@@ -65,8 +69,8 @@ const SignIn = () => {
               Modern Convenience.
             </h1>
             <p className="hidden lg:block text-base text-white font-semibold text-left">
-              Experience the finest Nigerian cuisine delivered with precision
-              and pride. Your journey to the heart of our kitchen starts here.
+              Build a personalized Nigerian meal plan with flavors you love,
+              goals you choose, and a weekly rhythm that fits your life.
             </p>
           </div>
         </div>
@@ -190,6 +194,7 @@ const SignIn = () => {
               </span>
               <Link
                 to="/sign-up"
+                state={{ from }}
                 className="text-accent-orange font-semibold hover:underline text-base font-inter"
               >
                 Sign Up

@@ -49,3 +49,40 @@ input,
 textarea {
   font-family: var(--font-inter);
 }
+
+@keyframes steam {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-120px) scale(2);
+    opacity: 0;
+  }
+}
+
+.steam-bubble {
+  animation: steam 3s ease-in-out infinite;
+  position: absolute;
+}
+
+@keyframes logo-in {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-logo {
+  animation: logo-in 1s ease-out forwards;
+}

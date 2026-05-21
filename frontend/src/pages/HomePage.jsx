@@ -26,8 +26,8 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         <div
-          onClick={() => navigate("/meal/jollof-rice-grilled-fish")}
-          className="lg:col-span-7 bg-[#2d4a1e] rounded-3xl overflow-hidden text-white transition-transform hover:scale-[1.01] cursor-pointer group"
+          onClick={() => navigate("/meal/jollof-rice-and-grilled-fish")}
+          className="lg:col-span-7 bg-text-primary rounded-3xl overflow-hidden text-white cursor-pointer group"
         >
           <div className="relative h-[300px] lg:h-[400px]">
             <img
@@ -73,7 +73,7 @@ const HomePage = () => {
                 The Elite Taste of Nigeria
               </span>
             </div>
-            <h1 className="text-4xl lg:text-5xl font-display font-bold text-text-primary leading-tight">
+            <h1 className="text-subheading lg:text-[42px] font-display font-bold text-text-primary leading-tight">
               Heritage Flavors, <br />
               <span className="text-[#8B4513] font-display!">
                 Modern <br /> Convenience

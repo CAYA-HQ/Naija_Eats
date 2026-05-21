@@ -1,4 +1,30 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { authService } from "../services/auth.api";
+
 const Profile = () => {
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState({
+    full_name: "John Doe",
+    location: "Lagos, Nigeria",
+    role: "Health Enthusiast",
+  });
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setUserData((prev) => ({
+          ...prev,
+          full_name: user.full_name || prev.full_name,
+        }));
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+      }
+    }
+  }, []);
   const settingsGroups = [
     {
       title: "Account Settings",
@@ -135,10 +161,10 @@ const Profile = () => {
       {/* User Info */}
       <div className="text-center mt-6">
         <h1 className="text-4xl font-display font-extrabold text-text-primary">
-          John Doe
+          {userData.full_name}
         </h1>
         <p className="text-sm font-medium text-gray-500 mt-1">
-          Lagos, Nigeria • Health Enthusiast
+          {userData.location} • {userData.role}
         </p>
       </div>
 
@@ -203,7 +229,13 @@ const Profile = () => {
       </div>
 
       {/* Logout Button */}
-      <button className="w-full mt-10 border-2 border-[#D32F2F] text-[#D32F2F] py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#D32F2F]/5 transition-all">
+      <button
+        onClick={() => {
+          authService.logout();
+          navigate("/sign-in");
+        }}
+        className="w-full mt-10 border-2 border-[#D32F2F] text-[#D32F2F] py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#D32F2F]/5 transition-all"
+      >
         <svg
           width="20"
           height="20"
