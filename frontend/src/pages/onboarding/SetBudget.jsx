@@ -53,11 +53,11 @@ const SetBudget = () => {
 
     // Automatically highlight tier based on value
     if (frequency === "Weekly") {
-      if (numValue < 7000) setBudgetTier("Low cost");
+      if (numValue < 7000) setBudgetTier("Low");
       else if (numValue >= 7000 && numValue < 10000) setBudgetTier("Standard");
       else if (numValue >= 10000) setBudgetTier("Premium");
     } else {
-      if (numValue < 30000) setBudgetTier("Low cost");
+      if (numValue < 30000) setBudgetTier("Low");
       else if (numValue >= 50000 && numValue < 70000) setBudgetTier("Standard");
       else if (numValue >= 70000) setBudgetTier("Premium");
     }
