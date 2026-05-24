@@ -3,7 +3,7 @@
 # Thorough API Test Script for Naija Eats Backend
 # Organized into: PASS, FAIL, EDGE CASES, and E2E Sections
 
-BASE_URL=${1:-"http://localhost:3000"}
+BASE_URL=${1:-"https://naijaeats-production.up.railway.app"}
 RANDOM_ID=$RANDOM
 TEST_EMAIL="thorough_${RANDOM_ID}@test.com"
 TEST_PASSWORD="SecurePass123!"
