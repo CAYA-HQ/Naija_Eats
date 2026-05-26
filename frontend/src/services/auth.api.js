@@ -31,6 +31,12 @@ export const authService = {
     });
 
     const data = await response.json();
+<<<<<<< HEAD
+=======
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to sign up");
+    }
+>>>>>>> f238a7b (feat: added buffered budget and implemented meal swap function)
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to create account");
