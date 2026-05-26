@@ -16,7 +16,7 @@ export const postWithAuth = async (endpoint, body) => {
     body: JSON.stringify(body),
   });
 
-  console.log("Body sent to", endpoint, ":", body);
+
   const data = await response.json();
 
   if (!response.ok) {

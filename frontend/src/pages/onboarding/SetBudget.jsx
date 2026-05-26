@@ -105,6 +105,17 @@ const SetBudget = () => {
     try {
       await preferencesService.saveBudgetPreferences(getBudgetPayload());
       storeBudgetLocally();
+      localStorage.setItem(
+        "buffered_budget",
+        JSON.stringify({
+          amount:
+            parseInt(budgetData.budgetValue, 10) -
+            (selectedBuffer === "Custom"
+              ? (parseFloat(customBuffer) || 0) / 100
+              : parseFloat(selectedBuffer) / 100) *
+              parseInt(budgetData.budgetValue, 10),
+        }),
+      );
       toast.success("Your budget has been successfully set.");
       navigate("/onboarding/cooking-frequency");
     } catch (err) {

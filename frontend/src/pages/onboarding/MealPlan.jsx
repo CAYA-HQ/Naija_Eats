@@ -1,4 +1,4 @@
-// import React from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import {
@@ -15,9 +15,13 @@ import {
   subMeals,
   weeklyMeals,
 } from "../../constants/mealPlan";
+import { planService } from "../../services/plan.api";
 
 const MealPlan = () => {
   const navigate = useNavigate();
+  const bufferedBudget =
+    JSON.parse(localStorage.getItem("buffered_budget")) || "0";
+  const amount = bufferedBudget?.amount;
 
   const onBoardUser = () => {
     const token = localStorage.getItem("token");
@@ -38,6 +42,18 @@ const MealPlan = () => {
     // Logic for regenerating plan would go here
     navigate("/onboarding/generating-plan");
   };
+
+  useEffect(() => {
+    const fetchMealPlan = async () => {
+      try {
+        const data = await planService.getCurrentMealPlan();
+        console.log(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchMealPlan();
+  }, []);
 
   return (
     <>
@@ -67,7 +83,7 @@ const MealPlan = () => {
               </p>
 
               <div className="space-y-3">
-                {budgetStats.map((stat, i) => (
+                {budgetStats(amount).map((stat, i) => (
                   <div
                     key={i}
                     className="flex justify-between items-center border-b border-gray-100 pb-4"
@@ -102,7 +118,7 @@ const MealPlan = () => {
               </div>
             </div>
 
-            {/* Nutritional Info Card */}
+            {/* Nutritional Info Card
             <div className="bg-[#2d4a1e] rounded-3xl p-5 text-white shadow-lg overflow-hidden relative">
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2 opacity-80">
@@ -130,7 +146,7 @@ const MealPlan = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Shopping List Card */}
             <div className="bg-white/50 border-2 border-dashed border-[#2d4a1e]/20 rounded-4xl p-4 text-center flex flex-col items-center">

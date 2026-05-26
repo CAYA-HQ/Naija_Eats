@@ -37,7 +37,9 @@ export const authService = {
     });
 
     const data = await response.json();
-    console.log(data)
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to sign up");
+    }
 
     if (data.data?.token) {
       localStorage.setItem("token", data.data.token);

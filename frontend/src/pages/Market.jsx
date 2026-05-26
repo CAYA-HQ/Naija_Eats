@@ -1,13 +1,43 @@
 import { useState, useEffect } from "react";
 import { SearchIcon, ShoppingCartIcon } from "../constants/icons";
-import { MarketData } from "../constants/market";
+
 import { useBudgetAlert } from "../context/useBudgetAlert";
+import { WeekPlan } from "../constants/weekPlan";
+import { getMealMarketData } from "../utils/getMarketData";
+import {
+  GrainIcon,
+  LeafIcon,
+  ProteinIcon,
+  SpiceIcon,
+} from "../constants/icons";
 
 const Market = () => {
-  const [marketData, setMarketData] = useState(MarketData);
   const [activeFilter, setActiveFilter] = useState("Today's Meals");
   const [searchTerm, setSearchTerm] = useState("");
   const { setShoppingListTotal } = useBudgetAlert();
+  const [randomMeal, setRandomMeal] = useState(WeekPlan[0].meals[0]);
+  const [marketData, setMarketData] = useState(() =>
+    getMealMarketData(WeekPlan[0].meals[0]),
+  );
+  const categoryIcons = {
+    Grains: <GrainIcon />,
+    Proteins: <ProteinIcon />,
+    Vegetables: <LeafIcon />,
+    Spices: <SpiceIcon />,
+    Miscellaneous: "🥣",
+  };
+
+  const swapMeals = () => {
+    let meal;
+    do {
+      const randomDay = WeekPlan[Math.floor(Math.random() * WeekPlan.length)];
+      meal =
+        randomDay.meals[Math.floor(Math.random() * randomDay.meals.length)];
+    } while (meal.name === randomMeal.name);
+
+    setRandomMeal(meal);
+    setMarketData(getMealMarketData(meal)); // add this
+  };
 
   // Calculate and update shopping list total
   useEffect(() => {
@@ -74,7 +104,10 @@ const Market = () => {
           <h2 className="text-2xl font-display font-extrabold text-text-primary">
             Today's Meal
           </h2>
-          <button className="text-accent-orange text-xs font-bold flex items-center gap-1 hover:underline">
+          <button
+            onClick={swapMeals}
+            className="text-accent-orange text-xs font-bold flex items-center gap-1 hover:underline"
+          >
             Swap Meal
             <svg
               width="14"
@@ -93,26 +126,22 @@ const Market = () => {
           <div className="flex gap-4 ">
             <div className="w-32 h-32 shrink-0 rounded-2xl overflow-hidden border-2 border-white/10">
               <img
-                src="/images/jollof_fish_plantains.png"
-                alt="Jollof Rice"
+                src={randomMeal.image}
+                alt={randomMeal.name}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex gap-2">
                 <span className="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">
-                  Lunch
-                </span>
-                <span className="bg-white/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">
                   Served 1
                 </span>
               </div>
               <h3 className="text-xl font-display font-bold leading-tight mt-1">
-                Jollof Rice & Grilled Fish
+                {randomMeal.name}
               </h3>
               <p className="text-[10px] text-white/70 leading-relaxed line-clamp-3 font-medium">
-                A spicy, aromatic classic paired with ocean-fresh tilapia,
-                slow-grilled with herb butter.
+                {randomMeal.description}
               </p>
             </div>
           </div>
@@ -122,7 +151,7 @@ const Market = () => {
               Ingredients Needed:
             </h4>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-              {["Rice", "Fish", "Plantain", "Spices"].map((ing) => (
+              {randomMeal.ingredients.slice(0, 4).map((ing) => (
                 <div key={ing} className="flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-accent-orange" />
                   <span className="text-[11px] font-medium text-white/90">
@@ -158,7 +187,9 @@ const Market = () => {
         {marketData.map((section, catIdx) => (
           <div key={catIdx} className="flex flex-col gap-3">
             <div className="flex items-center gap-2 opacity-80">
-              <span className="text-xl text-text-muted/50">{section.icon}</span>
+              <span className="text-xl text-text-muted/50">
+                {categoryIcons[section.category] ?? "🛒"}
+              </span>
               <h2 className="text-lg font-display font-bold text-text-primary">
                 {section.category}
               </h2>
