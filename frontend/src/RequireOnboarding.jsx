@@ -4,6 +4,11 @@ import LandingPage from "./pages/onboarding/LandingPage";
 export const RequireOnboarding = () => {
   const location = useLocation();
   const onboarded = localStorage.getItem("onboarded");
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return <Navigate to="/sign-in" replace state={{ from: location }} />;
+  }
 
   if (!onboarded) {
     if (location.pathname === "/") {
