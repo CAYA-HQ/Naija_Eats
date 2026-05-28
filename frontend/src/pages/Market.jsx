@@ -305,7 +305,7 @@ const Market = () => {
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {item.price && (
+                      {(item.minPrice !== undefined && item.maxPrice !== undefined) && (
                         <span
                           className={`text-xs font-bold ${
                             item.bought
@@ -313,7 +313,7 @@ const Market = () => {
                               : "text-text-primary"
                           }`}
                         >
-                          ₦ {item.price.toFixed(2)}
+                          ₦{item.minPrice.toLocaleString()} - ₦{item.maxPrice.toLocaleString()}
                         </span>
                       )}
                       {item.qty && (
