@@ -18,8 +18,14 @@ export const authService = {
 
     if (data.data?.token) {
       localStorage.setItem("token", data.data.token);
-      localStorage.setItem("user", JSON.stringify(data.data.user));
+      // Backend doesn't return user on login yet — save email as fallback
+      if (data.data?.user) {
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+      } else {
+        localStorage.setItem("user", JSON.stringify({ email }));
+      }
     }
+
     return data;
   },
 
@@ -36,24 +42,22 @@ export const authService = {
       throw new Error(data.message || "Failed to create account");
     }
 
-    // backend does NOT return a token on register — email verification required first
+    // Backend does NOT return a token on register — email verification required first
     return data;
   },
 
+  // ⚠️ verify-email is now a GET that redirects to /sign-in — this is no longer called
+  // Backend sends email with link to BACKEND_URL/auth/verify-email?token=...
+  // which redirects to FRONTEND_URL/sign-in?status=success&verified=true
   async verifyEmail(token) {
-    const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    });
-
-    const data = await response.json();
-
+    const response = await fetch(
+      `${API_BASE_URL}/auth/verify-email?token=${token}`,
+      { method: "GET" },
+    );
     if (!response.ok) {
-      throw new Error(data.message || "Verification failed");
+      throw new Error("Verification failed");
     }
-
-    return data;
+    return response;
   },
 
   async resendVerification(email) {
@@ -104,6 +108,7 @@ export const authService = {
     return data;
   },
 
+  // ⚠️ Needs /auth/me endpoint from backend before this works fully
   async userInfo() {
     const token = localStorage.getItem("token");
 
@@ -111,7 +116,7 @@ export const authService = {
       throw new Error("No authentication token found. Please sign in again.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -123,6 +128,10 @@ export const authService = {
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to fetch user info");
+    }
+
+    if (data.data?.user) {
+      localStorage.setItem("user", JSON.stringify(data.data.user));
     }
 
     return data;
