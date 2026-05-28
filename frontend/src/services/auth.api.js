@@ -31,7 +31,9 @@ export const authService = {
     });
 
     const data = await response.json();
-
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to create account");
+    }
     if (!response.ok) {
       throw new Error(data.message || "Failed to create account");
     }
@@ -41,11 +43,11 @@ export const authService = {
   },
 
   async verifyEmail(token) {
-    const response = await fetch(`${API_BASE_URL}/auth/verify-email/${token}`, {
+    const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
     });
-
     const data = await response.json();
 
     if (!response.ok) {
@@ -98,6 +100,30 @@ export const authService = {
 
     if (!response.ok) {
       throw new Error(data.message || "Failed to reset password");
+    }
+
+    return data;
+  },
+
+  async userInfo() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No authentication token found. Please sign in again.");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch user info");
     }
 
     return data;
