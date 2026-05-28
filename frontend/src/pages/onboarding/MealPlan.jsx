@@ -40,7 +40,7 @@ const MealPlan = () => {
       return;
     }
     // Logic for regenerating plan would go here
-    navigate("/onboarding/generating-plan");
+    navigate("/onboarding/set-budget");
   };
 
   useEffect(() => {
