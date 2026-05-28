@@ -11,21 +11,15 @@ export const authService = {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || "Failed to sign in");
+      const err = new Error(data.message || "Failed to sign in");
+      err.status = response.status;
+      throw err;
     }
 
     if (data.data?.token) {
       localStorage.setItem("token", data.data.token);
-      if (data.data.user) {
-        localStorage.setItem("user", JSON.stringify(data.data.user));
-        if (data.data.user.onboarded === true) {
-          localStorage.setItem("onboarded", "true");
-        } else {
-          localStorage.removeItem("onboarded");
-        }
-      }
+      localStorage.setItem("user", JSON.stringify(data.data.user));
     }
-
     return data;
   },
 
@@ -37,15 +31,74 @@ export const authService = {
     });
 
     const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(data.message || "Failed to sign up");
+      throw new Error(data.message || "Failed to create account");
     }
 
-    if (data.data?.token) {
-      localStorage.setItem("token", data.data.token);
-      if (data.data.user) {
-        localStorage.setItem("user", JSON.stringify(data.data.user));
-      }
+    // backend does NOT return a token on register — email verification required first
+    return data;
+  },
+
+  async verifyEmail(token) {
+    const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Verification failed");
+    }
+
+    return data;
+  },
+
+  async resendVerification(email) {
+    const response = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to resend verification email");
+    }
+
+    return data;
+  },
+
+  async forgotPassword(email) {
+    const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to send reset email");
+    }
+
+    return data;
+  },
+
+  async resetPassword(token, newPassword) {
+    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, newPassword }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to reset password");
     }
 
     return data;
@@ -54,5 +107,7 @@ export const authService = {
   logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-  }
+    localStorage.removeItem("onboarded");
+    localStorage.removeItem("plan_id");
+  },
 };
