@@ -12,7 +12,7 @@ import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
 import GeneratingPlan from "./pages/onboarding/GeneratingPlan";
 import MealPlan from "./pages/onboarding/MealPlan";
-import WeeklyPlan from "./pages/onboarding/WeeklyPlan";
+import WeeklyPlan from "./pages/WeeklyPlan";
 import Market from "./pages/Market";
 import MenuPage from "./pages/MenuPage";
 import Profile from "./pages/Profile";
@@ -27,6 +27,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 
 import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
+import OnboardingLayout from "./components/layout/OnboardingLayout";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -83,7 +84,14 @@ function App() {
               </HomePageLayout>
             }
           />
-          <Route path="/weekly-plan" element={<WeeklyPlan />} />
+          <Route
+            path="/weekly-plan"
+            element={
+              <HomePageLayout>
+                <WeeklyPlan />
+              </HomePageLayout>
+            }
+          />
           <Route
             path="/meal/:id"
             element={
@@ -109,7 +117,14 @@ function App() {
           path="/onboarding/generating-plan"
           element={<GeneratingPlan />}
         />
-        <Route path="/onboarding/meal-plan" element={<MealPlan />} />
+        <Route
+          path="/onboarding/meal-plan"
+          element={
+            <OnboardingLayout>
+              <MealPlan />
+            </OnboardingLayout>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />

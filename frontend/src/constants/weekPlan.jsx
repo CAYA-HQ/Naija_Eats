@@ -1,10 +1,4 @@
-import {
-  BurgerIcon,
-  ForkAndKnife,
-  SnackIcon,
-  // SpagIcon,
-  UtensilsIcon,
-} from "./icons";
+import { BurgerIcon, ForkAndKnife, SnackIcon, UtensilsIcon } from "./icons";
 
 const DAY_COLORS = {
   Monday: "bg-orange-800",
@@ -47,7 +41,7 @@ const MEAL_IMAGE_MAP = {
   "puff puff": "/images/puffpuff.png",
   "yam porridge": "/images/fried-yam-and-egg-sauce.jpg",
   "chin chin": "/images/puffpuff.png",
-  boli: "/images/plantain.jpg",
+  boli: "/images/boiled-plantain.jpg",
   "fish stew": "/images/fisherman_soup.png",
   "chicken stew": "/images/rice-and-stew.jpg",
   "beef stew": "/images/rice-and-stew.jpg",

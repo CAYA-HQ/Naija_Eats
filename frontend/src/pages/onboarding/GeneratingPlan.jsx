@@ -18,6 +18,7 @@ const GeneratingPlan = () => {
       try {
         // Generate the timetable (preferences have already been saved in previous steps)
         await preferencesService.generateTimetable();
+        localStorage.removeItem("weekly_meal_plan");
 
         if (!active) return;
         toast.success("Meal plan generated successfully!");
