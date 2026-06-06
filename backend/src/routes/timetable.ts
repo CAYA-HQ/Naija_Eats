@@ -74,6 +74,7 @@ function formatPlan(plan: any) {
     ...plan,
     items: plan.items.map((item: any) => ({
       ...item,
+      price_at_time: item.price_at_time ? Number(item.price_at_time) : null,
       meal: {
         ...item.meal,
         price_min: item.meal.price_min ? Number(item.meal.price_min) : null,
@@ -180,40 +181,89 @@ router.post("/generate", async (req: Request, res: Response) => {
     );
     const allOtherMeals = pool;
 
-    // 7. Run atomic writes in a short transaction
+    // 7. Select meals for each day/slot and compute total cost
+    const selectedItems: Array<{
+      meal_id: string;
+      day_of_week: string;
+      meal_slot: string;
+      price_at_time: number;
+    }> = [];
+
+    for (const day of days) {
+      for (const slot of slots) {
+        let candidates: typeof pool;
+
+        if (slot === "Breakfast") {
+          candidates = breakfastMeals.length > 0 ? breakfastMeals : allOtherMeals;
+        } else {
+          candidates = lunchDinnerMeals.length > 0 ? lunchDinnerMeals : allOtherMeals;
+        }
+
+        const meal = candidates[Math.floor(Math.random() * candidates.length)];
+        selectedItems.push({
+          meal_id: meal.id,
+          day_of_week: day,
+          meal_slot: slot,
+          price_at_time: meal.price_min ? Number(meal.price_min) : 0,
+        });
+      }
+    }
+
+    const totalCost = selectedItems.reduce((sum, item) => sum + item.price_at_time, 0);
+    if (budgetVal > 0 && totalCost > budgetVal) {
+      throw new Error("Generated timetable exceeds your budget");
+    }
+
+    // 8. Run atomic writes in a short transaction
     const newPlan = await prisma.$transaction(async (tx) => {
       const createdPlan = await tx.meal_plans.create({
         data: { user_id: user.id, status: "active" },
       });
 
-      const itemsData: Array<{
-        plan_id: string;
-        meal_id: string;
-        day_of_week: string;
-        meal_slot: string;
+      const itemsData = selectedItems.map((item) => ({
+        plan_id: createdPlan.id,
+        meal_id: item.meal_id,
+        day_of_week: item.day_of_week,
+        meal_slot: item.meal_slot,
+        price_at_time: item.price_at_time,
+      }));
+
+      await tx.meal_plan_items.createMany({ data: itemsData });
+
+      // Build shopping list from selected meals' ingredients
+      const mealIds = [...new Set(selectedItems.map((i) => i.meal_id))];
+      const mealsWithIngredients = await tx.meals.findMany({
+        where: { id: { in: mealIds } },
+        select: { ingredients: true },
+      });
+
+      const seen = new Set<string>();
+      const shoppingItems: Array<{
+        meal_plan_id: string;
+        name: string;
+        category: string | null;
+        quantity: string | null;
       }> = [];
 
-      for (const day of days) {
-        for (const slot of slots) {
-          let candidates: typeof pool;
-
-          if (slot === "Breakfast") {
-            candidates = breakfastMeals.length > 0 ? breakfastMeals : allOtherMeals;
-          } else {
-            candidates = lunchDinnerMeals.length > 0 ? lunchDinnerMeals : allOtherMeals;
+      for (const meal of mealsWithIngredients) {
+        const ingredients: Array<{ name: string; category?: string; quantity?: string }> =
+          (meal.ingredients as any) ?? [];
+        for (const ing of ingredients) {
+          if (!seen.has(ing.name)) {
+            seen.add(ing.name);
+            shoppingItems.push({
+              meal_plan_id: createdPlan.id,
+              name: ing.name,
+              category: ing.category ?? null,
+              quantity: ing.quantity ?? null,
+            });
           }
-
-          const meal = candidates[Math.floor(Math.random() * candidates.length)];
-          itemsData.push({
-            plan_id: createdPlan.id,
-            meal_id: meal.id,
-            day_of_week: day,
-            meal_slot: slot,
-          });
         }
       }
 
-      await tx.meal_plan_items.createMany({ data: itemsData });
+      if (shoppingItems.length > 0) {
+        await tx.shopping_list_items.createMany({ data: shoppingItems });
+      }
 
       const planWithMeals = await tx.meal_plans.findUnique({
         where: { id: createdPlan.id },
