@@ -1,22 +1,34 @@
 // import React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import { FilterIcon } from "../../constants/icons";
-import { WeekPlan } from "../../constants/weekPlan";
+import transformTimetable from "../../constants/weekPlan";
 import { planService } from "../../services/plan.api";
 import { WeeklySummaryCard } from "../../components/ui/WeeklySummaryCard";
+import { preferencesService } from "../../services/preferences.api";
 
 const WeeklyPlan = () => {
   const navigate = useNavigate();
+  const [weekPlan, setWeekPlan] = useState([]);
 
   useEffect(() => {
     const getMealPlan = async () => {
-      const data = await planService.getCurrentMealPlan();
+      const data = await planService.getTimetable();
+      setWeekPlan(transformTimetable(data));
       console.log("Current meal plan data in WeeklyPlan:", data);
     };
     getMealPlan();
   }, []);
+
+  const handleRegenerate = () => {
+    const getNewTimetable = async () => {
+      const data = await preferencesService.generateMealPlans();
+      setWeekPlan(transformTimetable(data));
+      console.log("Regenerated timetable data:", data);
+    };
+    getNewTimetable();
+  };
 
   return (
     <>
@@ -32,7 +44,7 @@ const WeeklyPlan = () => {
 
         {/* Plan List */}
         <div className=" space-y-6 lg:flex lg:flex-wrap lg:justify-center gap-6 w-full">
-          {WeekPlan.map((dayPlan, idx) => (
+          {weekPlan.map((dayPlan, idx) => (
             <div key={idx} className="space-y-3 lg:min-w-xs">
               <div className="flex items-center gap-2">
                 <div
@@ -47,11 +59,7 @@ const WeeklyPlan = () => {
                 {dayPlan.meals.map((meal, mIdx) => (
                   <div
                     key={mIdx}
-                    onClick={() =>
-                      navigate(
-                        `/meal/${meal.slug}`,
-                      )
-                    }
+                    onClick={() => navigate(`/meal/${meal.slug}`)}
                     className={`flex items-center gap-4 p-4 cursor-pointer hover:bg-black/5 transition-colors ${
                       mIdx !== dayPlan.meals.length - 1
                         ? "border-b border-text-muted/10"
@@ -88,7 +96,11 @@ const WeeklyPlan = () => {
           >
             Accept Plan
           </Button>
-          <Button variant="outline" className="w-full ">
+          <Button
+            variant="outline"
+            className="w-full "
+            onClick={handleRegenerate}
+          >
             Regenerate
           </Button>
         </div>
