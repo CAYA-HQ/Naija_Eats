@@ -6,12 +6,16 @@ import { FilterIcon } from "../constants/icons";
 import transformTimetable from "../constants/weekPlan";
 import { planService } from "../services/plan.api";
 import { WeeklySummaryCard } from "../components/ui/WeeklySummaryCard";
+import SwapMealModal from "../components/shared/SwapMealModal";
 // import { preferencesService } from "../services/preferences.api";
 
 const WeeklyPlan = () => {
   const navigate = useNavigate();
   const [weekPlan, setWeekPlan] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Swap State
+  const [swapItem, setSwapItem] = useState(null);
 
   useEffect(() => {
     const getMealPlan = async () => {
@@ -41,9 +45,12 @@ const WeeklyPlan = () => {
     const getNewTimetable = async () => {
       setLoading(true);
       try {
-        const data = await planService.getTimetable();
-        localStorage.setItem("weekly_meal_plan", JSON.stringify(data));
-        setWeekPlan(transformTimetable(data));
+        const data = await planService.generateTimetable();
+        localStorage.setItem(
+          "weekly_meal_plan",
+          JSON.stringify(data.data || data),
+        );
+        setWeekPlan(transformTimetable(data.data || data));
         console.log("Regenerated timetable data:", data);
       } catch (err) {
         console.error("Failed to regenerate meal plan:", err);
@@ -54,9 +61,19 @@ const WeeklyPlan = () => {
     getNewTimetable();
   };
 
+  const handleOpenSwap = (e, mealItem) => {
+    e.stopPropagation();
+    setSwapItem(mealItem);
+  };
+
+  const handleSwapComplete = (updatedData) => {
+    localStorage.setItem("weekly_meal_plan", JSON.stringify(updatedData));
+    setWeekPlan(transformTimetable(updatedData));
+  };
+
   return (
     <>
-      <div className="bg-bg-background min-h-screen pb-50 pt-4 px-4 lg:pb-30">
+      <div className="bg-bg-background min-h-screen pb-50 pt-4 px-4 lg:pb-30 relative">
         <WeeklySummaryCard />
         {/* Title Header */}
         <div className=" py-4 flex justify-between items-center">
@@ -122,8 +139,16 @@ const WeeklyPlan = () => {
                             {meal.name}
                           </div>
                         </div>
-                        <div className="text-[11px] font-bold text-orange-900">
-                          {meal.price}
+                        <div className="flex flex-col items-end gap-1">
+                          <div className="text-[11px] font-bold text-orange-900">
+                            {meal.price}
+                          </div>
+                          <button
+                            onClick={(e) => handleOpenSwap(e, meal)}
+                            className="text-[10px] font-bold text-accent-orange bg-accent-orange/10 px-2 py-1 rounded-md hover:bg-accent-orange/20 transition-colors"
+                          >
+                            Swap
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -151,6 +176,12 @@ const WeeklyPlan = () => {
             {loading && weekPlan.length > 0 ? "Regenerating..." : "Regenerate"}
           </Button>
         </div>
+
+        <SwapMealModal
+          swapItem={swapItem}
+          onClose={() => setSwapItem(null)}
+          onSwapComplete={handleSwapComplete}
+        />
       </div>
     </>
   );
