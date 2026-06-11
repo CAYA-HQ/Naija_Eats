@@ -176,6 +176,7 @@ Success response:
       "email": "user@example.com",
       "phone_number": "+2348000000000",
       "isVerified": true,
+      "onboarded": false,
       "created_at": "2026-01-01T00:00:00.000Z",
       "profile": {
         "id": "profile-uuid",
@@ -309,6 +310,7 @@ Success response:
     "email": "user@example.com",
     "phone_number": "+2348000000000",
     "isVerified": true,
+    "onboarded": false,
     "created_at": "2026-01-01T00:00:00.000Z",
     "profile": {
       "id": "profile-uuid",
@@ -731,10 +733,11 @@ Success response:
 }
 ```
 
-Implementation note:
+Implementation notes:
 
 - `allergies` is currently stored as a single string in one `user_allergies` row in this route.
 - That differs from `POST /preference`, which accepts an array and creates multiple allergy rows.
+- This endpoint also sets `user.onboarded = true` after a successful save, marking the user's onboarding as complete.
 
 ### `POST /api/meal-plans/generate`
 
