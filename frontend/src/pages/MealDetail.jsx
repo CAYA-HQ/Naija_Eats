@@ -13,6 +13,32 @@ import { planService } from "../services/plan.api";
 import transformTimetable from "../constants/weekPlan";
 import { getMealImage } from "../constants/weekPlan";
 
+/* ── helpers ── */
+function getHouseholdServings() {
+  try {
+    // Priority 1: permanent key saved after onboarding completes
+    const saved = localStorage.getItem("user_household_size");
+    if (saved) {
+      const size = parseInt(saved, 10);
+      if (!isNaN(size) && size > 0) {
+        return size === 1 ? "1 Serving" : `${size} Servings`;
+      }
+    }
+    // Priority 2: still in onboarding flow (not yet finished)
+    const freq = localStorage.getItem("onboarding_frequency");
+    if (freq) {
+      const parsed = JSON.parse(freq);
+      const size = parseInt(parsed.household_size, 10);
+      if (!isNaN(size) && size > 0) {
+        return size === 1 ? "1 Serving" : `${size} Servings`;
+      }
+    }
+  } catch {
+    // fallback below
+  }
+  return "1 Serving";
+}
+
 const MealDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -21,7 +47,14 @@ const MealDetail = () => {
   useEffect(() => {
     const fetchMeal = async () => {
       try {
-        const data = await planService.getTimetable();
+        const cached = localStorage.getItem("weekly_meal_plan");
+        let data;
+        if (cached) {
+          data = JSON.parse(cached);
+        } else {
+          data = await planService.getTimetable();
+          localStorage.setItem("weekly_meal_plan", JSON.stringify(data));
+        }
         const weekPlan = transformTimetable(data);
         const allMeals = weekPlan.flatMap((day) => day.meals);
         const found = allMeals.find((m) => m.slug === id);
@@ -33,27 +66,45 @@ const MealDetail = () => {
     fetchMeal();
   }, [id]);
 
-  // Static detail overrides keyed by slug
-  const detailKey = id;
-  const details = MEAL_DETAILS[detailKey] || {};
+  const details = MEAL_DETAILS[id] || {};
 
-  // Build the composite meal object used by the UI
-  const meal = {
-    id,
-    name: mealData?.name || details.name || "Recipe Not Found",
-    image: mealData?.image || getMealImage(details.name || id) || "/images/dish.webp",
-    isPremium: true,
-    time: details.time || "45 MINS",
-    cost: mealData?.price || "VARIABLE COST",
-    servings: details.servings || "4 SERVINGS",
-    ingredients: details.ingredients || [
+  /* ── ingredients: DB → MEAL_DETAILS → generic ── */
+  const getIngredientsList = () => {
+    if (
+      mealData?.ingredients &&
+      Array.isArray(mealData.ingredients) &&
+      mealData.ingredients.length > 0
+    ) {
+      return mealData.ingredients.map((ing) => {
+        if (typeof ing === "string") return ing;
+        return ing.quantity ? `${ing.name} (${ing.quantity})` : ing.name;
+      });
+    }
+    if (details.ingredients?.length > 0) return details.ingredients;
+    return [
       "Freshly sourced ingredients",
       "Local market spices",
       "Traditional Nigerian seasonings",
       "Vegetable Oil",
       "Salt & Pepper to taste",
-    ],
-    steps: details.steps || [
+    ];
+  };
+
+  /* ── steps: MEAL_DETAILS → DB instructions → generic ── */
+  const getStepsList = () => {
+    if (details.steps?.length > 0) return details.steps;
+    if (mealData?.instructions) {
+      const sentences = mealData.instructions
+        .split(/(?<=[.!?])\s+/)
+        .filter(Boolean);
+      if (sentences.length > 0) {
+        return sentences.map((s, i) => ({
+          title: `Step ${i + 1}`,
+          desc: s,
+        }));
+      }
+    }
+    return [
       {
         title: "Prepare the Ingredients",
         desc: "Thoroughly wash and prep all your ingredients. Ensure everything is chopped and ready before you start cooking.",
@@ -72,20 +123,42 @@ const MealDetail = () => {
       },
       {
         title: "The Perfect Finish",
-        desc: "Taste for seasoning and let the meal 'rest' for a few minutes before serving to let the flavors settle.",
+        desc: "Taste for seasoning and let the meal rest for a few minutes before serving to let the flavors settle.",
       },
-    ],
+    ];
+  };
+
+  /* ── time: MEAL_DETAILS → DB prep_time_mins → 45 ── */
+  const getTime = () => {
+    if (details.time) return details.time;
+    if (mealData?.prep_time_mins) return `${mealData.prep_time_mins} MINS`;
+    return "45 MINS";
+  };
+
+  const meal = {
+    id,
+    name: mealData?.name || details.name || "Recipe Not Found",
+    image:
+      mealData?.image ||
+      getMealImage(details.name || id) ||
+      "/images/dish.webp",
+    isPremium: true,
+    time: getTime(),
+    cost: mealData?.price || "VARIABLE COST",
+    // ✅ always from user preference, no hardcoded fallback
+    servings: getHouseholdServings(),
+    ingredients: getIngredientsList(),
+    steps: getStepsList(),
     tips: details.tips || [],
     proTip: details.proTip || {
       title: "Pro Tip: Authentic Flavor",
-      text: "For that real home-cooked taste, allow your spices to 'toast' slightly in oil before adding liquids. This releases the essential oils and deepens the overall flavor profile of your meal.",
+      text: "For that real home-cooked taste, allow your spices to toast slightly in oil before adding liquids. This releases the essential oils and deepens the overall flavor profile of your meal.",
     },
   };
 
   return (
     <div className="flex flex-col pt-5 px-4 animate-in fade-in duration-500">
-      {/* Hero Section */}
-      <div className="relative h-[400px] rounded-2xl overflow-hidden w-full mx-auto">
+      <div className="relative h-100 rounded-2xl overflow-hidden w-full mx-auto">
         <img
           src={meal.image}
           alt={meal.name}
@@ -102,8 +175,8 @@ const MealDetail = () => {
         </div>
       </div>
 
-      <div className="px-5 -mt-20 relative z-10 w-full max-w-md mx-auto ">
-        <div className="bg-white rounded-[32px] p-6 shadow-xl border border-black/5">
+      <div className="px-5 -mt-20 relative z-10 w-full max-w-md mx-auto">
+        <div className="bg-white rounded-4xl p-6 shadow-xl border border-black/5">
           <div className="flex justify-between items-start mb-2">
             <div>
               {meal.isPremium && (

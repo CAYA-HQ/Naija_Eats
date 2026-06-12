@@ -16,8 +16,6 @@ const SLOT_ICONS = {
   Dinner: <ForkAndKnife className="text-text-primary" />,
 };
 
-// Maps a meal name (from the DB) to a local public image path.
-// Falls back to the generic dish placeholder for unmapped meals.
 const MEAL_IMAGE_MAP = {
   "jollof rice": "/images/jollof.webp",
   "egusi soup": "/images/swallow_egusi.png",
@@ -121,10 +119,6 @@ const MEAL_IMAGE_MAP = {
   "steak and fries": "/images/ribeye.png",
 };
 
-/**
- * Returns the public image path for a given meal name.
- * Looks up by lower-cased name; falls back to generic dish placeholder.
- */
 export function getMealImage(mealName) {
   if (!mealName) return "/images/dish.webp";
   return MEAL_IMAGE_MAP[mealName.toLowerCase()] ?? "/images/dish.webp";
@@ -132,7 +126,6 @@ export function getMealImage(mealName) {
 
 export default function transformTimetable(apiData) {
   const grouped = {};
-
   const items = apiData.items || apiData.data?.items || [];
 
   for (const item of items) {
@@ -153,15 +146,17 @@ export default function transformTimetable(apiData) {
       type: meal_slot.toUpperCase(),
       name: meal.name,
       ingredients: meal.ingredients || [],
+      prep_time_mins: meal.prep_time_mins ?? null,
+      instructions: meal.instructions ?? null,
+      // ✅ DB image_url takes priority, falls back to local image map
+      image: meal.image_url || getMealImage(meal.name),
       price: `₦${Number(meal.price_min).toLocaleString()} - ₦${Number(meal.price_max).toLocaleString()}`,
       icon: SLOT_ICONS[meal_slot] ?? (
         <UtensilsIcon className="text-text-primary" />
       ),
-      image: getMealImage(meal.name),
     });
   }
 
-  // preserve day order
   const ORDER = [
     "Monday",
     "Tuesday",
@@ -173,6 +168,8 @@ export default function transformTimetable(apiData) {
   ];
   return ORDER.filter((d) => grouped[d]).map((d) => grouped[d]);
 }
+
+// ── old WeekPlan mock is commented out below ──
 
 // import {
 //   BurgerIcon,

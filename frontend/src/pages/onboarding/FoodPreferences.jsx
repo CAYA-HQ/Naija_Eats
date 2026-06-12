@@ -11,8 +11,6 @@ import {
 import { Preferences } from "../../constants/preferences";
 import { preferencesService } from "../../services/preferences.api";
 
-// all start unticked — user actively selects what applies to them
-// added Shellfish and Eggs — both very common allergens in Nigeria
 const DEFAULT_DIETARY_TAGS = [
   { label: "Gluten-Free", active: false },
   { label: "Lactose-Intolerant", active: false },
@@ -66,9 +64,23 @@ const FoodPreferences = () => {
     try {
       await preferencesService.saveFoodPreferences(payload);
       toast.success("Your food preferences were saved successfully.");
+
+      // ✅ persist household_size permanently before cleanup
+      const frequencyData = JSON.parse(
+        localStorage.getItem("onboarding_frequency") || "{}",
+      );
+      if (frequencyData.household_size) {
+        localStorage.setItem(
+          "user_household_size",
+          String(frequencyData.household_size),
+        );
+      }
+
+      // clean up temporary onboarding keys
       localStorage.removeItem("onboarding_budget");
       localStorage.removeItem("onboarding_frequency");
       localStorage.setItem("onboarded", "true");
+
       navigate("/onboarding/generating-plan");
     } catch (err) {
       console.error(
@@ -156,7 +168,6 @@ const FoodPreferences = () => {
 
         <p className="text-sm font-medium mb-3">Do you have any allergies?</p>
 
-        {/* textarea with clickable info icon */}
         <div className="relative mb-4">
           <textarea
             value={allergyInput}
@@ -192,7 +203,6 @@ const FoodPreferences = () => {
                   Always inform your chef or host about your allergies before
                   eating a meal prepared by others.
                 </p>
-                {/* arrow pointing down */}
                 <div className="absolute top-[99%] right-3 border-8 border-transparent border-t-text-primary" />
               </div>
             )}
