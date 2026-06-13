@@ -1,49 +1,141 @@
 import { useState, useEffect } from "react";
 import { SearchIcon } from "../constants/icons";
 import { useNavigate } from "react-router-dom";
-import { planService } from "../services/plan.api";
 import { getMealImage } from "../constants/weekPlan";
 import EmptyState from "./EmptyState";
-// import TrendingRecipes from "../components/shared/TrendingRecipes";
 
-const CATEGORY_MAP = {
-  Main: "Rice Dishes",
-  Snack: "Proteins",
-  Breakfast: "Proteins",
-  Dessert: "Proteins",
-  Swallow: "Swallows",
-  Side: "Proteins",
-};
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-function transformMenuMeals(apiData) {
-  const seen = new Set();
+// ── category detection ──────────────────────────────────────────────────────
+// DB categories: Main | Swallow | Breakfast | Snack | Side | Dessert
+// Display categories: Soups | Rice Dishes | Swallows | Proteins
 
-  return apiData.data.items
-    .filter(({ meal }) => {
-      if (seen.has(meal.id)) return false;
-      seen.add(meal.id);
-      return true;
-    })
-    .map(({ meal }, index) => ({
-      id: index + 1,
-      slug: meal.name.toLowerCase().replace(/\s+/g, "-"),
-      name: meal.name,
-      price: `₦${Number(meal.price_min).toLocaleString()} - ₦${Number(meal.price_max).toLocaleString()}`,
-      duration: `${meal.prep_time_mins} mins`,
-      description: meal.instructions,
-      img: meal.image_url || getMealImage(meal.name),
-      category: [CATEGORY_MAP[meal.category] ?? "Proteins"],
-    }));
+const SOUP_NAMES = new Set([
+  "egusi soup",
+  "ogbono soup",
+  "efo riro",
+  "banga soup",
+  "okra soup",
+  "afang soup",
+  "oha soup",
+  "nsala soup",
+  "edikang ikong",
+  "ewedu",
+  "bitterleaf soup",
+  "white soup",
+  "groundnut soup",
+  "karkashi soup",
+  "editan soup",
+  "gbegiri",
+  "vegetable soup",
+  "fisherman soup",
+  "miyan kuka",
+  "miyan gyada",
+  "miyan taushe",
+  "alale soup",
+  "pepper soup",
+  "cowleg pepper soup",
+  "goat meat pepper soup",
+  "chicken pepper soup",
+  "fresh fish pepper soup",
+  "dry fish pepper soup",
+  "bushmeat pepper soup",
+  "turkey pepper soup",
+  "snail pepper soup",
+  "fish pepper soup",
+  "fisherman pepper soup",
+]);
+
+const SOUP_KEYWORDS = [
+  "soup",
+  "pepper soup",
+  "egusi",
+  "ogbono",
+  "efo riro",
+  "banga",
+  "afang",
+  "oha soup",
+  "nsala",
+  "edikang",
+  "miyan",
+  "ewedu",
+  "bitterleaf",
+  "karkashi",
+  "editan",
+  "gbegiri",
+  "groundnut soup",
+  "white soup",
+];
+
+const RICE_KEYWORDS = [
+  "jollof rice",
+  "fried rice",
+  "coconut rice",
+  "ofada rice",
+  "native jollof",
+  "pepper rice",
+  "coconut jollof",
+  "rice pudding",
+  "spaghetti jollof",
+  "indomie",
+  "pasta",
+  "ramen",
+  "pad thai",
+  "paella",
+  "burrito",
+  "fried rice (chinese)",
+];
+
+function getCategoryLabel(meal) {
+  const name = meal.name.toLowerCase().trim();
+  const dbCategory = meal.category;
+
+  // swallows — DB category is reliable here
+  if (dbCategory === "Swallow") return "Swallows";
+
+  // desserts — map to Proteins (or add Desserts tab if needed)
+  if (dbCategory === "Dessert") return "Proteins";
+
+  // exact soup name match first
+  if (SOUP_NAMES.has(name)) return "Soups";
+
+  // keyword soup match — catches combos like "Pounded Yam and Egusi Soup"
+  // but skip swallow combos (already caught above)
+  if (SOUP_KEYWORDS.some((kw) => name.includes(kw))) return "Soups";
+
+  // rice / grain / noodle dishes
+  if (RICE_KEYWORDS.some((kw) => name.includes(kw))) return "Rice Dishes";
+
+  // anything left: snacks, sides, breakfast, protein mains
+  return "Proteins";
 }
+
+function transformMeals(apiData) {
+  const meals = apiData.data?.meals || [];
+  return meals.map((meal) => ({
+    id: meal.id,
+    slug: meal.name.toLowerCase().replace(/\s+/g, "-"),
+    name: meal.name,
+    price: `₦${Number(meal.price_min).toLocaleString()} - ₦${Number(meal.price_max).toLocaleString()}`,
+    duration: meal.prep_time_mins ? `${meal.prep_time_mins} mins` : "45 mins",
+    description: Array.isArray(meal.instructions)
+      ? meal.instructions[0] || "A delicious Nigerian meal."
+      : meal.instructions || "A delicious Nigerian meal.",
+    img: meal.image_url || getMealImage(meal.name),
+    category: getCategoryLabel(meal),
+  }));
+}
+
+// ── component ───────────────────────────────────────────────────────────────
+const CATEGORIES = ["All", "Soups", "Rice Dishes", "Swallows", "Proteins"];
 
 const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("All");
-  const categories = ["All", "Soups", "Rice Dishes", "Swallows", "Proteins"];
   const [value, setValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasPlan, setHasPlan] = useState(true);
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,16 +146,19 @@ const MenuPage = () => {
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        const data = await planService.getTimetable();
-        const transformed = transformMenuMeals(data);
-        if (transformed.length === 0) {
-          setHasPlan(false);
-        } else {
-          setMeals(transformed);
-          setHasPlan(true);
-        }
+        const token = localStorage.getItem("token");
+        // ✅ limit=200 to fetch all meals in the DB
+        const response = await fetch(`${API_BASE_URL}/meals/?limit=200`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error("Failed to load meals");
+        setMeals(transformMeals(data));
       } catch {
-        setHasPlan(false);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -73,13 +168,17 @@ const MenuPage = () => {
 
   const filteredMeals = meals.filter((meal) => {
     const matchesCategory =
-      activeCategory === "All" ||
-      [].concat(meal.category).includes(activeCategory);
-    const matchesSearch =
-      meal.name.toLowerCase().includes(debouncedValue.toLowerCase()) ||
-      meal.description.toLowerCase().includes(debouncedValue.toLowerCase());
+      activeCategory === "All" || meal.category === activeCategory;
+    const searchTarget = `${meal.name} ${meal.description}`.toLowerCase();
+    const matchesSearch = searchTarget.includes(debouncedValue.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  // counts per category for the tab badges
+  const countFor = (cat) =>
+    cat === "All"
+      ? meals.length
+      : meals.filter((m) => m.category === cat).length;
 
   return (
     <main className="px-5 pt-8 flex flex-col gap-6">
@@ -89,6 +188,7 @@ const MenuPage = () => {
         Flavors
       </h1>
 
+      {/* search */}
       <div className="relative">
         <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted w-5 h-5" />
         <input
@@ -100,26 +200,48 @@ const MenuPage = () => {
         />
       </div>
 
+      {/* category tabs with counts */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-        {categories.map((category) => (
+        {CATEGORIES.map((category) => (
           <button
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`px-6 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
               activeCategory === category
                 ? "bg-text-primary text-white shadow-lg"
                 : "bg-[#D1D89D] text-text-primary hover:bg-[#c4cc8b]"
             }`}
           >
             {category}
+            {!loading && (
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                  activeCategory === category
+                    ? "bg-white/20 text-white"
+                    : "bg-text-primary/10 text-text-primary"
+                }`}
+              >
+                {countFor(category)}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* Loading skeleton */}
+      {/* results count */}
+      {!loading && !error && (
+        <p className="text-xs text-text-muted -mt-3">
+          Showing {filteredMeals.length}{" "}
+          {filteredMeals.length === 1 ? "meal" : "meals"}
+          {activeCategory !== "All" ? ` in ${activeCategory}` : ""}
+          {debouncedValue ? ` for "${debouncedValue}"` : ""}
+        </p>
+      )}
+
+      {/* loading skeleton */}
       {loading ? (
         <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6 pb-12">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
               className="bg-text-primary/10 rounded-md overflow-hidden animate-pulse h-[420px]"
@@ -133,11 +255,9 @@ const MenuPage = () => {
             </div>
           ))}
         </div>
-      ) : !hasPlan ? (
-        /* No active meal plan — show EmptyState */
+      ) : error ? (
         <EmptyState />
       ) : filteredMeals.length === 0 ? (
-        /* Plan exists but search/filter returned nothing */
         <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
           <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto text-3xl">
             🍽️
@@ -162,6 +282,13 @@ const MenuPage = () => {
                   alt={meal.name}
                   className="w-full h-full object-cover"
                 />
+                {/* category badge */}
+                <div className="absolute top-4 left-4 bg-accent-orange/90 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                  <span className="text-[9px] font-bold text-white uppercase tracking-wider">
+                    {meal.category}
+                  </span>
+                </div>
+                {/* heart */}
                 <div className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md cursor-pointer hover:scale-110 transition-transform">
                   <svg
                     width="20"
@@ -174,6 +301,7 @@ const MenuPage = () => {
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </div>
+                {/* duration */}
                 <div className="absolute bottom-4 left-4 bg-text-primary/40 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/20">
                   <svg
                     width="12"
@@ -194,18 +322,18 @@ const MenuPage = () => {
 
               <div className="p-6 h-[50%] flex flex-col justify-between items-start gap-3">
                 <div className="flex justify-between items-start w-full">
-                  <h3 className="text-xl font-display font-bold text-white max-w-[70%] leading-tight">
+                  <h3 className="text-xl font-display font-bold text-white max-w-[65%] leading-tight">
                     {meal.name}
                   </h3>
-                  <span className="text-sm font-bold text-white opacity-80">
+                  <span className="text-xs font-bold text-white/80 text-right max-w-[35%]">
                     {meal.price}
                   </span>
                 </div>
-                <p className="text-[11px] text-white/60 leading-relaxed font-medium">
+                <p className="text-[11px] text-white/60 leading-relaxed font-medium line-clamp-2">
                   {meal.description}
                 </p>
                 <button
-                  className="bg-accent-orange mt-auto hover:bg-accent-orange/75 text-white py-3.5 rounded-xs font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 w-full max-w-xs mt-auto"
+                  className="bg-accent-orange hover:bg-accent-orange/75 text-white py-3.5 rounded-xs font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 w-full"
                   onClick={() => navigate(`/meal/${meal.slug}`)}
                 >
                   View Meal
@@ -227,11 +355,6 @@ const MenuPage = () => {
           ))}
         </div>
       )}
-
-      {/* Trending section — shown only when plan is active */}
-      {/* {hasPlan && !loading && (
-        <TrendingRecipes />
-      )} */}
     </main>
   );
 };

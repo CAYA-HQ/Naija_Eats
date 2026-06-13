@@ -27,7 +27,6 @@ const SetBudget = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
-  // placeholder ranges
   const getBudgetValuePlaceholder = (tier, freq) => {
     if (freq === "Weekly") {
       if (tier === "Low") return "15,000 - 25,000";
@@ -53,7 +52,6 @@ const SetBudget = () => {
       budgetValue: value,
     }));
 
-    // auto tier detection based on input
     if (frequency === "Weekly") {
       if (numValue < 25000) setBudgetTier("Low");
       else if (numValue >= 25000 && numValue < 45000) setBudgetTier("Standard");
@@ -101,6 +99,12 @@ const SetBudget = () => {
       return;
     }
 
+    // ✅ monthly planning not available yet — redirect to coming soon
+    if (frequency === "Monthly") {
+      navigate("/coming-soon");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -136,7 +140,9 @@ const SetBudget = () => {
       prevTo="/"
       onNext={handleBudgetSubmit}
       nextButtonDisabled={isSubmitting}
-      nextLabel="Set Frequency"
+      nextLabel={
+        frequency === "Monthly" ? "See What's Coming" : "Set Frequency"
+      }
     >
       <h1 className="text-subheading tracking-tight font-bold leading-tight mb-2">
         Set your weekly budget
@@ -152,9 +158,7 @@ const SetBudget = () => {
         {["Weekly", "Monthly"].map((freq) => (
           <button
             key={freq}
-            onClick={() => {
-              setFrequency(freq);
-            }}
+            onClick={() => setFrequency(freq)}
             className={`flex-1 py-4 lg:py-8 px-4 rounded-xl flex flex-col items-center gap-2 transition-all duration-300 cursor-pointer ${
               frequency === freq
                 ? "bg-text-primary/10 text-text-primary border-2 border-text-primary"
@@ -172,6 +176,19 @@ const SetBudget = () => {
           </button>
         ))}
       </div>
+
+      {/* monthly coming soon banner */}
+      {frequency === "Monthly" && (
+        <div className="bg-accent-orange/10 border border-accent-orange/30 rounded-xl px-4 py-3 mb-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <p className="text-xs font-bold text-accent-orange mb-0.5">
+            🚧 Monthly Planning — Coming Soon
+          </p>
+          <p className="text-xs text-text-primary/70 font-inter">
+            We're building full monthly planning with batch-cook meals and bulk
+            shopping lists. Click below to see what's on the way!
+          </p>
+        </div>
+      )}
 
       <div className="bg-text-muted/10 rounded-2xl p-3 mb-3 relative">
         <input
@@ -275,7 +292,6 @@ const SetBudget = () => {
         </div>
       )}
 
-      {/* Pro Insight Card */}
       <div className="bg-text-muted/10 rounded-lg py-3 px-5 flex gap-4 items-start overflow-hidden relative">
         <div className="w-1 h-full bg-accent-orange absolute top-0 left-0"></div>
         <span className="w-8 h-8 grid place-items-center rounded-sm my-auto bg-accent-orange/20 p-1">

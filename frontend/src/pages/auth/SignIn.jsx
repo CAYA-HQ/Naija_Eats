@@ -24,7 +24,6 @@ const SignIn = () => {
 
   const [formData, setFormData] = useState({ email: "", password: "" });
 
-  // Handle redirect from backend after email verification or session expiration
   useEffect(() => {
     const status = searchParams.get("status");
     const message = searchParams.get("message");
@@ -65,6 +64,7 @@ const SignIn = () => {
     try {
       await authService.signIn(formData.email, formData.password);
       toast.success("Signed in successfully.");
+      // ✅ read from localStorage — auth.api.js already set it from user.onboarded
       const isOnboarded = localStorage.getItem("onboarded") === "true";
       navigate(isOnboarded ? from || "/" : "/onboarding/set-budget", {
         replace: true,
@@ -115,7 +115,6 @@ const SignIn = () => {
             Sign in to explore Nigeria's premium tastes.
           </p>
 
-          {/* unverified email banner */}
           {unverifiedEmail && (
             <div className="mb-5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 space-y-1.5">
               <p className="text-sm font-bold text-amber-800">

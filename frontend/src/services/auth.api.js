@@ -33,12 +33,18 @@ export const authService = {
         localStorage.setItem("user", JSON.stringify(userObj));
       }
 
+      // ✅ persist onboarded state from DB so returning users skip onboarding
+      if (userObj.onboarded) {
+        localStorage.setItem("onboarded", "true");
+      }
+
       // Migrate guest plan to user-specific plan key
       const guestPlan = localStorage.getItem("weekly_meal_plan");
       if (guestPlan) {
-        const userKey = userObj.id ? `weekly_meal_plan_${userObj.id}` : `weekly_meal_plan_${userObj.email}`;
+        const userKey = userObj.id
+          ? `weekly_meal_plan_${userObj.id}`
+          : `weekly_meal_plan_${userObj.email}`;
         localStorage.setItem(userKey, guestPlan);
-        // Clear original guest cache
         localStorage.removeItem("weekly_meal_plan");
       }
     }
@@ -62,8 +68,6 @@ export const authService = {
     return data;
   },
 
-  // verify-email GET redirects to /verify-email?status=...
-  // verify-email POST returns JSON — used by VerifyEmail.jsx
   async verifyEmail(token) {
     const response = await fetch(`${API_BASE_URL}/auth/verify-email/${token}`, {
       method: "POST",
@@ -127,7 +131,6 @@ export const authService = {
     return data;
   },
 
-  // GET /profile/me — fetch logged in user's profile
   async userInfo() {
     const token = localStorage.getItem("token");
 
@@ -161,7 +164,6 @@ export const authService = {
     return data;
   },
 
-  // PUT /profile/me — update profile
   async updateProfile(updates) {
     const token = localStorage.getItem("token");
 
@@ -199,6 +201,8 @@ export const authService = {
   logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
+    localStorage.removeItem("onboarded");
+    localStorage.removeItem("user_household_size");
+    localStorage.removeItem("weekly_meal_plan");
   },
 };

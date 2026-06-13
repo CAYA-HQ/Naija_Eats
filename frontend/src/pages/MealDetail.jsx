@@ -93,17 +93,33 @@ const MealDetail = () => {
   /* ── steps: MEAL_DETAILS → DB instructions → generic ── */
   const getStepsList = () => {
     if (details.steps?.length > 0) return details.steps;
+
     if (mealData?.instructions) {
-      const sentences = mealData.instructions
-        .split(/(?<=[.!?])\s+/)
-        .filter(Boolean);
-      if (sentences.length > 0) {
-        return sentences.map((s, i) => ({
-          title: `Step ${i + 1}`,
-          desc: s,
-        }));
+      // handle array of strings/objects directly
+      if (Array.isArray(mealData.instructions)) {
+        const list = mealData.instructions.filter(Boolean);
+        if (list.length > 0) {
+          return list.map((s, i) => ({
+            title: `Step ${i + 1}`,
+            desc: typeof s === "string" ? s : s.desc || String(s),
+          }));
+        }
+      }
+
+      // handle string instructions
+      if (typeof mealData.instructions === "string") {
+        const sentences = mealData.instructions
+          .split(/(?<=[.!?])\s+/)
+          .filter(Boolean);
+        if (sentences.length > 0) {
+          return sentences.map((s, i) => ({
+            title: `Step ${i + 1}`,
+            desc: s,
+          }));
+        }
       }
     }
+
     return [
       {
         title: "Prepare the Ingredients",

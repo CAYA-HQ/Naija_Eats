@@ -24,6 +24,7 @@ import { BudgetAlertProvider } from "./context/BudgetAlertProvider";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import ComingSoon from "./pages/ComingSoon";
 
 import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
@@ -89,6 +90,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/coming-soon" element={<ComingSoon />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
       </Routes>
     </BudgetAlertProvider>
