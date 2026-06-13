@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import OnboardingLayout from "../../components/layout/OnboardingLayout";

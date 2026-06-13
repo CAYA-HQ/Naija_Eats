@@ -69,7 +69,7 @@ const GeneratingPlan = () => {
           <div className="absolute inset-3 rounded-full border-[3px] border-accent-orange/10"></div>
           <div className="absolute inset-3 rounded-full border-[3px] border-transparent border-r-accent-orange/40 animate-[spin_3s_linear_infinite_reverse]"></div>
           <div className="absolute inset-5.5 rounded-full border border-accent-orange/20"></div>
-          {/* // Center Content */}
+
           <div className="flex flex-col items-center gap-2 mt-2">
             <MealIcon className={"w-15 text-text-primary"} />
             <div className="flex gap-2 mt-1">
@@ -88,7 +88,7 @@ const GeneratingPlan = () => {
             </div>
           </div>
         </div>
-        {/*  Loading Text */}
+
         <h1 className="font-display text-[28px] font-bold text-text-primary text-center mb-4 leading-[1.2]">
           Generating your
           <br />

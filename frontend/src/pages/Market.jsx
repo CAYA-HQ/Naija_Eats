@@ -215,6 +215,17 @@ const Market = () => {
         MARKET
       </h1>
       <WeeklySummaryCard />
+      <div className="relative">
+        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted w-5 h-5" />
+        <input
+          type="text"
+          placeholder="Search items..."
+          name="item-search"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 shadow-sm outline-none placeholder:text-text-muted text-sm"
+        />
+      </div>
 
       <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
         {filters.map((filter) => (
@@ -277,18 +288,6 @@ const Market = () => {
           )}
         </>
       )}
-
-      <div className="relative">
-        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted w-5 h-5" />
-        <input
-          type="text"
-          placeholder="Search items..."
-          name="item-search"
-          value={searchTerm}
-          onChange={handleSearch}
-          className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 shadow-sm outline-none placeholder:text-text-muted text-sm"
-        />
-      </div>
 
       <CustomItemsSection
         customItems={customItems}

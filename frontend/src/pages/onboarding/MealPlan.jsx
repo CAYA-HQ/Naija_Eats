@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
-import {
-  HeartIcon,
-  ShoppingCartIcon,
-  StopWatch,
-  BoltIcon,
-} from "../../constants/icons";
+import { ShoppingCartIcon } from "../../constants/icons";
 
-import { featuredMeal, subMeals } from "../../constants/mealPlan";
 import { planService } from "../../services/plan.api";
 
 const MealPlan = () => {
@@ -166,90 +160,7 @@ const MealPlan = () => {
               </Button>
             </div>
           </div>
-
-          {/* Main Content */}
-          <div className="flex flex-col gap-6">
-            {/* Featured Meal Card */}
-            <div className="bg-[#2d4a1e] rounded-3xl overflow-hidden text-white shadow-2xl group cursor-pointer transition-all duration-500 hover:shadow-green-900/20">
-              <div className="h-60 relative overflow-hidden">
-                <img
-                  src={featuredMeal.image}
-                  alt={featuredMeal.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-6 left-6 bg-accent-orange text-white px-4 py-1.5 rounded-lg text-[0.7rem] font-black tracking-widest uppercase">
-                  {featuredMeal.day}
-                </div>
-              </div>
-              <div className="py-4 px-4 relative">
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-subheading font-display font-bold max-w-lg leading-tight">
-                    {featuredMeal.title}
-                  </h2>
-                  <button className="bg-white/10 hover:bg-accent-orange p-3 rounded-full transition-colors duration-300">
-                    <HeartIcon className="w-4 h-4 text-white fill-none group-hover:fill-current" />
-                  </button>
-                </div>
-                <p className="text-base opacity-70 mb-8 max-w-xl leading-relaxed">
-                  {featuredMeal.description}
-                </p>
-                <div className="flex gap-8 items-center border-t border-white/10 pt-8">
-                  <div className="flex items-center gap-2">
-                    <StopWatch className="w-5 h-5 text-accent-orange" />
-                    <span className="font-bold opacity-80">
-                      {featuredMeal.time}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/60">•</div>
-                  <div className="flex items-center gap-2">
-                    <BoltIcon className="w-5 h-5 text-accent-orange" />
-                    <span className="font-bold opacity-80">
-                      {featuredMeal.calories}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sub Meals */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {subMeals.map((meal, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-3xl p-4 flex items-center gap-6 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group"
-                >
-                  <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100">
-                    <img
-                      src={meal.image}
-                      alt={meal.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[0.65rem] font-black text-text-muted tracking-widest mb-1 uppercase">
-                      {meal.type}
-                    </span>
-                    <h3 className="text-base font-display font-bold text-[#2d4a1e] group-hover:text-accent-orange transition-colors">
-                      {meal.title}
-                    </h3>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
-
-        {/* Weekly Grid */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-          {weeklyMeals.map((meal, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-4xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group cursor-pointer border border-gray-100 flex flex-col h-full hover:-translate-y-2"
-            >
-              ...
-            </div>
-          ))}
-        </div> */}
       </div>
     </>
   );

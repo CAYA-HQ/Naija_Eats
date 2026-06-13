@@ -1,90 +1,19 @@
 import { useState, useEffect } from "react";
-import { SearchIcon } from "../constants/icons";
+import {
+  SearchIcon,
+  MealCardHeartIcon,
+  ClockIcon,
+  MealArrowIcon,
+} from "../constants/icons";
 import { useNavigate } from "react-router-dom";
 import { getMealImage } from "../constants/weekPlan";
 import EmptyState from "./EmptyState";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-// ── category detection ──────────────────────────────────────────────────────
-// DB categories: Main | Swallow | Breakfast | Snack | Side | Dessert
-// Display categories: Soups | Rice Dishes | Swallows | Proteins
-
-const SOUP_NAMES = new Set([
-  "egusi soup",
-  "ogbono soup",
-  "efo riro",
-  "banga soup",
-  "okra soup",
-  "afang soup",
-  "oha soup",
-  "nsala soup",
-  "edikang ikong",
-  "ewedu",
-  "bitterleaf soup",
-  "white soup",
-  "groundnut soup",
-  "karkashi soup",
-  "editan soup",
-  "gbegiri",
-  "vegetable soup",
-  "fisherman soup",
-  "miyan kuka",
-  "miyan gyada",
-  "miyan taushe",
-  "alale soup",
-  "pepper soup",
-  "cowleg pepper soup",
-  "goat meat pepper soup",
-  "chicken pepper soup",
-  "fresh fish pepper soup",
-  "dry fish pepper soup",
-  "bushmeat pepper soup",
-  "turkey pepper soup",
-  "snail pepper soup",
-  "fish pepper soup",
-  "fisherman pepper soup",
-]);
-
-const SOUP_KEYWORDS = [
-  "soup",
-  "pepper soup",
-  "egusi",
-  "ogbono",
-  "efo riro",
-  "banga",
-  "afang",
-  "oha soup",
-  "nsala",
-  "edikang",
-  "miyan",
-  "ewedu",
-  "bitterleaf",
-  "karkashi",
-  "editan",
-  "gbegiri",
-  "groundnut soup",
-  "white soup",
-];
-
-const RICE_KEYWORDS = [
-  "jollof rice",
-  "fried rice",
-  "coconut rice",
-  "ofada rice",
-  "native jollof",
-  "pepper rice",
-  "coconut jollof",
-  "rice pudding",
-  "spaghetti jollof",
-  "indomie",
-  "pasta",
-  "ramen",
-  "pad thai",
-  "paella",
-  "burrito",
-  "fried rice (chinese)",
-];
+import { planService } from "../services/plan.api";
+import {
+  SOUP_NAMES,
+  SOUP_KEYWORDS,
+  RICE_KEYWORDS,
+} from "../constants/menuCategories";
 
 function getCategoryLabel(meal) {
   const name = meal.name.toLowerCase().trim();
@@ -146,16 +75,7 @@ const MenuPage = () => {
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        const token = localStorage.getItem("token");
-        // ✅ limit=200 to fetch all meals in the DB
-        const response = await fetch(`${API_BASE_URL}/meals/?limit=200`, {
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        });
-        const data = await response.json();
-        if (!data.success) throw new Error("Failed to load meals");
+        const data = await planService.getAllMeals();
         setMeals(transformMeals(data));
       } catch {
         setError(true);
@@ -290,30 +210,11 @@ const MenuPage = () => {
                 </div>
                 {/* heart */}
                 <div className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md cursor-pointer hover:scale-110 transition-transform">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#FF7A1A"
-                    strokeWidth="2.5"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
+                  <MealCardHeartIcon className="text-accent-orange" />
                 </div>
                 {/* duration */}
                 <div className="absolute bottom-4 left-4 bg-text-primary/40 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/20">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="3"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 6v6l4 2" />
-                  </svg>
+                  <ClockIcon className="text-white" />
                   <span className="text-[10px] font-bold text-white uppercase">
                     {meal.duration}
                   </span>
@@ -337,18 +238,7 @@ const MenuPage = () => {
                   onClick={() => navigate(`/meal/${meal.slug}`)}
                 >
                   View Meal
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M5 12h14m-7-7 7 7-7 7" />
-                  </svg>
+                  <MealArrowIcon />
                 </button>
               </div>
             </div>

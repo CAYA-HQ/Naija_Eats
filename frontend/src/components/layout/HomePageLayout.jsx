@@ -18,7 +18,7 @@ const HomePageLayout = ({ children }) => {
         isVisible={showBudgetAlert}
       />
       <Header toggleSidebar={() => setIsSidebarExpanded(!isSidebarExpanded)} />
-      <div className="flex flex-1 min-w-0">
+      <div className={`flex flex-1 min-w-0 transition-all duration-300 ${isSidebarExpanded ? "lg:pl-54" : "lg:pl-20"}`}>
         <Sidebar
           isExpanded={isSidebarExpanded}
         />

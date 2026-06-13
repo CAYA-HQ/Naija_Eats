@@ -68,9 +68,9 @@ const Sidebar = ({ isExpanded }) => {
 
   return (
     <aside
-      className={`fixed lg:static top-0 left-0 h-screen bg-bg-background border-r border-text-muted/10 transition-all duration-300 z-50 flex flex-col ${
+      className={`fixed top-[62px] left-0 h-screen bg-bg-background border-r border-text-muted/10 transition-all duration-300 z-50 flex flex-col ${
         isExpanded ? "w-54" : "w-20"
-      } ${!isExpanded && "lg:w-20"} hidden lg:flex`}
+      } hidden lg:flex`}
     >
       {/* User Profile Info */}
       <div className="p-6 mb-4 flex items-center gap-3 overflow-hidden transition-all duration-300">

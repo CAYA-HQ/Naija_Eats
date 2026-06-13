@@ -11,7 +11,7 @@ import transformTimetable from "../constants/weekPlan";
 import { planService } from "../services/plan.api";
 import Button from "../components/ui/Button";
 import EmptyState from "./EmptyState";
-// import TrendingRecipes from "../components/shared/TrendingRecipes";
+
 
 /* ─── module-level helpers ─────────────────────────────────────────────── */
 const SLOT_ORDER = ["Breakfast", "Lunch", "Dinner"];
@@ -40,7 +40,7 @@ const HomePage = () => {
   const [planLoading, setPlanLoading] = useState(true);
   const [hasPlan, setHasPlan] = useState(true);
 
-  // const categories = ["All", "Yoruba", "Igbo", "Hausa"];
+
 
   useEffect(() => {
     const fetchPlan = async () => {
@@ -321,26 +321,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── Trending Recipes ───────────────────────────────────────────────
-      <section className="flex flex-col gap-8">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <h2 className="text-2xl lg:text-3xl font-display font-bold text-text-primary">
-            Trending Recipes
-          </h2>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${cat === "All" ? "bg-[#D1D89D] text-text-primary" : "bg-white border border-text-muted/10 text-text-muted hover:border-text-primary hover:text-text-primary"}`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
 
-        <TrendingRecipes />
-      </section> */}
     </div>
   );
 };
