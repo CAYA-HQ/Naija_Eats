@@ -8,6 +8,7 @@ Backend API for Naija Eats, built with Bun, Express, TypeScript, Prisma, and Pos
 - Requires email verification before login.
 - Issues JWT bearer tokens for protected routes.
 - Stores onboarding preferences, budget details, household profile data, dietary preferences, allergies, and dietary tags.
+- Tracks onboarding completion status on the user record (`onboarded` boolean).
 - Exposes meal catalogue and meal-plan endpoints for authenticated users.
 - Sends verification and password-reset emails through Resend.
 
