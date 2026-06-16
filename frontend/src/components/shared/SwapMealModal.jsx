@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import { SearchIcon } from "../../constants/icons";
 import { planService } from "../../services/plan.api";
 
-export default function SwapMealModal({ swapItem, onClose, onSwapComplete }) {
+export default function SwapMealModal({
+  swapItem,
+  onClose,
+  onSwapComplete,
+  onBudgetExceeded,
+}) {
   const [availableMeals, setAvailableMeals] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSwapping, setIsSwapping] = useState(false);
   const [loadingMeals, setLoadingMeals] = useState(true);
-
-  // Custom meal state
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [customMealName, setCustomMealName] = useState("");
   const [customMealPrice, setCustomMealPrice] = useState("");
@@ -17,12 +20,9 @@ export default function SwapMealModal({ swapItem, onClose, onSwapComplete }) {
     const fetchMeals = async () => {
       try {
         setLoadingMeals(true);
-        const res = await planService.getMeals();
-        // The API wraps the response in 'data', and axios also wraps in 'data'
-        const mealsArray =
-          res.data?.data?.meals ||
-          res.data?.meals ||
-          (Array.isArray(res.data) ? res.data : []);
+        // ✅ getAllMeals → GET /meals/?limit=200
+        const res = await planService.getAllMeals();
+        const mealsArray = res.data?.meals || [];
         setAvailableMeals(mealsArray);
       } catch (err) {
         console.error("Failed to fetch meals:", err);
@@ -40,18 +40,30 @@ export default function SwapMealModal({ swapItem, onClose, onSwapComplete }) {
         m.category.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
-  const handleConfirmSwap = async (mealId) => {
+  const handleConfirmSwap = async (mealId, mealPrice) => {
     try {
       setIsSwapping(true);
       const res = await planService.updateTimetableItem(swapItem.id, mealId);
       onSwapComplete(res.data);
       setSearchQuery("");
+      onClose();
     } catch (err) {
       console.error("Failed to swap meal:", err);
-      alert(err.message || "Failed to swap meal");
+      const isBudgetError = err?.message?.toLowerCase().includes("budget");
+      if (isBudgetError && onBudgetExceeded) {
+        onClose();
+        onBudgetExceeded({
+          newCost: mealPrice || 0,
+          budgetLimit: parseInt(
+            JSON.parse(localStorage.getItem("buffered_budget") || "{}")
+              ?.amount || 0,
+          ),
+        });
+      } else {
+        alert(err.message || "Failed to swap meal. Please try again.");
+      }
     } finally {
       setIsSwapping(false);
-      onClose();
     }
   };
 
@@ -67,18 +79,29 @@ export default function SwapMealModal({ swapItem, onClose, onSwapComplete }) {
         price: customMealPrice ? Number(customMealPrice) : 0,
       });
       const newMeal = customRes.data;
-
       const res = await planService.updateTimetableItem(
         swapItem.id,
         newMeal.id,
       );
       onSwapComplete(res.data);
+      onClose();
     } catch (err) {
       console.error("Failed to create and swap custom meal:", err);
-      alert(err.message || "Failed to add custom meal");
+      const isBudgetError = err?.message?.toLowerCase().includes("budget");
+      if (isBudgetError && onBudgetExceeded) {
+        onClose();
+        onBudgetExceeded({
+          newCost: Number(customMealPrice) || 0,
+          budgetLimit: parseInt(
+            JSON.parse(localStorage.getItem("buffered_budget") || "{}")
+              ?.amount || 0,
+          ),
+        });
+      } else {
+        alert(err.message || "Failed to add custom meal");
+      }
     } finally {
       setIsSwapping(false);
-      onClose();
     }
   };
 
@@ -104,7 +127,6 @@ export default function SwapMealModal({ swapItem, onClose, onSwapComplete }) {
           </button>
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b border-black/5">
           <button
             onClick={() => setIsCustomMode(false)}
@@ -191,11 +213,12 @@ export default function SwapMealModal({ swapItem, onClose, onSwapComplete }) {
                   {filteredAvailableMeals.map((m) => (
                     <div
                       key={m.id}
-                      onClick={() => !isSwapping && handleConfirmSwap(m.id)}
+                      onClick={() =>
+                        !isSwapping &&
+                        handleConfirmSwap(m.id, Number(m.price_min))
+                      }
                       className={`flex items-center justify-between p-3 rounded-xl border ${
-                        swapItem.meal_id === m.id ||
-                        swapItem.id === m.id ||
-                        swapItem.meal?.id === m.id
+                        swapItem.mealId === m.id || swapItem.id === m.id
                           ? "border-accent-orange bg-accent-orange/5"
                           : "border-black/5 hover:border-accent-orange/30 cursor-pointer"
                       } transition-colors`}

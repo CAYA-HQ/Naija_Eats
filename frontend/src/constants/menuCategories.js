@@ -3,6 +3,7 @@
 // Display categories: Soups | Rice Dishes | Swallows | Proteins
 
 export const SOUP_NAMES = new Set([
+  // Nigerian soups — exact name matches
   "egusi soup",
   "ogbono soup",
   "efo riro",
@@ -25,6 +26,7 @@ export const SOUP_NAMES = new Set([
   "miyan gyada",
   "miyan taushe",
   "alale soup",
+  // pepper soups
   "pepper soup",
   "cowleg pepper soup",
   "goat meat pepper soup",
@@ -59,6 +61,7 @@ export const SOUP_KEYWORDS = [
   "white soup",
 ];
 
+// ✅ Nigerian only — international rice/pasta dishes removed
 export const RICE_KEYWORDS = [
   "jollof rice",
   "fried rice",
@@ -70,10 +73,4 @@ export const RICE_KEYWORDS = [
   "rice pudding",
   "spaghetti jollof",
   "indomie",
-  "pasta",
-  "ramen",
-  "pad thai",
-  "paella",
-  "burrito",
-  "fried rice (chinese)",
 ];

@@ -16,7 +16,6 @@ import { getMealImage } from "../constants/weekPlan";
 /* ── helpers ── */
 function getHouseholdServings() {
   try {
-    // Priority 1: permanent key saved after onboarding completes
     const saved = localStorage.getItem("user_household_size");
     if (saved) {
       const size = parseInt(saved, 10);
@@ -24,7 +23,6 @@ function getHouseholdServings() {
         return size === 1 ? "1 Serving" : `${size} Servings`;
       }
     }
-    // Priority 2: still in onboarding flow (not yet finished)
     const freq = localStorage.getItem("onboarding_frequency");
     if (freq) {
       const parsed = JSON.parse(freq);
@@ -39,36 +37,92 @@ function getHouseholdServings() {
   return "1 Serving";
 }
 
+// ✅ use planService.getAllMeals() instead of direct fetch
+async function fetchMealFromCatalogue(slug) {
+  try {
+    const res = await planService.getAllMeals();
+    const meals = res.data?.meals || [];
+    const match = meals.find(
+      (m) => m.name.toLowerCase().replace(/\s+/g, "-") === slug,
+    );
+    if (!match) return null;
+
+    return {
+      id: match.id,
+      mealId: match.id,
+      slug,
+      name: match.name,
+      ingredients: Array.isArray(match.ingredients)
+        ? match.ingredients
+        : typeof match.ingredients === "object" && match.ingredients !== null
+          ? Object.values(match.ingredients)
+          : [],
+      prep_time_mins: match.prep_time_mins ?? null,
+      instructions: match.instructions ?? null,
+      image: match.image_url || getMealImage(match.name),
+      price: `₦${Number(match.price_min).toLocaleString()} - ₦${Number(match.price_max).toLocaleString()}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
 const MealDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [mealData, setMealData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMeal = async () => {
+      setLoading(true);
       try {
+        // ── Step 1: check timetable cache first ──
         const cached = localStorage.getItem("weekly_meal_plan");
-        let data;
+        let foundInTimetable = null;
+
         if (cached) {
-          data = JSON.parse(cached);
-        } else {
-          data = await planService.getTimetable();
-          localStorage.setItem("weekly_meal_plan", JSON.stringify(data));
+          const data = JSON.parse(cached);
+          const weekPlan = transformTimetable(data);
+          const allMeals = weekPlan.flatMap((day) => day.meals);
+          foundInTimetable = allMeals.find((m) => m.slug === id) || null;
         }
-        const weekPlan = transformTimetable(data);
-        const allMeals = weekPlan.flatMap((day) => day.meals);
-        const found = allMeals.find((m) => m.slug === id);
-        setMealData(found || null);
+
+        if (foundInTimetable) {
+          setMealData(foundInTimetable);
+          return;
+        }
+
+        // ── Step 2: not in cache, try fresh timetable ──
+        try {
+          const data = await planService.getTimetable();
+          localStorage.setItem("weekly_meal_plan", JSON.stringify(data));
+          const weekPlan = transformTimetable(data);
+          const allMeals = weekPlan.flatMap((day) => day.meals);
+          const foundFresh = allMeals.find((m) => m.slug === id) || null;
+          if (foundFresh) {
+            setMealData(foundFresh);
+            return;
+          }
+        } catch {
+          // timetable fetch failed — continue to catalogue
+        }
+
+        // ── Step 3: fetch from full meal catalogue ──
+        const fromCatalogue = await fetchMealFromCatalogue(id);
+        setMealData(fromCatalogue);
       } catch {
         setMealData(null);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchMeal();
   }, [id]);
 
   const details = MEAL_DETAILS[id] || {};
 
-  /* ── ingredients: DB → MEAL_DETAILS → generic ── */
   const getIngredientsList = () => {
     if (
       mealData?.ingredients &&
@@ -90,12 +144,9 @@ const MealDetail = () => {
     ];
   };
 
-  /* ── steps: MEAL_DETAILS → DB instructions → generic ── */
   const getStepsList = () => {
     if (details.steps?.length > 0) return details.steps;
-
     if (mealData?.instructions) {
-      // handle array of strings/objects directly
       if (Array.isArray(mealData.instructions)) {
         const list = mealData.instructions.filter(Boolean);
         if (list.length > 0) {
@@ -105,21 +156,15 @@ const MealDetail = () => {
           }));
         }
       }
-
-      // handle string instructions
       if (typeof mealData.instructions === "string") {
         const sentences = mealData.instructions
           .split(/(?<=[.!?])\s+/)
           .filter(Boolean);
         if (sentences.length > 0) {
-          return sentences.map((s, i) => ({
-            title: `Step ${i + 1}`,
-            desc: s,
-          }));
+          return sentences.map((s, i) => ({ title: `Step ${i + 1}`, desc: s }));
         }
       }
     }
-
     return [
       {
         title: "Prepare the Ingredients",
@@ -144,7 +189,6 @@ const MealDetail = () => {
     ];
   };
 
-  /* ── time: MEAL_DETAILS → DB prep_time_mins → 45 ── */
   const getTime = () => {
     if (details.time) return details.time;
     if (mealData?.prep_time_mins) return `${mealData.prep_time_mins} MINS`;
@@ -161,7 +205,6 @@ const MealDetail = () => {
     isPremium: true,
     time: getTime(),
     cost: mealData?.price || "VARIABLE COST",
-    // ✅ always from user preference, no hardcoded fallback
     servings: getHouseholdServings(),
     ingredients: getIngredientsList(),
     steps: getStepsList(),
@@ -171,6 +214,26 @@ const MealDetail = () => {
       text: "For that real home-cooked taste, allow your spices to toast slightly in oil before adding liquids. This releases the essential oils and deepens the overall flavor profile of your meal.",
     },
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col pt-5 px-4 animate-pulse">
+        <div className="h-100 rounded-2xl bg-text-muted/20 w-full" />
+        <div className="px-5 -mt-20 relative z-10 w-full max-w-md mx-auto">
+          <div className="bg-white rounded-4xl p-6 shadow-xl border border-black/5 flex flex-col gap-4">
+            <div className="h-4 w-24 bg-text-muted/20 rounded-full" />
+            <div className="h-8 w-3/4 bg-text-muted/20 rounded-full" />
+            <div className="h-px bg-black/5 w-full" />
+            <div className="flex justify-between">
+              <div className="h-8 w-16 bg-text-muted/10 rounded-full" />
+              <div className="h-8 w-16 bg-text-muted/10 rounded-full" />
+              <div className="h-8 w-16 bg-text-muted/10 rounded-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col pt-5 px-4 animate-in fade-in duration-500">

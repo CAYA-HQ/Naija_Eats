@@ -7,7 +7,7 @@ import transformTimetable from "../constants/weekPlan";
 import { planService } from "../services/plan.api";
 import { WeeklySummaryCard } from "../components/ui/WeeklySummaryCard";
 import SwapMealModal from "../components/shared/SwapMealModal";
-
+import BudgetWarning from "../pages/BudgetWarning.jsx";
 import { getWeeklyPlanKey } from "../utils/planHelpers";
 
 const WeeklyPlan = () => {
@@ -15,6 +15,17 @@ const WeeklyPlan = () => {
   const [weekPlan, setWeekPlan] = useState([]);
   const [loading, setLoading] = useState(true);
   const [swapItem, setSwapItem] = useState(null);
+  const [showBudgetWarning, setShowBudgetWarning] = useState(false);
+  const [budgetWarningData, setBudgetWarningData] = useState(null);
+
+  // ✅ real budget from backend — not localStorage which has post-buffer amount
+  const [realBudget, setRealBudget] = useState(0);
+
+  // ✅ helper to parse "₦15,000" → 15000
+  const parseNaira = (str) => {
+    if (!str) return 0;
+    return parseInt(String(str).replace(/[₦,\s]/g, ""), 10) || 0;
+  };
 
   useEffect(() => {
     const getMealPlan = async () => {
@@ -35,26 +46,97 @@ const WeeklyPlan = () => {
         setLoading(false);
       }
     };
-    getMealPlan();
-  }, []);
 
-  const handleRegenerate = () => {
-    const getNewTimetable = async () => {
-      setLoading(true);
+    const fetchRealBudget = async () => {
       try {
-        const data = await planService.generateTimetable();
-        localStorage.setItem(
-          getWeeklyPlanKey(),
-          JSON.stringify(data.data || data),
-        );
-        setWeekPlan(transformTimetable(data.data || data));
-      } catch (err) {
-        console.error("Failed to regenerate meal plan:", err);
-      } finally {
-        setLoading(false);
+        // ✅ GET /api/meal-plans/current returns budgetStats.weeklyBudget
+        const data = await planService.getCurrentMealPlan();
+        const raw = data.data?.budgetStats?.weeklyBudget || "0";
+        setRealBudget(parseNaira(raw));
+      } catch {
+        // fallback: use onboarding_budget (original amount before buffer)
+        try {
+          const stored = JSON.parse(
+            localStorage.getItem("onboarding_budget") || "{}",
+          );
+          setRealBudget(parseInt(stored?.amount || 0, 10));
+        } catch {
+          setRealBudget(0);
+        }
       }
     };
-    getNewTimetable();
+
+    getMealPlan();
+    fetchRealBudget();
+  }, []);
+
+  // ✅ calculate total plan cost from all meals using min price
+  const getPlanCost = () => {
+    return weekPlan.reduce((total, day) => {
+      return (
+        total +
+        day.meals.reduce((dayTotal, meal) => {
+          const minPrice =
+            parseInt(
+              String(meal.price)
+                .split("-")[0]
+                .replace(/[₦,\s]/g, ""),
+              10,
+            ) || 0;
+          return dayTotal + minPrice;
+        }, 0)
+      );
+    }, 0);
+  };
+
+  // ✅ called by WeeklySummaryCard when adjusted budget < plan cost
+  const handleBudgetAdjustExceeded = ({ newBudget, planCost }) => {
+    setBudgetWarningData({
+      plan: {
+        name: "Weekly Meal Plan",
+        cost: planCost,
+        meals: weekPlan.reduce((sum, day) => sum + day.meals.length, 0),
+        days: 7,
+      },
+      budget: {
+        limit: newBudget, // ✅ the new budget user just typed
+      },
+    });
+    setShowBudgetWarning(true);
+  };
+
+  const handleRegenerate = async () => {
+    setLoading(true);
+    try {
+      const data = await planService.generateTimetable();
+      localStorage.setItem(
+        getWeeklyPlanKey(),
+        JSON.stringify(data.data || data),
+      );
+      setWeekPlan(transformTimetable(data.data || data));
+    } catch (err) {
+      const isBudgetError = err?.message
+        ?.toLowerCase()
+        .includes("exceeds your budget");
+      if (isBudgetError) {
+        setBudgetWarningData({
+          plan: {
+            name: "Weekly Meal Plan",
+            cost: getPlanCost(),
+            meals: weekPlan.reduce((sum, day) => sum + day.meals.length, 0),
+            days: 7,
+          },
+          budget: {
+            limit: realBudget, // ✅ real budget from backend
+          },
+        });
+        setShowBudgetWarning(true);
+      } else {
+        toast.error("Failed to regenerate meal plan. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOpenSwap = (e, mealItem) => {
@@ -67,10 +149,43 @@ const WeeklyPlan = () => {
     setWeekPlan(transformTimetable(updatedData));
   };
 
+  const handleSwapBudgetError = (errorData) => {
+    setSwapItem(null);
+    setBudgetWarningData({
+      plan: {
+        name: "Weekly Meal Plan",
+        cost: errorData?.newCost || getPlanCost(),
+        meals: weekPlan.reduce((sum, day) => sum + day.meals.length, 0),
+        days: 7,
+      },
+      budget: {
+        limit: errorData?.budgetLimit || realBudget, // ✅ real budget
+      },
+    });
+    setShowBudgetWarning(true);
+  };
+
+  if (showBudgetWarning && budgetWarningData) {
+    return (
+      <BudgetWarning
+        plan={budgetWarningData.plan}
+        budget={budgetWarningData.budget}
+        onContinue={() => {
+          setShowBudgetWarning(false);
+          setBudgetWarningData(null);
+        }}
+      />
+    );
+  }
+
   return (
     <>
       <div className="bg-bg-background min-h-screen pb-50 pt-4 px-4 lg:pb-30 relative">
-        <WeeklySummaryCard />
+        <WeeklySummaryCard
+          planCost={getPlanCost()}
+          onBudgetExceeded={handleBudgetAdjustExceeded}
+        />
+
         <div className="py-4 flex justify-between items-center">
           <h2 className="text-2xl font-display font-extrabold text-text-primary lg:mb-6">
             Full Weekly Plan
@@ -110,7 +225,6 @@ const WeeklyPlan = () => {
                       {dayPlan.day}
                     </h3>
                   </div>
-
                   <div className="bg-white border border-text-muted/20 rounded-2xl overflow-hidden shadow-sm">
                     {dayPlan.meals.map((meal, mIdx) => (
                       <div
@@ -177,6 +291,7 @@ const WeeklyPlan = () => {
           swapItem={swapItem}
           onClose={() => setSwapItem(null)}
           onSwapComplete={handleSwapComplete}
+          onBudgetExceeded={handleSwapBudgetError}
         />
       </div>
     </>

@@ -4,12 +4,12 @@ import { toast } from "sonner";
 import { MealIcon } from "../../constants/icons";
 import { preferencesService } from "../../services/preferences.api";
 import Button from "../../components/ui/Button";
-
 import { getWeeklyPlanKey } from "../../utils/planHelpers";
 
 const GeneratingPlan = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [hasError, setHasError] = useState(false);
+  const [errorType, setErrorType] = useState("general"); // "budget" | "general"
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,14 +18,12 @@ const GeneratingPlan = () => {
 
     const generateMealPlan = async () => {
       try {
-        // Generate the timetable (preferences have already been saved in previous steps)
         await preferencesService.generateTimetable();
         localStorage.removeItem(getWeeklyPlanKey());
 
         if (!active) return;
         toast.success("Meal plan generated successfully!");
 
-        // progress timers start only after successful API call
         timer1 = setTimeout(() => {
           if (active) setCurrentStep(2);
         }, 2500);
@@ -40,10 +38,21 @@ const GeneratingPlan = () => {
         }, 9000);
       } catch (err) {
         if (!active) return;
-        console.error("Failed to generate meal plan during onboarding:", err);
-        toast.error(
-          "We couldn't generate your meal plan. Please sign in or try again.",
-        );
+
+        const isBudgetError = err?.message
+          ?.toLowerCase()
+          .includes("exceeds your budget");
+
+        if (isBudgetError) {
+          toast.error(
+            "Your budget is too low for a full week of meals. Try increasing it.",
+          );
+          setErrorType("budget");
+        } else {
+          toast.error("We couldn't generate your meal plan. Please try again.");
+          setErrorType("general");
+        }
+
         setHasError(true);
       }
     };
@@ -69,7 +78,6 @@ const GeneratingPlan = () => {
           <div className="absolute inset-3 rounded-full border-[3px] border-accent-orange/10"></div>
           <div className="absolute inset-3 rounded-full border-[3px] border-transparent border-r-accent-orange/40 animate-[spin_3s_linear_infinite_reverse]"></div>
           <div className="absolute inset-5.5 rounded-full border border-accent-orange/20"></div>
-
           <div className="flex flex-col items-center gap-2 mt-2">
             <MealIcon className={"w-15 text-text-primary"} />
             <div className="flex gap-2 mt-1">
@@ -99,6 +107,7 @@ const GeneratingPlan = () => {
           <br />
           with your health goals.
         </p>
+
         {/* Progress bar */}
         <div className="w-full flex items-center gap-0 mb-8">
           <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden relative">
@@ -114,6 +123,7 @@ const GeneratingPlan = () => {
 
       {hasError ? (
         <div className="w-full p-6 bg-red-50 border border-red-100 rounded-2xl flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300">
+          {/* error icon */}
           <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
             <svg
               width="24"
@@ -130,37 +140,69 @@ const GeneratingPlan = () => {
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
           </div>
-          <p className="text-sm font-bold text-red-800 text-center">
-            We couldn't generate your meal plan. Please try again or sign in.
-          </p>
-          <Button
-            onClick={() =>
-              navigate("/sign-in", {
-                state: { from: "/onboarding/generating-plan" },
-              })
-            }
-            variant="primary"
-            className="w-full max-w-xs"
-          >
-            Sign In
-          </Button>
-          <Button
-            onClick={() => window.location.reload()}
-            variant="outline"
-            className="w-full max-w-xs"
-          >
-            Retry Generation
-          </Button>
+
+          {/* ✅ budget error */}
+          {errorType === "budget" ? (
+            <>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-bold text-red-800">Budget too low</p>
+                <p className="text-xs text-red-600 leading-relaxed">
+                  Your budget is too low to generate a full week of meals.
+                  Increase it and try again.
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate("/onboarding/set-budget")}
+                variant="primary"
+                className="w-full max-w-xs"
+              >
+                Increase Budget
+              </Button>
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+                className="w-full max-w-xs"
+              >
+                Retry Anyway
+              </Button>
+            </>
+          ) : (
+            // ✅ general error
+            <>
+              <p className="text-sm font-bold text-red-800 text-center">
+                We couldn't generate your meal plan. Please try again or sign
+                in.
+              </p>
+              <Button
+                onClick={() =>
+                  navigate("/sign-in", {
+                    state: { from: "/onboarding/generating-plan" },
+                  })
+                }
+                variant="primary"
+                className="w-full max-w-xs"
+              >
+                Sign In
+              </Button>
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+                className="w-full max-w-xs"
+              >
+                Retry Generation
+              </Button>
+            </>
+          )}
         </div>
       ) : (
         <div className="w-full flex flex-col gap-3">
           {/* Step 1 */}
           <div
-            className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 1 ? "border-gray-100 bg-white " : "border-gray-200 bg-white "}`}
+            className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 1 ? "border-gray-100 bg-white" : "border-gray-200 bg-white"}`}
           >
             <div className="flex items-center gap-3.5">
               {currentStep > 1 ? (
-                <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 ">
+                <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0">
                   <svg
                     width="14"
                     height="14"
@@ -190,9 +232,7 @@ const GeneratingPlan = () => {
                   </svg>
                 </div>
               )}
-              <span
-                className={`text-[14px] font-bold ${currentStep > 1 ? "text-text-primary" : "text-text-primary"}`}
-              >
+              <span className="text-[14px] font-bold text-text-primary">
                 Analyzing dietary preferences
               </span>
             </div>
@@ -205,11 +245,11 @@ const GeneratingPlan = () => {
 
           {/* Step 2 */}
           <div
-            className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 2 ? "border-gray-100 bg-white " : currentStep === 2 ? "border-gray-200 bg-white " : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
+            className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 2 ? "border-gray-100 bg-white" : currentStep === 2 ? "border-gray-200 bg-white" : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
           >
             <div className="flex items-center gap-3.5">
               {currentStep > 2 ? (
-                <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 ">
+                <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0">
                   <svg
                     width="14"
                     height="14"
@@ -274,11 +314,11 @@ const GeneratingPlan = () => {
 
           {/* Step 3 */}
           <div
-            className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 3 ? "border-gray-100 bg-white " : currentStep === 3 ? "border-gray-200 bg-white " : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
+            className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-500 ${currentStep > 3 ? "border-gray-100 bg-white" : currentStep === 3 ? "border-gray-200 bg-white" : "border-dashed border-gray-200 bg-gray-50/50 opacity-60"}`}
           >
             <div className="flex items-center gap-3.5">
               {currentStep > 3 ? (
-                <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0 ">
+                <div className="w-6 h-6 rounded-full bg-text-link flex items-center justify-center text-white shrink-0">
                   <svg
                     width="14"
                     height="14"

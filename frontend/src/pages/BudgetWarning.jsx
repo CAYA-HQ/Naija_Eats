@@ -1,17 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import { ForkAndKnife, WarningIcon } from "../constants/icons";
+import {
+  ForkAndKnife,
+  WarningIcon,
+  TipIcon,
+  CalendarIcon,
+} from "../constants/icons";
 import Button from "../components/ui/Button";
-import { TipIcon } from "../constants/icons";
-import { CalendarIcon } from "../constants/icons";
 
 const BudgetWarning = ({ plan, budget, onContinue }) => {
   const navigate = useNavigate();
 
-  const overAmount = plan.cost - budget.limit;
-  const utilization = Math.round((plan.cost / budget.limit) * 100);
+  // guard against 0 budget to avoid division by zero
+  const safeBudget = budget.limit || 1;
+  const overAmount = Math.max(0, plan.cost - budget.limit);
+  const utilization = Math.round((plan.cost / safeBudget) * 100);
 
   return (
-    <div className="px-4 py-6 space-y-5 max-w-sm mx-auto w-full">
+    <div className="px-4 py-6 space-y-5 max-w-sm mx-auto w-full min-h-screen flex flex-col justify-center">
       {/* alert header */}
       <div className="flex flex-col items-center text-center space-y-3">
         <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
@@ -33,9 +38,8 @@ const BudgetWarning = ({ plan, budget, onContinue }) => {
 
       {/* plan card */}
       <div className="bg-white rounded-2xl p-4 space-y-4 border border-gray-100">
-        {/* label + cost */}
         <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
-          Shopping List
+          Plan Summary
         </p>
         <div className="flex items-center justify-between">
           <p className="font-bold text-text-primary">{plan.name}</p>
@@ -44,7 +48,6 @@ const BudgetWarning = ({ plan, budget, onContinue }) => {
           </p>
         </div>
 
-        {/* stats */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-gray-50 rounded-xl p-3 space-y-1">
             <ForkAndKnife className="w-5 h-5 text-red-600" />
@@ -77,22 +80,22 @@ const BudgetWarning = ({ plan, budget, onContinue }) => {
         </div>
       </div>
 
-      {/* action buttons */}
-      <Button onClick={() => navigate("/weekly-plan")} className="w-full">
-        Adjust Plan
+      <Button
+        onClick={() => navigate("/onboarding/set-budget")}
+        className="w-full"
+      >
+        Increase Budget
       </Button>
 
       <Button variant="outline" onClick={onContinue} className="w-full">
         Continue Anyway
       </Button>
 
-      {/* tip */}
       <div className="flex items-center justify-center gap-2">
-        <span className="text-sm">
-          <TipIcon className="w-5 h-5 text-accent-black" />
-        </span>
+        <TipIcon className="w-5 h-5 text-accent-black" />
         <p className="text-xs text-text-muted">
-          Tip: Remove ₦{overAmount.toLocaleString()} worth of items to stay within budget.
+          Tip: Increase your budget by at least ₦{overAmount.toLocaleString()}{" "}
+          to cover this plan.
         </p>
       </div>
     </div>
