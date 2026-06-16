@@ -2,7 +2,10 @@ import { prisma } from "../config/prisma";
 import { PrismaClient } from "@prisma/client";
 import { safeParseInstructions } from "../utils/helper";
 
-type PrismaTx = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
+type PrismaTx = Omit<
+  PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>;
 
 interface FilterOptions {
   cuisine?: string;
@@ -31,20 +34,14 @@ async function getFilteredMeals(tx: PrismaTx, filters: FilterOptions) {
 
   if (filters.vegetarianOnly) {
     conditions.push({
-      OR: [
-        { dietary_tags: { contains: "vegetarian" } },
-        { dietary_tags: "" },
-      ],
+      OR: [{ dietary_tags: { contains: "vegetarian" } }, { dietary_tags: "" }],
     });
   }
 
   if (filters.restrictionTags && filters.restrictionTags.length > 0) {
     for (const tag of filters.restrictionTags) {
       conditions.push({
-        OR: [
-          { dietary_tags: { contains: tag } },
-          { dietary_tags: "" },
-        ],
+        OR: [{ dietary_tags: { contains: tag } }, { dietary_tags: "" }],
       });
     }
   }
@@ -74,7 +71,9 @@ export function formatPlan(plan: any) {
       price_at_time: item.price_at_time ? Number(item.price_at_time) : null,
       meal: {
         ...item.meal,
-        instructions: item.meal.instructions ? safeParseInstructions(item.meal.instructions) : null,
+        instructions: item.meal.instructions
+          ? safeParseInstructions(item.meal.instructions)
+          : null,
         price_min: item.meal.price_min ? Number(item.meal.price_min) : null,
         price_max: item.meal.price_max ? Number(item.meal.price_max) : null,
       },
@@ -87,24 +86,33 @@ export async function generateTimetable(userId: string) {
     where: { user_id: userId, status: "active" },
   });
 
-  const [budget, household, preferences, dietaryRestrictions] = await Promise.all([
-    prisma.budgets.findUnique({ where: { user_id: userId } }),
-    prisma.household_profiles.findUnique({ where: { user_id: userId } }),
-    prisma.user_preferences.findMany({ where: { user_id: userId } }),
-    prisma.dietary_tags.findMany({ where: { user_id: userId } }),
-  ]);
+  const [budget, household, preferences, dietaryRestrictions] =
+    await Promise.all([
+      prisma.budgets.findUnique({ where: { user_id: userId } }),
+      prisma.household_profiles.findUnique({ where: { user_id: userId } }),
+      prisma.user_preferences.findMany({ where: { user_id: userId } }),
+      prisma.dietary_tags.findMany({ where: { user_id: userId } }),
+    ]);
 
-  const dailyMeals = Math.min(Math.max(parseInt(household?.daily_meals || "3", 10), 1), 3);
+  const dailyMeals = Math.min(
+    Math.max(parseInt(household?.daily_meals || "3", 10), 1),
+    3,
+  );
   const includeDessert = household?.is_dessert ?? false;
   const budgetVal = parseInt(budget?.value || "0", 10);
-  const perMealMax = budgetVal > 0 ? Math.floor(budgetVal / (dailyMeals * 7)) : Infinity;
+  const perMealMax =
+    budgetVal > 0 ? Math.floor(budgetVal / (dailyMeals * 7)) : Infinity;
   const prefCategories = preferences.map((p) => p.preference);
   const restrictionTags = dietaryRestrictions.map((d) => d.tag.toLowerCase());
 
   const filterOpts: FilterOptions = {
-    cuisine: prefCategories.includes("Traditional Nigerian Meals") ? "Nigerian" : undefined,
+    cuisine: prefCategories.includes("Traditional Nigerian Meals")
+      ? "Nigerian"
+      : undefined,
     maxPrepTime: prefCategories.includes("Quick Meals") ? 20 : undefined,
-    categories: prefCategories.includes("Light Snacks") ? ["Snack", "Side"] : undefined,
+    categories: prefCategories.includes("Light Snacks")
+      ? ["Snack", "Side"]
+      : undefined,
     vegetarianOnly: prefCategories.includes("Vegetarian Options"),
     restrictionTags: restrictionTags.length > 0 ? restrictionTags : undefined,
     includeDessert,
@@ -133,12 +141,21 @@ export async function generateTimetable(userId: string) {
     throw new Error("No meals available to generate timetable");
   }
 
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const slots = dailyMeals >= 3
-    ? ["Breakfast", "Lunch", "Dinner"]
-    : dailyMeals === 2
-      ? ["Breakfast", "Dinner"]
-      : ["Dinner"];
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const slots =
+    dailyMeals >= 3
+      ? ["Breakfast", "Lunch", "Dinner"]
+      : dailyMeals === 2
+        ? ["Breakfast", "Dinner"]
+        : ["Dinner"];
 
   const breakfastMeals = pool.filter((m) => m.category === "Breakfast");
   const lunchDinnerMeals = pool.filter((m) =>
@@ -146,38 +163,67 @@ export async function generateTimetable(userId: string) {
   );
   const allOtherMeals = pool;
 
-  const selectedItems: Array<{
-    meal_id: string;
-    day_of_week: string;
-    meal_slot: string;
-    price_at_time: number;
-  }> = [];
+  const buildSelectedItems = (mealPool: typeof pool) => {
+    const items: Array<{
+      meal_id: string;
+      day_of_week: string;
+      meal_slot: string;
+      price_at_time: number;
+    }> = [];
 
-  for (const day of days) {
-    for (const slot of slots) {
-      let candidates: typeof pool;
+    const poolBreakfast = mealPool.filter((m) => m.category === "Breakfast");
+    const poolMains = mealPool.filter((m) =>
+      ["Main", "Side", "Swallow"].includes(m.category),
+    );
 
-      if (slot === "Breakfast") {
-        candidates = breakfastMeals.length > 0 ? breakfastMeals : allOtherMeals;
-      } else {
-        candidates = lunchDinnerMeals.length > 0 ? lunchDinnerMeals : allOtherMeals;
+    for (const day of days) {
+      for (const slot of slots) {
+        let candidates: typeof pool;
+        if (slot === "Breakfast") {
+          candidates = poolBreakfast.length > 0 ? poolBreakfast : mealPool;
+        } else {
+          candidates = poolMains.length > 0 ? poolMains : mealPool;
+        }
+        const meal = candidates[Math.floor(Math.random() * candidates.length)];
+        items.push({
+          meal_id: meal.id,
+          day_of_week: day,
+          meal_slot: slot,
+          price_at_time: meal.price_min ? Number(meal.price_min) : 0,
+        });
       }
-
-      const meal = candidates[Math.floor(Math.random() * candidates.length)];
-      selectedItems.push({
-        meal_id: meal.id,
-        day_of_week: day,
-        meal_slot: slot,
-        price_at_time: meal.price_min ? Number(meal.price_min) : 0,
-      });
     }
-  }
+    return items;
+  };
 
-  const totalCost = selectedItems.reduce((sum, item) => sum + item.price_at_time, 0);
+  // ✅ build initial selected items
+  let selectedItems = buildSelectedItems(pool);
+  let totalCost = selectedItems.reduce(
+    (sum, item) => sum + item.price_at_time,
+    0,
+  );
+
+  // ✅ if over budget — retry with only cheap meals that fit the per-meal max
   if (budgetVal > 0 && totalCost > budgetVal) {
-    throw new Error("Generated timetable exceeds your budget");
+    const cheapPerMeal = Math.floor(budgetVal / (dailyMeals * 7));
+    const cheapPool = pool.filter(
+      (m) => (m.price_min ? Number(m.price_min) : 0) <= cheapPerMeal,
+    );
+
+    // only retry if we have enough cheap meals to fill the week
+    if (cheapPool.length >= 7) {
+      selectedItems = buildSelectedItems(cheapPool);
+      totalCost = selectedItems.reduce(
+        (sum, item) => sum + item.price_at_time,
+        0,
+      );
+    }
+    // if still not enough cheap meals — continue with original selection
+    // BudgetWarning on the frontend will notify the user
   }
 
+  // ✅ always save the plan — never throw for budget reasons
+  // frontend BudgetWarning handles notifying the user if exceeded
   const newPlan = await prisma.$transaction(async (tx) => {
     const createdPlan = await tx.meal_plans.create({
       data: { user_id: userId, status: "active" },
@@ -208,8 +254,11 @@ export async function generateTimetable(userId: string) {
     }> = [];
 
     for (const meal of mealsWithIngredients) {
-      const ingredients: Array<{ name: string; category?: string; quantity?: string }> =
-        (meal.ingredients as any) ?? [];
+      const ingredients: Array<{
+        name: string;
+        category?: string;
+        quantity?: string;
+      }> = (meal.ingredients as any) ?? [];
       for (const ing of ingredients) {
         if (!seen.has(ing.name)) {
           seen.add(ing.name);

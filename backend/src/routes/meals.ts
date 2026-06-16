@@ -28,21 +28,35 @@ router.post("/preference", async (req: Request, res: Response) => {
       await tx.budgets.upsert({
         where: { user_id: user.id },
         update: { value: amount, frequency, fluctuation_buffer },
-        create: { user_id: user.id, value: amount, frequency, fluctuation_buffer },
+        create: {
+          user_id: user.id,
+          value: amount,
+          frequency,
+          fluctuation_buffer,
+        },
       });
 
       // Upsert household profile
       await tx.household_profiles.upsert({
         where: { user_id: user.id },
         update: { household_size, daily_meals, is_dessert, cooking_frequency },
-        create: { user_id: user.id, household_size, daily_meals, is_dessert, cooking_frequency },
+        create: {
+          user_id: user.id,
+          household_size,
+          daily_meals,
+          is_dessert,
+          cooking_frequency,
+        },
       });
 
       // Update preferences
       await tx.user_preferences.deleteMany({ where: { user_id: user.id } });
       if (preferences && Array.isArray(preferences) && preferences.length > 0) {
         await tx.user_preferences.createMany({
-          data: preferences.map((p: string) => ({ user_id: user.id, preference: p })),
+          data: preferences.map((p: string) => ({
+            user_id: user.id,
+            preference: p,
+          })),
         });
       }
 
@@ -50,7 +64,10 @@ router.post("/preference", async (req: Request, res: Response) => {
       await tx.user_allergies.deleteMany({ where: { user_id: user.id } });
       if (allergies && Array.isArray(allergies) && allergies.length > 0) {
         await tx.user_allergies.createMany({
-          data: allergies.map((a: string) => ({ user_id: user.id, allergy: a })),
+          data: allergies.map((a: string) => ({
+            user_id: user.id,
+            allergy: a,
+          })),
         });
       }
     });
@@ -68,7 +85,10 @@ router.post("/preference", async (req: Request, res: Response) => {
 router.get("/", async (req: Request, res: Response) => {
   const { category } = req.query;
   const page = Math.max(1, parseInt(req.query.page as string) || 1);
-  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+  const limit = Math.min(
+    300,
+    Math.max(1, parseInt(req.query.limit as string) || 20),
+  );
   const skip = (page - 1) * limit;
 
   try {
@@ -86,7 +106,9 @@ router.get("/", async (req: Request, res: Response) => {
 
     const parsed = meals.map((m) => ({
       ...m,
-      instructions: m.instructions ? safeParseInstructions(m.instructions) : null,
+      instructions: m.instructions
+        ? safeParseInstructions(m.instructions)
+        : null,
     }));
 
     return _res.success(200, res, "Meals retrieved successfully", {
@@ -120,9 +142,9 @@ router.post("/meals-plan/generate", async (req: Request, res: Response) => {
       });
 
       // Note: meal_plan_items model needs to exist in schema.prisma
-      // For now, I'll assume it does based on previous logic, 
+      // For now, I'll assume it does based on previous logic,
       // but I should check schema.prisma again.
-      
+
       return plan;
     });
 
