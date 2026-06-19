@@ -281,6 +281,32 @@ router.get(
   },
 );
 
+// GET /api/budget
+// Returns the user's budget value, tier, frequency, and fluctuation buffer
+router.get("/budget", async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  try {
+    const budget = await prisma.budgets.findUnique({
+      where: { user_id: user.id },
+    });
+
+    if (!budget) {
+      return _res.error(404, res, "Budget not found");
+    }
+
+    return _res.success(200, res, "Budget retrieved successfully", {
+      value: budget.value,
+      tier: budget.tier,
+      frequency: budget.frequency,
+      fluctuation_buffer: budget.fluctuation_buffer,
+    });
+  } catch (err) {
+    console.error(err);
+    return _res.error(500, res, "Failed to retrieve budget");
+  }
+});
+
 // GET /api/meal-plans/
 
 export default router;

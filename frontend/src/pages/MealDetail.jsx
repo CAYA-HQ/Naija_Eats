@@ -8,7 +8,7 @@ import {
   SpiceIcon,
 } from "../constants/icons";
 import { MEAL_DETAILS } from "../constants/mealDetails";
-import MealDetailsTabs from "../components/ui/mealDetailsTabs";
+//import MealDetailsTabs from "../components/ui/mealDetailsTabs";
 import { planService } from "../services/plan.api";
 import transformTimetable from "../constants/weekPlan";
 import { getMealImage } from "../constants/weekPlan";
