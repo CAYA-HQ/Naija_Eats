@@ -126,6 +126,30 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
+// GET /:id
+// Returns a single meal by ID
+router.get("/:id", async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+
+  try {
+    const meal = await prisma.meals.findUnique({ where: { id } });
+
+    if (!meal) {
+      return _res.error(404, res, "Meal not found");
+    }
+
+    return _res.success(200, res, "Meal retrieved successfully", {
+      ...meal,
+      instructions: meal.instructions
+        ? safeParseInstructions(meal.instructions)
+        : null,
+    });
+  } catch (err) {
+    console.error(err);
+    return _res.error(500, res, "Failed to retrieve meal");
+  }
+});
+
 // POST /meals-plan/generate
 router.post("/meals-plan/generate", async (req: Request, res: Response) => {
   const user = req.user!;
