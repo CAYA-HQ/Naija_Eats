@@ -12,7 +12,6 @@ import { planService } from "../services/plan.api";
 import Button from "../components/ui/Button";
 import EmptyState from "./EmptyState";
 
-
 /* ─── module-level helpers ─────────────────────────────────────────────── */
 const SLOT_ORDER = ["Breakfast", "Lunch", "Dinner"];
 
@@ -39,8 +38,6 @@ const HomePage = () => {
   const [todayMeals, setTodayMeals] = useState([]);
   const [planLoading, setPlanLoading] = useState(true);
   const [hasPlan, setHasPlan] = useState(true);
-
-
 
   useEffect(() => {
     const fetchPlan = async () => {
@@ -147,7 +144,7 @@ const HomePage = () => {
                     alt={meal.name}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
                   {/* slot badge */}
                   <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
@@ -320,8 +317,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-
     </div>
   );
 };

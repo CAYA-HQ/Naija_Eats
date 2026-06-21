@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { getMealImage } from "../constants/weekPlan";
 import EmptyState from "./EmptyState";
 import { planService } from "../services/plan.api";
+import { getMenuMealsKey } from "../utils/planHelpers";
 import {
   SOUP_NAMES,
   SOUP_KEYWORDS,
@@ -57,6 +58,7 @@ function transformMeals(apiData) {
 
 // ── component ───────────────────────────────────────────────────────────────
 const CATEGORIES = ["All", "Soups", "Rice Dishes", "Swallows", "Proteins"];
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -74,11 +76,26 @@ const MenuPage = () => {
 
   useEffect(() => {
     const fetchMeals = async () => {
+      const cacheKey = getMenuMealsKey();
       try {
-        const data = await planService.getAllMeals();
-        setMeals(transformMeals(data));
+        // ── check cache first ──────────────────────────────────────────────
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_TTL_MS) {
+            setMeals(data);
+            setLoading(false);
+            return;
+          }
+        }
+        // ── cache miss or stale: hit the API ──────────────────────────────
+        const raw = await planService.getAllMeals();
+        const transformed = transformMeals(raw);
+        setMeals(transformed);
+        localStorage.setItem(cacheKey, JSON.stringify({ data: transformed, timestamp: Date.now() }));
       } catch {
         setError(true);
+        localStorage.removeItem(cacheKey); // bust stale cache on failure
       } finally {
         setLoading(false);
       }

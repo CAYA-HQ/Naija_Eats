@@ -79,6 +79,37 @@ const MealDetail = () => {
     const fetchMeal = async () => {
       setLoading(true);
       try {
+        const res = await planService.getMealById(id);
+        if (res?.data) {
+          const match = res.data;
+          setMealData({
+            id: match.id,
+            mealId: match.id,
+            name: match.name,
+            ingredients: Array.isArray(match.ingredients)
+              ? match.ingredients
+              : typeof match.ingredients === "object" && match.ingredients !== null
+                ? Object.values(match.ingredients)
+                : [],
+            prep_time_mins: match.prep_time_mins ?? null,
+            instructions: match.instructions ?? null,
+            tips: Array.isArray(match.tips)
+              ? match.tips
+              : typeof match.tips === "string"
+                ? match.tips.split('\n').filter(Boolean)
+                : match.tips || [],
+            image: match.image_url || getMealImage(match.name),
+            price: `₦${Number(match.price_min).toLocaleString()} - ₦${Number(match.price_max).toLocaleString()}`,
+          });
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error("Failed to fetch meal directly by ID:", error);
+      }
+
+      // Fallback: search in weekly_meal_plan by id/slug if the direct API fails
+      try {
         const cached = localStorage.getItem("weekly_meal_plan");
         let foundInTimetable = null;
 
@@ -86,7 +117,7 @@ const MealDetail = () => {
           const data = JSON.parse(cached);
           const weekPlan = transformTimetable(data);
           const allMeals = weekPlan.flatMap((day) => day.meals);
-          foundInTimetable = allMeals.find((m) => m.slug === id) || null;
+          foundInTimetable = allMeals.find((m) => m.slug === id || m.id === id) || null;
         }
 
         if (foundInTimetable) {
@@ -99,7 +130,7 @@ const MealDetail = () => {
           localStorage.setItem("weekly_meal_plan", JSON.stringify(data));
           const weekPlan = transformTimetable(data);
           const allMeals = weekPlan.flatMap((day) => day.meals);
-          const foundFresh = allMeals.find((m) => m.slug === id) || null;
+          const foundFresh = allMeals.find((m) => m.slug === id || m.id === id) || null;
           if (foundFresh) {
             setMealData(foundFresh);
             return;
@@ -144,15 +175,17 @@ const MealDetail = () => {
   };
 
   const getStepsList = () => {
-    if (details.steps?.length > 0) return details.steps;
     if (mealData?.instructions) {
       if (Array.isArray(mealData.instructions)) {
         const list = mealData.instructions.filter(Boolean);
         if (list.length > 0) {
-          return list.map((s, i) => ({
-            title: `Step ${i + 1}`,
-            desc: typeof s === "string" ? s : s.desc || String(s),
-          }));
+          return list.map((s, i) => {
+            if (typeof s === "string") return { title: `Step ${i + 1}`, desc: s };
+            return {
+              title: s.title || s.step || `Step ${i + 1}`,
+              desc: s.desc || s.description || s.text || String(s)
+            };
+          });
         }
       }
       if (typeof mealData.instructions === "string") {
@@ -164,6 +197,7 @@ const MealDetail = () => {
         }
       }
     }
+    if (details.steps?.length > 0) return details.steps;
     return [
       {
         title: "Prepare the Ingredients",
@@ -207,7 +241,7 @@ const MealDetail = () => {
     servings: getHouseholdServings(),
     ingredients: getIngredientsList(),
     steps: getStepsList(),
-    tips: details.tips || [],
+    tips: mealData?.tips?.length > 0 ? mealData.tips : details.tips || [],
     proTip: details.proTip || {
       title: "Pro Tip: Authentic Flavor",
       text: "For that real home-cooked taste, allow your spices to toast slightly in oil before adding liquids. This releases the essential oils and deepens the overall flavor profile of your meal.",
