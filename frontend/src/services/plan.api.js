@@ -97,12 +97,16 @@ const putWithAuth = async (endpoint, body) => {
 
 export const planService = {
   getCurrentMealPlan: () => getWithAuth("/api/meal-plans/current"),
+  getBudget: () => getWithAuth("/api/budget"), // ✅ real saved budget straight from DB
   getTimetable: () => getWithAuth("/timetable/generate"),
   generateTimetable: () => postWithAuth("/timetable/generate"),
   getMeals: (category) =>
-    getWithAuth(category ? `/meals?category=${category}&limit=200` : "/meals?limit=200"),
+    getWithAuth(
+      category ? `/meals?category=${category}&limit=200` : "/meals?limit=200",
+    ),
   getAllMeals: () => getWithAuth("/meals/?limit=200"),
+  getMealById: (id) => getWithAuth(`/meals/${id}`), // ✅ single meal direct fetch
   createCustomMeal: (data) => postWithAuth("/meals/custom", data),
-  updateTimetableItem: (itemId, mealId) => putWithAuth(`/timetable/items/${itemId}`, { mealId }),
+  updateTimetableItem: (itemId, mealId) =>
+    putWithAuth(`/timetable/items/${itemId}`, { mealId }),
 };
-

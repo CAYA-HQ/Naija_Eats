@@ -8,7 +8,10 @@ import {
   SpiceIcon,
 } from "../constants/icons";
 import { MEAL_DETAILS } from "../constants/mealDetails";
-//import MealDetailsTabs from "../components/ui/mealDetailsTabs";
+import MealDetailsTabs from "../components/ui/mealDetailsTabs";
+{
+  /* ✅ uncommented */
+}
 import { planService } from "../services/plan.api";
 import transformTimetable from "../constants/weekPlan";
 import { getMealImage } from "../constants/weekPlan";
@@ -37,7 +40,6 @@ function getHouseholdServings() {
   return "1 Serving";
 }
 
-// ✅ use planService.getAllMeals() instead of direct fetch
 async function fetchMealFromCatalogue(slug) {
   try {
     const res = await planService.getAllMeals();
@@ -77,7 +79,6 @@ const MealDetail = () => {
     const fetchMeal = async () => {
       setLoading(true);
       try {
-        // ── Step 1: check timetable cache first ──
         const cached = localStorage.getItem("weekly_meal_plan");
         let foundInTimetable = null;
 
@@ -93,7 +94,6 @@ const MealDetail = () => {
           return;
         }
 
-        // ── Step 2: not in cache, try fresh timetable ──
         try {
           const data = await planService.getTimetable();
           localStorage.setItem("weekly_meal_plan", JSON.stringify(data));
@@ -108,7 +108,6 @@ const MealDetail = () => {
           // timetable fetch failed — continue to catalogue
         }
 
-        // ── Step 3: fetch from full meal catalogue ──
         const fromCatalogue = await fetchMealFromCatalogue(id);
         setMealData(fromCatalogue);
       } catch {

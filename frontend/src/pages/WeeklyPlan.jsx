@@ -10,99 +10,86 @@ import SwapMealModal from "../components/shared/SwapMealModal";
 import BudgetWarning from "../pages/BudgetWarning.jsx";
 import { getWeeklyPlanKey } from "../utils/planHelpers";
 
+const parseNaira = (str) => {
+  if (!str) return 0;
+  return parseInt(String(str).replace(/[₦,\s]/g, ""), 10) || 0;
+};
+
 const WeeklyPlan = () => {
   const navigate = useNavigate();
   const [weekPlan, setWeekPlan] = useState([]);
   const [loading, setLoading] = useState(true);
   const [swapItem, setSwapItem] = useState(null);
-  const [showBudgetWarning, setShowBudgetWarning] = useState(false);
-  const [budgetWarningData, setBudgetWarningData] = useState(null);
 
-  // ✅ real budget from backend — not localStorage which has post-buffer amount
-  const [realBudget, setRealBudget] = useState(0);
+  const [budgetStats, setBudgetStats] = useState({
+    weeklyBudget: 0,
+    currentSpending: 0,
+  });
 
-  // ✅ helper to parse "₦15,000" → 15000
-  const parseNaira = (str) => {
-    if (!str) return 0;
-    return parseInt(String(str).replace(/[₦,\s]/g, ""), 10) || 0;
+  const [isBudgetLocked, setIsBudgetLocked] = useState(false);
+
+  // ✅ pure fetch helper — no setState here, just returns data
+  const fetchBudgetStats = async () => {
+    try {
+      const data = await planService.getCurrentMealPlan();
+      const stats = data.data?.budgetStats;
+      if (!stats) return null;
+      return {
+        weeklyBudget: parseNaira(stats.weeklyBudget),
+        currentSpending: parseNaira(stats.currentSpending),
+        exceeded: Boolean(stats.exceeded),
+      };
+    } catch {
+      return null;
+    }
   };
 
+  // ✅ single effect, single async function, mounted guard,
+  // all setState calls happen together after data is resolved
   useEffect(() => {
-    const getMealPlan = async () => {
+    let active = true;
+
+    const init = async () => {
       try {
         const cached = localStorage.getItem(getWeeklyPlanKey());
+        let planData = null;
+
         if (cached) {
-          const parsed = JSON.parse(cached);
-          setWeekPlan(transformTimetable(parsed));
-          setLoading(false);
+          planData = JSON.parse(cached);
         } else {
-          const data = await planService.getTimetable();
-          localStorage.setItem(getWeeklyPlanKey(), JSON.stringify(data));
-          setWeekPlan(transformTimetable(data));
-          setLoading(false);
+          planData = await planService.getTimetable();
+          localStorage.setItem(getWeeklyPlanKey(), JSON.stringify(planData));
         }
+
+        const stats = await fetchBudgetStats();
+
+        if (!active) return;
+
+        setWeekPlan(transformTimetable(planData));
+        if (stats) {
+          setBudgetStats({
+            weeklyBudget: stats.weeklyBudget,
+            currentSpending: stats.currentSpending,
+          });
+          setIsBudgetLocked(stats.exceeded);
+        }
+        setLoading(false);
       } catch (err) {
         console.error("Failed to load meal plan:", err);
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
-    const fetchRealBudget = async () => {
-      try {
-        // ✅ GET /api/meal-plans/current returns budgetStats.weeklyBudget
-        const data = await planService.getCurrentMealPlan();
-        const raw = data.data?.budgetStats?.weeklyBudget || "0";
-        setRealBudget(parseNaira(raw));
-      } catch {
-        // fallback: use onboarding_budget (original amount before buffer)
-        try {
-          const stored = JSON.parse(
-            localStorage.getItem("onboarding_budget") || "{}",
-          );
-          setRealBudget(parseInt(stored?.amount || 0, 10));
-        } catch {
-          setRealBudget(0);
-        }
-      }
-    };
+    init();
 
-    getMealPlan();
-    fetchRealBudget();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  // ✅ calculate total plan cost from all meals using min price
-  const getPlanCost = () => {
-    return weekPlan.reduce((total, day) => {
-      return (
-        total +
-        day.meals.reduce((dayTotal, meal) => {
-          const minPrice =
-            parseInt(
-              String(meal.price)
-                .split("-")[0]
-                .replace(/[₦,\s]/g, ""),
-              10,
-            ) || 0;
-          return dayTotal + minPrice;
-        }, 0)
-      );
-    }, 0);
-  };
-
-  // ✅ called by WeeklySummaryCard when adjusted budget < plan cost
-  const handleBudgetAdjustExceeded = ({ newBudget, planCost }) => {
-    setBudgetWarningData({
-      plan: {
-        name: "Weekly Meal Plan",
-        cost: planCost,
-        meals: weekPlan.reduce((sum, day) => sum + day.meals.length, 0),
-        days: 7,
-      },
-      budget: {
-        limit: newBudget, // ✅ the new budget user just typed
-      },
-    });
-    setShowBudgetWarning(true);
+  const handleBudgetAdjustExceeded = ({ newBudget }) => {
+    setBudgetStats((prev) => ({ ...prev, weeklyBudget: newBudget }));
+    setIsBudgetLocked(true);
   };
 
   const handleRegenerate = async () => {
@@ -114,23 +101,28 @@ const WeeklyPlan = () => {
         JSON.stringify(data.data || data),
       );
       setWeekPlan(transformTimetable(data.data || data));
+
+      const stats = await fetchBudgetStats();
+      if (stats) {
+        setBudgetStats({
+          weeklyBudget: stats.weeklyBudget,
+          currentSpending: stats.currentSpending,
+        });
+        setIsBudgetLocked(stats.exceeded);
+      }
     } catch (err) {
       const isBudgetError = err?.message
         ?.toLowerCase()
         .includes("exceeds your budget");
       if (isBudgetError) {
-        setBudgetWarningData({
-          plan: {
-            name: "Weekly Meal Plan",
-            cost: getPlanCost(),
-            meals: weekPlan.reduce((sum, day) => sum + day.meals.length, 0),
-            days: 7,
-          },
-          budget: {
-            limit: realBudget, // ✅ real budget from backend
-          },
-        });
-        setShowBudgetWarning(true);
+        const stats = await fetchBudgetStats();
+        if (stats) {
+          setBudgetStats({
+            weeklyBudget: stats.weeklyBudget,
+            currentSpending: stats.currentSpending,
+          });
+        }
+        setIsBudgetLocked(true);
       } else {
         toast.error("Failed to regenerate meal plan. Please try again.");
       }
@@ -144,45 +136,34 @@ const WeeklyPlan = () => {
     setSwapItem(mealItem);
   };
 
-  const handleSwapComplete = (updatedData) => {
+  const handleSwapComplete = async (updatedData) => {
     localStorage.setItem(getWeeklyPlanKey(), JSON.stringify(updatedData));
     setWeekPlan(transformTimetable(updatedData));
+
+    const stats = await fetchBudgetStats();
+    if (stats) {
+      setBudgetStats({
+        weeklyBudget: stats.weeklyBudget,
+        currentSpending: stats.currentSpending,
+      });
+      setIsBudgetLocked(stats.exceeded);
+    }
   };
 
-  const handleSwapBudgetError = (errorData) => {
+  const handleSwapBudgetError = (message) => {
     setSwapItem(null);
-    setBudgetWarningData({
-      plan: {
-        name: "Weekly Meal Plan",
-        cost: errorData?.newCost || getPlanCost(),
-        meals: weekPlan.reduce((sum, day) => sum + day.meals.length, 0),
-        days: 7,
-      },
-      budget: {
-        limit: errorData?.budgetLimit || realBudget, // ✅ real budget
-      },
-    });
-    setShowBudgetWarning(true);
+    toast.error(message || "That swap would exceed your budget.");
   };
 
-  if (showBudgetWarning && budgetWarningData) {
-    return (
-      <BudgetWarning
-        plan={budgetWarningData.plan}
-        budget={budgetWarningData.budget}
-        onContinue={() => {
-          setShowBudgetWarning(false);
-          setBudgetWarningData(null);
-        }}
-      />
-    );
+  if (isBudgetLocked) {
+    return <BudgetWarning budget={{ limit: budgetStats.weeklyBudget }} />;
   }
 
   return (
     <>
       <div className="bg-bg-background min-h-screen pb-50 pt-4 px-4 lg:pb-30 relative">
         <WeeklySummaryCard
-          planCost={getPlanCost()}
+          currentSpending={budgetStats.currentSpending}
           onBudgetExceeded={handleBudgetAdjustExceeded}
         />
 

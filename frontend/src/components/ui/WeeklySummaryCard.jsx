@@ -1,35 +1,84 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "./Button";
+import { planService } from "../../services/plan.api";
+import { preferencesService } from "../../services/preferences.api";
 
-export const WeeklySummaryCard = ({ planCost = 0, onBudgetExceeded }) => {
-  const bufferedAmount = JSON.parse(localStorage.getItem("buffered_budget"));
-  const amount = bufferedAmount?.amount;
-  const [budget, setBudget] = useState(amount);
+export const WeeklySummaryCard = ({
+  currentSpending = 0,
+  onBudgetExceeded,
+}) => {
+  const [budget, setBudget] = useState(0);
+  const [inputValue, setInputValue] = useState("");
   const [adjustValue, setAdjustValue] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [budgetMeta, setBudgetMeta] = useState({
+    frequency: "Weekly",
+    fluctuation_buffer: "10%",
+    tier: "Standard",
+  });
 
-  const handleAdjustBudget = () => {
-    if (adjustValue) {
-      const newBudget = parseInt(String(budget).replace(/,/g, ""), 10) || 0;
+  // ✅ fetch the REAL saved budget directly from the DB — no localStorage guessing
+  useEffect(() => {
+    const fetchBudget = async () => {
+      try {
+        const res = await planService.getBudget();
+        const value = parseInt(res.data?.value, 10) || 0;
+        setBudget(value);
+        setInputValue(String(value));
+        setBudgetMeta({
+          frequency: res.data?.frequency || "Weekly",
+          fluctuation_buffer: res.data?.fluctuation_buffer || "10%",
+          tier: res.data?.tier || "Standard",
+        });
+      } catch {
+        const stored = JSON.parse(
+          localStorage.getItem("onboarding_budget") || "{}",
+        );
+        const value = parseInt(stored?.amount, 10) || 0;
+        setBudget(value);
+        setInputValue(String(value));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBudget();
+  }, []);
 
-      // ✅ save updated budget to localStorage
-      const bufferedAmount = JSON.parse(
-        localStorage.getItem("buffered_budget"),
-      );
-      const updated = { ...bufferedAmount, amount: newBudget };
-      localStorage.setItem("buffered_budget", JSON.stringify(updated));
+  const handleAdjustBudget = async () => {
+    if (!adjustValue) {
+      setAdjustValue(true);
+      return;
+    }
+
+    const newBudget = parseInt(inputValue, 10) || 0;
+    setSaving(true);
+
+    try {
+      // ✅ persist the real change to the database — not just localStorage
+      await preferencesService.saveBudgetPreferences({
+        budgetTier: budgetMeta.tier,
+        budgetValue: String(newBudget),
+        frequency: budgetMeta.frequency,
+        fluctuationBuffer: budgetMeta.fluctuation_buffer,
+      });
+
       setBudget(newBudget);
 
-      // ✅ if new budget is less than current plan cost → show warning
-      if (planCost > 0 && newBudget < planCost && onBudgetExceeded) {
-        onBudgetExceeded({
-          newBudget,
-          planCost,
-        });
-        setAdjustValue(false);
-        return;
+      // ✅ compare against the REAL current plan cost passed down from WeeklyPlan
+      if (
+        currentSpending > 0 &&
+        newBudget < currentSpending &&
+        onBudgetExceeded
+      ) {
+        onBudgetExceeded({ newBudget, currentSpending });
       }
+    } catch {
+      setInputValue(String(budget)); // revert display if save failed
+    } finally {
+      setSaving(false);
+      setAdjustValue(false);
     }
-    setAdjustValue((prev) => !prev);
   };
 
   return (
@@ -41,11 +90,15 @@ export const WeeklySummaryCard = ({ planCost = 0, onBudgetExceeded }) => {
           </span>
           <div className="flex items-center gap-1 mt-1">
             <span className="text-4xl font-display font-bold">₦</span>
-            {adjustValue ? (
+            {loading ? (
+              <span className="text-4xl font-display font-bold opacity-50">
+                ...
+              </span>
+            ) : adjustValue ? (
               <input
-                value={budget}
+                value={inputValue}
                 type="number"
-                onChange={(e) => setBudget(e.target.value)}
+                onChange={(e) => setInputValue(e.target.value)}
                 className="text-4xl font-display font-bold bg-transparent outline-none border-b border-white/50 w-40"
                 autoFocus
               />
@@ -60,8 +113,9 @@ export const WeeklySummaryCard = ({ planCost = 0, onBudgetExceeded }) => {
           variant="primary"
           className="py-2 px-6 rounded-xl text-sm cursor-pointer hover:bg-orange-600 transition-colors"
           onClick={handleAdjustBudget}
+          disabled={loading || saving}
         >
-          {adjustValue ? "Save" : "Adjust"}
+          {saving ? "Saving..." : adjustValue ? "Save" : "Adjust"}
         </Button>
       </div>
     </div>

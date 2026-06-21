@@ -5,11 +5,15 @@ import { ShoppingCartIcon } from "../../constants/icons";
 import { planService } from "../../services/plan.api";
 import BudgetWarning from "../../pages/BudgetWarning.jsx";
 
+const parseNaira = (str) => {
+  if (!str) return 0;
+  return parseInt(String(str).replace(/[₦,]/g, ""), 10) || 0;
+};
+
 const MealPlan = () => {
   const navigate = useNavigate();
   const [planStats, setPlanStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
-  const [showWarning, setShowWarning] = useState(false);
 
   const onBoardUser = () => {
     const token = localStorage.getItem("token");
@@ -36,9 +40,6 @@ const MealPlan = () => {
         const data = await planService.getCurrentMealPlan();
         const stats = data.data?.budgetStats || null;
         setPlanStats(stats);
-        if (stats?.exceeded) {
-          setShowWarning(true);
-        }
       } catch {
         const bufferedBudget =
           JSON.parse(localStorage.getItem("buffered_budget")) || null;
@@ -58,12 +59,6 @@ const MealPlan = () => {
     fetchMealPlan();
   }, []);
 
-  // ✅ parse "₦15,000" → 15000
-  const parseNaira = (str) => {
-    if (!str) return 0;
-    return parseInt(String(str).replace(/[₦,]/g, ""), 10) || 0;
-  };
-
   const statRows = [
     {
       label: "WEEKLY BUDGET",
@@ -73,7 +68,6 @@ const MealPlan = () => {
       highlight: true,
     },
     {
-      // ✅ added currentSpending
       label: "CURRENT SPENDING",
       value: statsLoading ? "Loading..." : (planStats?.currentSpending ?? "—"),
       highlight: false,
@@ -94,20 +88,14 @@ const MealPlan = () => {
     },
   ];
 
-  // ✅ show BudgetWarning full screen if exceeded and not dismissed
-  if (!statsLoading && showWarning && planStats?.exceeded) {
+  // ✅ if budget exceeded, lock the user into the warning screen —
+  // no banner, no dismiss, only path forward is adjusting their budget
+  if (!statsLoading && planStats?.exceeded) {
     return (
       <BudgetWarning
-        plan={{
-          name: "Weekly Meal Plan",
-          cost: parseNaira(planStats.currentSpending),
-          meals: planStats.totalMeals ?? 0,
-          days: 7,
-        }}
         budget={{
           limit: parseNaira(planStats.weeklyBudget),
         }}
-        onContinue={() => setShowWarning(false)}
       />
     );
   }
@@ -125,29 +113,8 @@ const MealPlan = () => {
           </p>
         </header>
 
-        {/* ✅ subtle warning banner if exceeded but user dismissed full screen */}
-        {planStats?.exceeded && !showWarning && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
-            <p className="text-sm font-bold text-red-700">
-              ⚠️ This plan exceeds your budget by ₦
-              {Math.max(
-                0,
-                parseNaira(planStats.currentSpending) -
-                  parseNaira(planStats.weeklyBudget),
-              ).toLocaleString()}
-            </p>
-            <button
-              onClick={() => setShowWarning(true)}
-              className="text-xs font-bold text-red-600 underline whitespace-nowrap"
-            >
-              View details
-            </button>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-12">
           <div className="flex flex-col gap-6">
-            {/* Weekly Budget Card */}
             <div className="bg-white rounded-4xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
               <h2 className="text-2xl font-display font-bold mb-3">
                 Your Weekly Budget
@@ -197,7 +164,6 @@ const MealPlan = () => {
               </div>
             </div>
 
-            {/* Shopping List Card */}
             <div className="bg-white/50 border-2 border-dashed border-[#2d4a1e]/20 rounded-4xl p-4 text-center flex flex-col items-center">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm text-accent-orange">
                 <ShoppingCartIcon className="w-7 h-7" />

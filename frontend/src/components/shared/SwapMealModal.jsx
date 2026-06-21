@@ -20,7 +20,6 @@ export default function SwapMealModal({
     const fetchMeals = async () => {
       try {
         setLoadingMeals(true);
-        // ✅ getAllMeals → GET /meals/?limit=200
         const res = await planService.getAllMeals();
         const mealsArray = res.data?.meals || [];
         setAvailableMeals(mealsArray);
@@ -40,7 +39,7 @@ export default function SwapMealModal({
         m.category.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
-  const handleConfirmSwap = async (mealId, mealPrice) => {
+  const handleConfirmSwap = async (mealId) => {
     try {
       setIsSwapping(true);
       const res = await planService.updateTimetableItem(swapItem.id, mealId);
@@ -52,13 +51,8 @@ export default function SwapMealModal({
       const isBudgetError = err?.message?.toLowerCase().includes("budget");
       if (isBudgetError && onBudgetExceeded) {
         onClose();
-        onBudgetExceeded({
-          newCost: mealPrice || 0,
-          budgetLimit: parseInt(
-            JSON.parse(localStorage.getItem("buffered_budget") || "{}")
-              ?.amount || 0,
-          ),
-        });
+        // ✅ pass the backend's exact, accurate message — no fabricated numbers
+        onBudgetExceeded(err.message);
       } else {
         alert(err.message || "Failed to swap meal. Please try again.");
       }
@@ -90,13 +84,8 @@ export default function SwapMealModal({
       const isBudgetError = err?.message?.toLowerCase().includes("budget");
       if (isBudgetError && onBudgetExceeded) {
         onClose();
-        onBudgetExceeded({
-          newCost: Number(customMealPrice) || 0,
-          budgetLimit: parseInt(
-            JSON.parse(localStorage.getItem("buffered_budget") || "{}")
-              ?.amount || 0,
-          ),
-        });
+        // ✅ pass the backend's exact, accurate message — no fabricated numbers
+        onBudgetExceeded(err.message);
       } else {
         alert(err.message || "Failed to add custom meal");
       }
@@ -213,10 +202,7 @@ export default function SwapMealModal({
                   {filteredAvailableMeals.map((m) => (
                     <div
                       key={m.id}
-                      onClick={() =>
-                        !isSwapping &&
-                        handleConfirmSwap(m.id, Number(m.price_min))
-                      }
+                      onClick={() => !isSwapping && handleConfirmSwap(m.id)}
                       className={`flex items-center justify-between p-3 rounded-xl border ${
                         swapItem.mealId === m.id || swapItem.id === m.id
                           ? "border-accent-orange bg-accent-orange/5"

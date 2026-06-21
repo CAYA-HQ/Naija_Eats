@@ -7,8 +7,13 @@ import {
   MonthlyIcon,
   ProInsightIcon,
   CircleAlertIcon,
+  WarningIcon,
 } from "../../constants/icons";
 import { preferencesService } from "../../services/preferences.api";
+
+// ✅ minimum realistic weekly budget — matches the "Low" tier floor
+const MIN_WEEKLY_BUDGET = 15000;
+const MIN_MONTHLY_BUDGET = 60000;
 
 const SetBudget = () => {
   const navigate = useNavigate();
@@ -66,6 +71,12 @@ const SetBudget = () => {
   const tiers = ["Low", "Standard", "Premium"];
   const bufferOptions = ["10%", "15%", "20%", "Custom"];
 
+  // ✅ check if entered amount is below realistic minimum for the chosen frequency
+  const numericBudget = parseInt(budgetData.budgetValue, 10) || 0;
+  const minThreshold =
+    frequency === "Weekly" ? MIN_WEEKLY_BUDGET : MIN_MONTHLY_BUDGET;
+  const isBudgetTooLow = numericBudget > 0 && numericBudget < minThreshold;
+
   const getBudgetPayload = () => ({
     budgetTier,
     budgetValue: budgetData.budgetValue,
@@ -104,6 +115,14 @@ const SetBudget = () => {
       return;
     }
 
+    // ✅ warn but allow proceeding — backend will still try cheap meals first,
+    // and the Low Budget screen will show after onboarding if it's still not enough
+    if (isBudgetTooLow) {
+      toast.warning(
+        "Your budget is below the recommended minimum. We'll try our best, but your plan may not cover a full week.",
+      );
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -140,7 +159,11 @@ const SetBudget = () => {
       onNext={handleBudgetSubmit}
       nextButtonDisabled={isSubmitting}
       nextLabel={
-        frequency === "Monthly" ? "See What's Coming" : "Set Frequency"
+        frequency === "Monthly"
+          ? "See What's Coming"
+          : isBudgetTooLow
+            ? "Continue Anyway"
+            : "Set Frequency"
       }
     >
       <h1 className="text-subheading tracking-tight font-bold leading-tight mb-2">
@@ -203,6 +226,21 @@ const SetBudget = () => {
           ₦
         </span>
       </div>
+
+      {/* ✅ low budget inline notice */}
+      {isBudgetTooLow && frequency === "Weekly" && (
+        <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-3 mb-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <WarningIcon className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-800 leading-relaxed">
+            <span className="font-bold">
+              This budget is quite low for a full week.
+            </span>{" "}
+            Most weekly plans need at least ₦
+            {MIN_WEEKLY_BUDGET.toLocaleString()}. You can still continue — we'll
+            pick the most affordable meals we can find.
+          </p>
+        </div>
+      )}
 
       <div className="flex items-center gap-4 mb-2">
         {tiers.map((tier) => (
