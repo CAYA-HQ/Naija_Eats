@@ -274,7 +274,7 @@ const MealDetail = () => {
         <img
           src={meal.image}
           alt={meal.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
         <div className="absolute bg-linear-to-b inset-0 from-transparent via-transparent to-white/50"></div>
         <div className="absolute top-4 left-4">
