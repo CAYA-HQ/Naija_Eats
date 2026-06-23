@@ -1,53 +1,30 @@
-// import transporter from "../config/mail";
 import emailjs from "@emailjs/nodejs";
 
-console.log('EmailJS config check:', {
-  serviceId: process.env.EMAILJS_SERVICE_ID ? 'SET' : 'MISSING',
-  templateId: process.env.EMAILJS_TEMPLATE_ID ? 'SET' : 'MISSING',
-  publicKey: process.env.EMAILJS_PUBLIC_KEY ? 'SET' : 'MISSING',
-});
+const SERVICE_ID = "service_t4xoffb";
+const TEMPLATE_ID_RESET = "template_ysohwva";
+const TEMPLATE_ID_VERIFY = "template_867634j";
 
-const FROM_EMAIL =
-  process.env.EMAIL_FROM || "Naija Eats <naija-eats@no-reply.com>";
-
-// Initialize EmailJS
-emailjs.init({
-  publicKey: process.env.EMAILJS_PUBLIC_KEY!,
-  privateKey: process.env.EMAILJS_PRIVATE_KEY!,
-});
-
-const EMAILJS_SERVICE_ID = "service_t4xoffb";
-const EMAILJS_TEMPLATE_ID_RESET = "template_ysohwva";
-const EMAILJS_TEMPLATE_ID_VERIFY = "template_867634j";
+let inited = false;
+function initEmailJS() {
+  if (inited) return;
+  emailjs.init({
+    publicKey: process.env.EMAILJS_PUBLIC_KEY!,
+    privateKey: process.env.EMAILJS_PRIVATE_KEY!,
+  });
+  inited = true;
+}
 
 export const sendVerificationEmail = async (email: string, token: string) => {
   const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
   const verificationUrl = `${backendUrl}/auth/verify-email/${token}`;
 
   try {
-    /*
-    // Old Nodemailer implementation
-    const info = await transporter.sendMail({
-      from: FROM_EMAIL,
-      to: email,
-      subject: "Verify your email address",
-      html: `
-        <h1>Welcome to Naija Eats!</h1>
-        <p>Please verify your email address by clicking the link below:</p>
-        <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
-        <p>This link will expire in 24 hours.</p>
-        <p>If you didn't create an account, you can safely ignore this email.</p>
-      `,
-    });
-    return { success: true, data: info };
-    */
-
-    // New EmailJS implementation
+    initEmailJS();
     const response = await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID_VERIFY,
+      SERVICE_ID,
+      TEMPLATE_ID_VERIFY,
       {
-        email: email,
+        email,
         url: verificationUrl,
         from_name: "Naija Eats",
       },
@@ -65,29 +42,12 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
   const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
 
   try {
-    /*
-    // Old Nodemailer implementation
-    const info = await transporter.sendMail({
-      from: FROM_EMAIL,
-      to: email,
-      subject: "Reset your password",
-      html: `
-        <h1>Password Reset Request</h1>
-        <p>You requested to reset your password. Click the link below to set a new one:</p>
-        <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
-        <p>This link will expire in 1 hour.</p>
-        <p>If you didn't request a password reset, you can safely ignore this email.</p>
-      `,
-    });
-    return { success: true, data: info };
-    */
-
-    // New EmailJS implementation
+    initEmailJS();
     const response = await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID_RESET,
+      SERVICE_ID,
+      TEMPLATE_ID_RESET,
       {
-        email: email,
+        email,
         url: resetUrl,
         from_name: "Naija Eats",
       },

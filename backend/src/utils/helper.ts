@@ -22,7 +22,7 @@ export const _res = {
   success: (
     code: number,
     res: Response,
-    message: String,
+    message: string,
     data?: any
   ) => res.status(code).json({
       success: true,
