@@ -27,7 +27,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.get("/health", (req: Request, res: Response) => {
+app.get("/health", (_: Request, res: Response) => {
   res.status(200).json({ status: "OK", message: "Server is healthy" });
 });
 
@@ -39,7 +39,7 @@ app.use("/profile", authMiddleware, profileRoutes);
 app.use("/admin", authMiddleware, adminMiddleware, adminRoutes);
 
 // Catch-all 404 handler
-app.use((req, res) => {
+app.use((_, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
 

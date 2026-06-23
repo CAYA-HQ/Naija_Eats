@@ -1,0 +1,9 @@
+process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
+process.env.JWT_SECRET = "test-secret";
+process.env.CLOUDINARY_CLOUD_NAME = "test";
+process.env.CLOUDINARY_API_KEY = "test";
+process.env.CLOUDINARY_API_SECRET = "test";
+process.env.EMAILJS_PUBLIC_KEY = "test";
+process.env.EMAILJS_PRIVATE_KEY = "test";
+process.env.FRONTEND_URL = "http://localhost:5173";
+process.env.BACKEND_URL = "http://localhost:3000";
