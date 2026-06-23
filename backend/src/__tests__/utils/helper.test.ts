@@ -19,19 +19,13 @@ describe("safeParseInstructions", () => {
     expect(safeParseInstructions("")).toBeNull();
   });
 
-  it("returns null for non-array JSON (object)", () => {
+  it("returns null for non-array JSON (object, primitive, number)", () => {
     expect(safeParseInstructions('{"key": "value"}')).toBeNull();
+    expect(safeParseInstructions('"string"')).toBeNull();
+    expect(safeParseInstructions("42")).toBeNull();
   });
 
   it("returns null for malformed JSON", () => {
     expect(safeParseInstructions("not json")).toBeNull();
-  });
-
-  it("returns null for JSON primitive", () => {
-    expect(safeParseInstructions('"string"')).toBeNull();
-  });
-
-  it("returns null for JSON number", () => {
-    expect(safeParseInstructions("42")).toBeNull();
   });
 });
