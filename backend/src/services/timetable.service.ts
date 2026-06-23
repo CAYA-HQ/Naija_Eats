@@ -1,11 +1,7 @@
 import { prisma } from "../config/prisma";
-import { PrismaClient } from "@prisma/client";
 import { safeParseInstructions } from "../utils/helper";
 
-type PrismaTx = Omit<
-  PrismaClient,
-  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
->;
+type PrismaTx = typeof prisma;
 
 interface FilterOptions {
   cuisine?: string;
