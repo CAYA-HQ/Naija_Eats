@@ -2,13 +2,12 @@ import { prisma } from "../config/prisma";
 
 export const calculateBudgetTier = (amount: number, frequency: string): string => {
   if (frequency === "Weekly") {
-    if (amount < 7000) return "Low";
-    if (amount < 10000) return "Standard";
+    if (amount < 25000) return "Low";
+    if (amount < 45000) return "Standard";
     return "Premium";
   } else {
-    // Monthly or other
-    if (amount < 30000) return "Low";
-    if (amount < 70000) return "Standard";
+    if (amount < 100000) return "Low";
+    if (amount < 180000) return "Standard";
     return "Premium";
   }
 };
