@@ -20,12 +20,13 @@ import EditProfile from "./pages/EditProfile";
 import MealDetail from "./pages/MealDetail";
 import SplashScreen from "./pages/onboarding/SplashScreen";
 import { BudgetAlertProvider } from "./context/BudgetAlertProvider";
+import { FavoritesProvider } from "./context/FavoritesContext";
 
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ComingSoon from "./pages/ComingSoon";
-
+import Favorites from "./pages/Favorites";
 import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import OnboardingLayout from "./components/layout/OnboardingLayout";
@@ -45,7 +46,8 @@ function App() {
   }
 
   return (
-    <BudgetAlertProvider>
+    <FavoritesProvider>
+      <BudgetAlertProvider>
       <Toaster position="top-right" richColors closeButton />
       <Routes>
         <Route
@@ -57,6 +59,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/market" element={<Market />} />
             <Route path="/menu-page" element={<MenuPage />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/weekly-plan" element={<WeeklyPlan />} />
             <Route path="/meal/:id" element={<MealDetail />} />
@@ -94,6 +97,7 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
       </Routes>
     </BudgetAlertProvider>
+    </FavoritesProvider>
   );
 }
 

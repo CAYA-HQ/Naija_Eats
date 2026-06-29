@@ -5,9 +5,11 @@ import {
   ShoppingCartIcon,
   UserIcon,
 } from "../../constants/icons";
+import { useFavorites } from "../../context/FavoritesContext";
 
 const BottomTabBar = () => {
   const location = useLocation();
+  const { hasUnseenFavorites } = useFavorites();
 
   const tabs = [
     { label: "Home", icon: HomeIcon, path: "/" },
@@ -26,11 +28,16 @@ const BottomTabBar = () => {
           <Link
             key={tab.path}
             to={tab.path}
-            className={`flex flex-col items-center gap-1 transition-all ${
+            className={`flex flex-col items-center gap-1 transition-all relative ${
               isActive ? "text-accent-orange" : "opacity-30 hover:opacity-100"
             }`}
           >
-            <Icon className="w-5 h-5" />
+            <div className="relative">
+              <Icon className="w-5 h-5" />
+              {tab.label === "You" && hasUnseenFavorites && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+              )}
+            </div>
             <span className="text-[10px] font-bold uppercase tracking-widest">
               {tab.label}
             </span>

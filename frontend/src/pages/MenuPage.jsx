@@ -15,6 +15,7 @@ import {
   SOUP_KEYWORDS,
   RICE_KEYWORDS,
 } from "../constants/menuCategories";
+import { useFavorites } from "../context/FavoritesContext";
 
 function getCategoryLabel(meal) {
   const name = meal.name.toLowerCase().trim();
@@ -68,6 +69,7 @@ const MenuPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedValue(value), 300);
@@ -226,9 +228,18 @@ const MenuPage = () => {
                   </span>
                 </div>
                 {/* heart */}
-                <div className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md cursor-pointer hover:scale-110 transition-transform">
-                  <MealCardHeartIcon className="text-accent-orange" />
-                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(meal);
+                  }}
+                  className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md cursor-pointer hover:scale-110 transition-transform"
+                >
+                  <MealCardHeartIcon 
+                    className="text-accent-orange" 
+                    filled={isFavorite(meal.id)} 
+                  />
+                </button>
                 {/* duration */}
                 <div className="absolute bottom-4 left-4 bg-text-primary/40 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/20">
                   <ClockIcon className="text-white" />

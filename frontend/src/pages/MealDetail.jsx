@@ -9,6 +9,7 @@ import {
 } from "../constants/icons";
 import { MEAL_DETAILS } from "../constants/mealDetails";
 import MealDetailsTabs from "../components/ui/mealDetailsTabs";
+import { useFavorites } from "../context/FavoritesContext";
 {
   /* ✅ uncommented */
 }
@@ -74,6 +75,7 @@ const MealDetail = () => {
   const navigate = useNavigate();
   const [mealData, setMealData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     const fetchMeal = async () => {
@@ -274,7 +276,7 @@ const MealDetail = () => {
         <img
           src={meal.image}
           alt={meal.name}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover"
         />
         <div className="absolute bg-linear-to-b inset-0 from-transparent via-transparent to-white/50"></div>
         <div className="absolute top-4 left-4">
@@ -300,8 +302,11 @@ const MealDetail = () => {
                 {meal.name}
               </h1>
             </div>
-            <button className="text-accent-orange hover:scale-110 transition-transform">
-              <HeartIcon className="w-6 h-6 fill-current" />
+            <button 
+              onClick={() => toggleFavorite(meal)}
+              className="text-accent-orange hover:scale-110 transition-transform cursor-pointer"
+            >
+              <HeartIcon className="w-6 h-6 text-accent-orange" filled={isFavorite(meal.id)} />
             </button>
           </div>
 

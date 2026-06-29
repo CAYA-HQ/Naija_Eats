@@ -8,6 +8,7 @@ import {
   UserIcon,
 } from "../../constants/icons";
 import { authService } from "../../services/auth.api";
+import { useFavorites } from "../../context/FavoritesContext";
 
 const getInitials = (name, email) => {
   if (name && name.trim()) {
@@ -27,6 +28,7 @@ const Sidebar = ({ isExpanded }) => {
   const location = useLocation();
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const { hasUnseenFavorites } = useFavorites();
 
   // load from localStorage first
   useEffect(() => {
@@ -109,7 +111,7 @@ const Sidebar = ({ isExpanded }) => {
                   : "text-text-muted hover:bg-text-muted/5 hover:text-text-primary"
               }`}
             >
-              <div className="shrink-0">
+              <div className="shrink-0 relative">
                 <Icon
                   className={`w-6 h-6 ${
                     isActive
@@ -117,6 +119,9 @@ const Sidebar = ({ isExpanded }) => {
                       : "text-text-muted group-hover:text-text-primary"
                   }`}
                 />
+                {item.label === "Profile" && hasUnseenFavorites && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-bg-background" />
+                )}
               </div>
               <span
                 className={`text-sm font-bold whitespace-nowrap transition-opacity duration-300 ${
