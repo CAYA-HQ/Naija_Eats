@@ -18,7 +18,7 @@ const SLOT_ICONS = {
 
 // ✅ no more hardcoded map — just use DB image_url
 // generic fallback only when DB has no image yet
-export function getMealImage(mealName) {
+export function getMealImage() {
   return "/images/dish.webp";
 }
 

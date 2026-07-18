@@ -6,6 +6,9 @@ import {
   GenerateIcon,
   BasketIcon,
   StarIcon,
+  MorningIcon,
+  AfternoonIcon,
+  EveningIcon,
 } from "../constants/icons";
 import transformTimetable from "../constants/weekPlan";
 import { planService } from "../services/plan.api";
@@ -16,9 +19,9 @@ import EmptyState from "./EmptyState";
 const SLOT_ORDER = ["Breakfast", "Lunch", "Dinner"];
 
 const SLOT_META = {
-  Breakfast: { emoji: "🌅", label: "Breakfast" },
-  Lunch: { emoji: "☀️", label: "Lunch" },
-  Dinner: { emoji: "🌙", label: "Dinner" },
+  Breakfast: { emoji: <MorningIcon className="w-4 h-4" />, label: "Breakfast" },
+  Lunch: { emoji: <AfternoonIcon className="w-4 h-4" />, label: "Lunch" },
+  Dinner: { emoji: <EveningIcon className="w-4 h-4" />, label: "Dinner" },
 };
 
 function getTodayName() {
